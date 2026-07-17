@@ -49,7 +49,11 @@ damped velocity model and taking the size from the last reliable history frame.
 ## Local validation
 Validation uses a category stratified split of the training clips and the exact Macro Calibrated
 Forecast Score, reconstructing the full pipeline (detector, refinement, classifier, forecast) on the
-held out clips. [FINAL: macro MCFS ~ TBD; per category TBD.]
+held out clips. Held out macro MCFS is about 0.19 (uav 0.35, people 0.25, cat 0.17, car near 0 on
+the small held out car sample). Refinement lifts the history frame hit rate (IoU at least 0.5) from
+about 0.30 (raw network box) to about 0.52. Coarse center accuracy within 30 px is about 0.66 (uav
+0.96, cat 0.60, people 0.40, car 0.38). The whole pipeline (data loading, training, inference) runs
+end to end in about 15 minutes on a 16 core Xeon, well inside the 1.5 hour budget.
 
 ## What worked / what did not
 Worked: the difference of Gaussians channel, grid classification for the center, local refinement

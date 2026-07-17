@@ -24,6 +24,14 @@
 - => Classification is in good shape given decent boxes; will calibrate probs (isotonic/temperature) for Brier. Detection is THE gate.
 - MCFS math: with cls~0.88 and mean IoU|hit~0.68, need ~67% IoU>=0.5 rate per category for MCFS 0.4. High bar -> detection quality is everything.
 
+## RESULTS (honest best)
+- Final pipeline: coarse center CNN (grid-CE, 12ch red/blue/DoG x t0-3, balanced sampling) -> local DoG-CC refinement (fixes size) -> geo+appearance HistGBM classifier -> damp0.3 forecast.
+- Local held-out macro-MCFS ~0.19 (single detector). Per-cat: uav 0.35, people 0.25, cat 0.17, car ~0 (car high-variance on ~18 val clips).
+- coarse cen@30=0.66 (uav .96 cat .60 ppl .40 car .38); refined t0-3 hit 0.52; t4 hit 0.36.
+- Full solution runs end-to-end in ~15 min on Box2 (Xeon parity). Valid submission produced.
+- Ensemble (multi-seed) test in progress as the last lever.
+- HONEST ASSESSMENT: 0.4 target not achievable with honest methods here in budget. Detection of wide/cluttered objects (car, cat) in camera-motion noise to IoU>=0.5 is the hard ceiling; would need ~2x detection quality. Delivering best honest result (~0.19-0.25) and being transparent.
+
 ## Goal: MCFS 0.4+ (orig)
 
 ## Progress log
