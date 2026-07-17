@@ -13,7 +13,7 @@ import pandas as pd
 from sklearn.ensemble import HistGradientBoostingClassifier
 from art_common import pool_lots, pair_features, pool_context, group_pool, mask_pool
 
-THRESHOLD = 0.28   # merge clusters while average same-sale prob exceeds this (test-faithful CV)
+THRESHOLD = 0.30   # merge clusters while average same-sale prob exceeds this (test-faithful CV peak)
 AUGMENT = 2        # masked copies per train pool (robustness to the test's lower field coverage)
 # test/train coverage ratios -> keep-probabilities that map train coverage down to test
 KEEP = dict(seller_keep=0.605 / 0.688, price_keep=0.352 / 0.497, nat_keep=0.640 / 0.719)
