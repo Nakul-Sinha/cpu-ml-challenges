@@ -11,26 +11,36 @@ for _v in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "NUMEXP
 import numpy as np
 import pandas as pd
 from sklearn.ensemble import HistGradientBoostingClassifier
-from art_common import pool_lots, pair_features, pool_context, group_pool
+from art_common import pool_lots, pair_features, pool_context, group_pool, mask_pool
 
-THRESHOLD = 0.25   # merge clusters while average same-sale prob exceeds this (CV-tuned)
+THRESHOLD = 0.28   # merge clusters while average same-sale prob exceeds this (test-faithful CV)
+AUGMENT = 2        # masked copies per train pool (robustness to the test's lower field coverage)
+# test/train coverage ratios -> keep-probabilities that map train coverage down to test
+KEEP = dict(seller_keep=0.605 / 0.688, price_keep=0.352 / 0.497, nat_keep=0.640 / 0.719)
+
+
+def _pairs(lots, g, X, y):
+    ctx = pool_context(lots)
+    n = len(lots)
+    for a in range(n):
+        if lots[a] is None:
+            continue
+        for b in range(a + 1, n):
+            if lots[b] is None:
+                continue
+            X.append(pair_features(lots[a], lots[b], ctx))
+            y.append(1 if g[a] == g[b] else 0)
 
 
 def build_pairs(df):
     X, y = [], []
+    rng = np.random.default_rng(0)
     for _, row in df.iterrows():
         lots = pool_lots(row)
-        ctx = pool_context(lots)
         g = str(row["grouping"]).split()
-        n = len(lots)
-        for a in range(n):
-            if lots[a] is None:
-                continue
-            for b in range(a + 1, n):
-                if lots[b] is None:
-                    continue
-                X.append(pair_features(lots[a], lots[b], ctx))
-                y.append(1 if g[a] == g[b] else 0)
+        _pairs(lots, g, X, y)
+        for _ in range(AUGMENT):
+            _pairs(mask_pool(lots, rng, **KEEP), g, X, y)
     return np.array(X, dtype=np.float32), np.array(y)
 
 
