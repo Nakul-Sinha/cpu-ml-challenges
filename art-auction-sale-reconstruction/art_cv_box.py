@@ -96,6 +96,10 @@ def main():
     print(f"[augment={args.augment}] test-faithful CV (masked val):")
     for t in thresholds:
         print(f"  threshold={t:.2f}  mean ARI = {np.mean(agg[t]):.4f}  (n={len(agg[t])})")
+    # per-pool oracle-threshold ceiling: best of the tested thresholds for each pool
+    mat = np.array([agg[t] for t in thresholds])       # (n_thresh, n_pools)
+    print(f"  [oracle per-pool threshold] mean ARI = {mat.max(axis=0).mean():.4f} "
+          f"(upper bound of the threshold approach)")
     print(f"  time={time.time()-t0:.0f}s")
 
 
