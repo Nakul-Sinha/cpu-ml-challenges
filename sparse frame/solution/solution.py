@@ -140,13 +140,15 @@ def train_detector(X, cen, siz, cls, outW, outH, log=print):
     def lr_at(ep):
         if ep < WARMUP: return (ep+1)/WARMUP
         p = (ep-WARMUP)/max(1, MAX_EPOCHS-WARMUP); return 0.5*(1+np.cos(np.pi*p))
+    # class-balanced sampling (macro metric weights the 4 categories equally)
+    counts = np.bincount(cls, minlength=4); sw = 1.0/np.maximum(counts[cls], 1); sw = sw/sw.sum()
     best_state = {k: v.clone() for k, v in net.state_dict().items()}
     t_start = time.time()
     for ep in range(MAX_EPOCHS):
         for g in opt.param_groups: g["lr"] = LR*lr_at(ep)
-        net.train(); rng.shuffle(idx); t0 = time.time()
+        net.train(); order = rng.choice(idx, size=N, replace=True, p=sw); t0 = time.time()
         for b in range(0, N, BS):
-            bi = idx[b:b+BS]
+            bi = order[b:b+BS]
             xb = np.empty((len(bi), 12, outH, outW), np.float32)
             cb = np.empty((len(bi), 5, 2), np.float32); sb = np.empty((len(bi), 5, 2), np.float32)
             for k, i in enumerate(bi):
