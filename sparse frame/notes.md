@@ -23,6 +23,12 @@
 - proto_cnn.py (soft-argmax localization): localization would not train (weak heatmap peaks). Abandoned.
 - proto2.py (grid cell-classification detector, softmax-CE over stride-4 grid, single positive cell/frame; heads for t0-t4 heatmap+offset+size+class): localization trains. At ep6 detIoU(t0-3)=0.26 and climbing, clsAcc 0.65. t4 via track extrapolation (lin2/linfit) blended with direct t4 head; blend/strategy tuned on val each eval. Full 70-epoch run in progress.
 - Runtime note: ~67s/epoch at 320x180 on 10 threads; will need speedups (lower res / fewer epochs) to fit grader 1.5h with margin once converged.
+- proto2 (320x180, 8ch, 5-heatmap incl t4): converged slowly, detIoU(t0-3) 0.19->0.28 by ep15, t4 hit 16%. Low ceiling. Killed.
+
+## Strategic insights (from GT-overlay inspection)
+- Many clips (esp cat) have heavy camera-motion background: object is barely separable even to a human. Detection is fundamentally hard on these -> bounds IoU>=0.5 rate. Wins come from the cleaner clips (uav-vs-sky, cleaner subset of others) + strong calibrated classification.
+- Localization is the IoU>=0.5 GATE: cls (Brier) only counts when loc>=0.5, so maximizing IoU>=0.5 rate is everything.
+- Plan: (1) best possible detector on t0-3 (proto3: residual backbone + DoG channel that suppresses uniform bg and highlights compact object blobs; focus capacity on visible-frame detection; t4 by track extrapolation). (2) DECOUPLE classification into a dedicated classifier on box geometry (uav tiny / people tall / car wide / cat medium = very discriminative) + appearance features; expect >0.59 clsAcc (CNN joint head underperformed). (3) calibrate probs (temperature) for Brier. (4) ensemble seeds / TTA to lift IoU>=0.5 rate.
 
 ## Approaches to try (compare on local val, macro-MCFS aligned)
 - A (classical): density-based cluster detection per frame (parse red/blue dots, robust to camera-motion noise) + trajectory extrapolation -> t4 box; geometry+appearance classifier (sklearn).

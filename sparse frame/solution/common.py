@@ -45,6 +45,24 @@ def load_clip_input(img_dir, clip, outW, outH, nframes=4):
         chans.append(frame_channels(img, outW, outH))
     return np.concatenate(chans, 0)
 
+def frame_channels3(img, outW, outH, dog_sigma=5.0):
+    """(3,outH,outW): red density, blue density, DoG (relu(comb - blur(comb))).
+    DoG highlights compact dense blobs (objects) and suppresses uniform camera-motion background."""
+    red, blue = masks(img)
+    red_d = cv2.resize(red, (outW, outH), interpolation=cv2.INTER_AREA)
+    blue_d = cv2.resize(blue, (outW, outH), interpolation=cv2.INTER_AREA)
+    comb = red_d + blue_d
+    blur = cv2.GaussianBlur(comb, (0, 0), dog_sigma)
+    dog = np.clip(comb - blur, 0, None)
+    return np.stack([red_d, blue_d, dog], 0)
+
+def load_clip_input3(img_dir, clip, outW, outH, nframes=4):
+    chans = []
+    for t in range(nframes):
+        img = np.asarray(Image.open(os.path.join(img_dir, clip, f"t{t}.png")).convert("RGB"))
+        chans.append(frame_channels3(img, outW, outH))
+    return np.concatenate(chans, 0)  # (3*nframes, outH, outW)
+
 def iou_xywh(a, b):
     ax, ay, aw, ah = a; bx, by, bw, bh = b
     x1 = max(ax, bx); y1 = max(ay, by); x2 = min(ax+aw, bx+bw); y2 = min(ay+ah, by+bh)
