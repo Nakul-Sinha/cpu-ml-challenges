@@ -18,6 +18,14 @@
 
 ## Goal: MCFS 0.4+
 
+## Classification (SOLVED-ish, given boxes)
+- GT-box geometry only: clsAcc 0.792, cls-reward(macro) 0.800 (uav .93, people .85, car .67, cat .68).
+- GT-box geometry + APPEARANCE (blob fill/polarity/solidity/vspread inside box from raw masks): clsAcc 0.867, cls-reward 0.884 (uav 1.00, people .90, cat .81, car .67). Car remains weakest (confused with cat).
+- => Classification is in good shape given decent boxes; will calibrate probs (isotonic/temperature) for Brier. Detection is THE gate.
+- MCFS math: with cls~0.88 and mean IoU|hit~0.68, need ~67% IoU>=0.5 rate per category for MCFS 0.4. High bar -> detection quality is everything.
+
+## Goal: MCFS 0.4+ (orig)
+
 ## Progress log
 - Classical single-frame detection (density/erode/coherence) all stuck at ~22% IoU>=0.5; camera-motion background dominates. Detection needs to be learned + multi-frame.
 - proto_cnn.py (soft-argmax localization): localization would not train (weak heatmap peaks). Abandoned.
