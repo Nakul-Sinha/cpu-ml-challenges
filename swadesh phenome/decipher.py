@@ -103,7 +103,8 @@ def align_pairs(x_ids, y_ids, S, gap):
 class Decipherer:
     def __init__(self, gap=-6.0, pmi_k=0.5, beta=1.5, tau=8.0, n_iter=14,
                  lensim_pow=2.0, rel_pow=1.0, seg_min_langs=2, align_scale=0.5,
-                 aff_keep=0.15, damp=0.5, freq_prior=0.5, use_nonuralic=False, verbose=False):
+                 aff_keep=0.15, damp=0.5, freq_prior=0.5, cog_floor=1.0,
+                 use_nonuralic=False, verbose=False):
         self.gap = gap            # gap penalty in the monotonic alignment (strong = near-diagonal)
         self.pmi_k = pmi_k        # additive smoothing in the PMI estimate
         self.beta = beta          # strength of frequency-rank init affinity
@@ -116,6 +117,7 @@ class Decipherer:
         self.aff_keep = aff_keep    # residual weight on rank-affinity after iter 0
         self.damp = damp            # EM damping: blend new counts with previous
         self.freq_prior = freq_prior  # weight on log segment-prior in assignment (Occam: prefer common segs)
+        self.cog_floor = cog_floor  # <1 gently upweights pairs whose decoded form matches the relative
         self.use_nonuralic = use_nonuralic
         self.verbose = verbose
 
@@ -157,15 +159,19 @@ class Decipherer:
         lang_idx = {l: i for i, l in enumerate(langs)}
         concept_cribs = defaultdict(list)
         seg_prior = np.zeros(Sn) + 1.0  # additive-1 smoothing
+        segfreq = np.full((len(langs), Sn), 0.1)  # per-language segment counts (for weighted prior)
         for lang, cd in crib.items():
+            li = lang_idx[lang]
             for c, forms in cd.items():
                 for f in forms:
                     ids = [self.seg_id[s] for s in f if s in self.seg_id]
                     if ids:
-                        concept_cribs[c].append((lang_idx[lang], np.array(ids, dtype=np.int64)))
+                        concept_cribs[c].append((li, np.array(ids, dtype=np.int64)))
                         for sid in ids:
                             seg_prior[sid] += 1.0
+                            segfreq[li, sid] += 1.0
         self.seg_prior = seg_prior / seg_prior.sum()
+        self.segfreq = segfreq
 
         # ---- target words as id seqs
         tw = [(c, np.array([self.tok_id[t] for t in w], dtype=np.int64))
@@ -184,13 +190,9 @@ class Decipherer:
         # language relatedness weights (init: uniform over relatives)
         wl = np.ones(len(langs))
         S = self.beta * aff        # alignment score matrix (iter 0: rank affinity only)
-        # Occam prior: prefer common segments when PMI is ambiguous (rare marked variants
-        # like nʲː spuriously score high under PMI; the truth is usually the plain segment).
-        self.logsegprior = np.log(self.seg_prior + 1e-9)
-        prior_term = self.freq_prior * self.logsegprior[None, :] + 1e-3 * aff
-        self._prior_term = prior_term
         sigma = self._assign(S)
         Cacc = None
+        best_obj, best_sigma, best_score = -1.0, sigma.copy(), np.zeros((T, Sn))
 
         for it in range(self.n_iter):
             C = np.zeros((T, Sn))
@@ -199,11 +201,14 @@ class Decipherer:
                 if not cribs:
                     continue
                 m = len(xids)
+                xdec = [sigma[t] for t in xids] if (self.cog_floor < 1.0 and it > 0) else None
                 for li, yids in cribs:
                     n = len(yids)
                     # stable cognate confidence: closer length + closer relative = stronger.
                     lensim = 1.0 - abs(m - n) / max(m, n, 1)
                     pw = wl[li] * (lensim ** self.lensim_pow)
+                    if xdec is not None:  # gentle cognate focus: reward decoded-form match
+                        pw *= self.cog_floor + (1.0 - self.cog_floor) * seg_sim_ids(xdec, yids)
                     if pw <= 1e-6:
                         continue
                     for (t, s) in align_pairs(xids, yids, S, self.gap):
@@ -214,19 +219,50 @@ class Decipherer:
             # M-step: PMI matrix corrects for segment frequency (t/k/a dominate raw counts)
             pmi = self._pmi(Cacc)
             S = self.align_scale * pmi + self.aff_keep * self.beta * aff   # next alignment
-            sigma = self._assign(pmi + self._prior_term)     # global one-to-one map
+            # Occam prior weighted by relatedness: as wl locks onto the close relatives, prefer
+            # the segments common in THEM (the target's likely inventory), not all-Uralic.
+            ascore = pmi + self._weighted_prior(wl, aff)
+            sigma = self._assign(ascore)                      # global one-to-one map
             # relatedness: which relatives decode best -> weight their evidence up next round
             wl = self._relatedness(tw, concept_cribs, sigma, len(langs))
+            # label-free objective: how well does this sigma make target words resemble their
+            # nearest same-concept cognate?  Correlates with the true metric; used to pick the
+            # best EM iteration (the raw score drifts, this keeps the best crossing).
+            obj = self._objective(tw, concept_cribs, sigma)
+            if obj >= best_obj:
+                best_obj, best_sigma, best_score = obj, sigma.copy(), ascore.copy()
             if eval_fn is not None:
                 sd = {self.tokens[t]: self.segs[sigma[t]] for t in range(T)}
-                print(f"  iter {it:2d}: score={eval_fn(sd):.4f}", flush=True)
+                print(f"  iter {it:2d}: score={eval_fn(sd):.4f}  obj={obj:.4f}", flush=True)
 
-        # final assignment
         self.C = self._last_C
-        self.pmi = self._pmi(self.C)
-        self.sigma_id = self._assign(self.pmi + self._prior_term)
-        self.sigma = {self.tokens[t]: self.segs[self.sigma_id[t]] for t in range(T)}
+        self.best_obj = best_obj
+        self.best_score = best_score       # assignment-score matrix at the best-obj iteration
+        self.wl = wl                       # final language relatedness weights
+        self.langs_ = langs
+        self.sigma_id = best_sigma
+        self.sigma = {self.tokens[t]: self.segs[best_sigma[t]] for t in range(T)}
         return self
+
+    def top_relatives(self, k=8):
+        order = np.argsort(-self.wl)
+        return [(self.langs_[i], round(float(self.wl[i]), 3)) for i in order[:k]]
+
+    def _weighted_prior(self, wl, aff):
+        wp = wl @ self.segfreq
+        wp = wp / wp.sum()
+        return self.freq_prior * np.log(wp + 1e-9)[None, :] + 1e-3 * aff
+
+    def _objective(self, tw, concept_cribs, sigma):
+        tot, cnt = 0.0, 0
+        for c, xids in tw:
+            cribs = concept_cribs.get(c)
+            if not cribs:
+                continue
+            xdec = [sigma[t] for t in xids]
+            tot += max(seg_sim_ids(xdec, yids) for _, yids in cribs)
+            cnt += 1
+        return tot / max(cnt, 1)
 
     def _pmi(self, C):
         tot = C.sum() + 1e-9
@@ -263,6 +299,34 @@ class Decipherer:
 
     def decode(self, token_seq):
         return [self.sigma.get(t, "") for t in token_seq]
+
+
+def ensemble_decode(target_words, crib, configs):
+    """Fit several configs, z-normalise and average their best-iteration assignment-score
+    matrices, then commit to ONE global bijection. Averaging reduces variance on borderline
+    tokens (the near-neighbour confusions like ɐ-vs-ɑ). Returns (sigma dict, list of decs)."""
+    decs, scores = [], []
+    ref = None
+    for cfg in configs:
+        d = Decipherer(**cfg).fit(target_words, crib)
+        if ref is None:
+            ref = (d.tokens, d.segs)
+        assert d.tokens == ref[0] and d.segs == ref[1], "ensemble members must share universes"
+        sc = d.best_score
+        sc = (sc - sc.mean()) / (sc.std() + 1e-9)   # comparable scale across members
+        scores.append(sc)
+        decs.append(d)
+    avg = np.mean(scores, axis=0)
+    ri, ci = linear_sum_assignment(-avg)
+    T = avg.shape[0]
+    sig = np.full(T, -1, dtype=np.int64)
+    sig[ri] = ci
+    for t in range(T):
+        if sig[t] < 0:
+            sig[t] = int(np.argmax(avg[t]))
+    tokens, segs = ref
+    sigma = {tokens[t]: segs[sig[t]] for t in range(T)}
+    return sigma, decs
 
 
 # ---------------------------------------------------------------------- helpers

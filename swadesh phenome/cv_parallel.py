@@ -36,7 +36,7 @@ def _fold(args):
     dec = Decipherer(**hp).fit(target_words, crib)
     sims = [similarity(dec.decode(w), ts) for (_, w), ts in zip(target_words, truth)]
     sf = df_lang.subfamily.iloc[0]
-    return lang, sf, len(segs), float(np.mean(sims))
+    return lang, sf, len(segs), float(np.mean(sims)), float(dec.best_obj)
 
 
 def main():
@@ -50,14 +50,16 @@ def main():
                             ("beta", float, 1.5), ("tau", float, 8.0), ("lensim_pow", float, 2.0),
                             ("rel_pow", float, 1.0), ("align_scale", float, 0.5),
                             ("seg_min_langs", int, 2), ("aff_keep", float, 0.15),
-                            ("damp", float, 0.5), ("freq_prior", float, 0.5)]:
+                            ("damp", float, 0.5), ("freq_prior", float, 0.5),
+                            ("cog_floor", float, 1.0)]:
         ap.add_argument(f"--{name}", type=typ, default=dflt)
     args = ap.parse_args()
 
     hp = dict(n_iter=args.n_iter, gap=args.gap, pmi_k=args.pmi_k, beta=args.beta,
               tau=args.tau, lensim_pow=args.lensim_pow, rel_pow=args.rel_pow,
               align_scale=args.align_scale, seg_min_langs=args.seg_min_langs,
-              aff_keep=args.aff_keep, damp=args.damp, freq_prior=args.freq_prior)
+              aff_keep=args.aff_keep, damp=args.damp, freq_prior=args.freq_prior,
+              cog_floor=args.cog_floor)
 
     _init(args.data)
     folds = args.langs.split(",") if args.langs else _URALIC
@@ -67,12 +69,15 @@ def main():
         res = pool.map(_fold, tasks)
     dt = time.time() - t0
 
-    df = pd.DataFrame(res, columns=["lang", "subfam", "nseg", "score"]).sort_values("score")
+    df = pd.DataFrame(res, columns=["lang", "subfam", "nseg", "score", "obj"]).sort_values("score")
     print(f"\n[{args.tag}] HP: {hp}")
     print(df.to_string(index=False))
     saami = df[df.subfam == "Saami"]
-    print(f"\n[{args.tag}] mean_all={df.score.mean():.4f}  mean_saami={saami.score.mean():.4f}  "
-          f"median={df.score.median():.4f}  n={len(df)}  time={dt:.0f}s")
+    finnic = df[df.subfam == "Finnic"]
+    print(f"\n[{args.tag}] mean_all={df.score.mean():.4f}  mean_finnic={finnic.score.mean():.4f}  "
+          f"mean_saami={saami.score.mean():.4f}  median={df.score.median():.4f}  n={len(df)}  time={dt:.0f}s")
+    # obj->score calibration (obj is computable on the real test -> honest score estimate)
+    print(f"[{args.tag}] obj-score corr={df.obj.corr(df.score):.3f}")
 
 
 if __name__ == "__main__":
