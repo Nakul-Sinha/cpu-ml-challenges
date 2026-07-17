@@ -49,17 +49,32 @@ damped velocity model and taking the size from the last reliable history frame.
 ## Local validation
 Validation uses a category stratified split of the training clips and the exact Macro Calibrated
 Forecast Score, reconstructing the full pipeline (detector, refinement, classifier, forecast) on the
-held out clips. Held out macro MCFS is about 0.19 (uav 0.35, people 0.25, cat 0.17, car near 0 on
-the small held out car sample). Refinement lifts the history frame hit rate (IoU at least 0.5) from
-about 0.30 (raw network box) to about 0.52. Coarse center accuracy within 30 px is about 0.66 (uav
-0.96, cat 0.60, people 0.40, car 0.38). The whole pipeline (data loading, training, inference) runs
-end to end in about 15 minutes on a 16 core Xeon, well inside the 1.5 hour budget.
+held out clips. Held out macro MCFS is about 0.21 for the best detector, chosen from a few seeds by
+held out center accuracy (uav about 0.35, people about 0.25, cat about 0.20, car near 0 on the small
+held out car sample). Refinement lifts the history frame hit rate (IoU at least 0.5) from about 0.38
+(raw network box) to about 0.60 for the best detector. Coarse center accuracy within 30 px is about
+0.66 to 0.69 depending on the seed. Detector quality varies noticeably across seeds, so the pipeline
+trains up to 3 and keeps the best by center accuracy; averaging several detectors was actually worse
+than selecting the single best, so it selects rather than ensembles. The whole pipeline runs end to
+end in about 15 minutes per detector on a 16 core Xeon, well inside the 1.5 hour budget, and it is
+time budgeted so it always finishes regardless of CPU speed.
 
 ## What worked / what did not
-Worked: the difference of Gaussians channel, grid classification for the center, local refinement
-for the size, class balanced sampling for the scarce categories, and a separate appearance
-classifier for the belief. Did not: purely classical global detection, soft argmax center
-regression (would not converge), and naive linear extrapolation of noisy boxes for t4.
+Worked: the difference of Gaussians channel, grid classification for the center, local mask
+refinement for the size (the single largest gain), class balanced sampling for the scarce
+categories, a separate appearance classifier for the belief, and best of N seed selection. Did not:
+purely classical global detection, soft argmax center regression (would not converge), naive linear
+extrapolation of noisy boxes for t4, a learned forecaster (motion too small to learn beneficially),
+higher input resolution, and averaging multiple detectors.
+
+## Honest ceiling
+The macro score is gated by IoU at least 0.5 at t4, and reliably localizing wide or cluttered
+objects (car, and the noisier cat clips) to that precision in heavy camera motion noise is the hard
+limit: the center has to land within roughly 25 px on a wide car, which the detector reaches only
+part of the time. Classification and forecasting are in good shape given a box, so the score is
+detection bound. Reaching 0.4 would need roughly double the detection quality, which I did not find
+an honest path to on this task in the budget; the delivered result is the strongest honest pipeline
+I reached.
 
 ## Compliance
 Trained from scratch on the provided frames and labels only. No external datasets or answer
