@@ -19,7 +19,7 @@ from decipher import Decipherer, forms_by_lang_concept, load_train
 CONFIG = dict(
     n_iter=18, gap=-6.0, pmi_k=0.5, beta=1.5, tau=8.0, lensim_pow=2.0,
     rel_pow=3.0, align_scale=0.5, seg_min_langs=2, aff_keep=0.15,
-    damp=0.5, freq_prior=0.7, cog_floor=0.5,
+    damp=0.5, freq_prior=0.7, cog_floor=0.5, vc_weight=1.0,
 )
 
 

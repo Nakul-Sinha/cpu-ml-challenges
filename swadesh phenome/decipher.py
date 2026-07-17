@@ -62,6 +62,19 @@ def similarity(pred, true):
     return 1.0 - lev(pred, true) / m
 
 
+# ------------------------------------------------------------ phonetic class
+_VOWEL_CHARS = set("iyɨʉɯuɪʏʊeøɘɵɤoəɛœɜɞʌɔæɐaɶäɑɒ")
+_CONS_CHARS = set("pbtdʈɖcɟkgɡqɢʔmɱnɳɲŋɴʙrʀɾɽɸβfvθðszʃʒʂʐçʝxɣχʁħʕhɦɬɮʋɹɻjɰlɭʎʟwʍɥ")
+
+
+def seg_is_vowel(seg):
+    """A segment is vocalic iff it contains a vowel character and no consonant character.
+    Handles length (aː), diphthongs (ɑʊ, ei), and marks consonants incl. j/w/palatalised (sʲ)."""
+    has_v = any(c in _VOWEL_CHARS for c in seg)
+    has_c = any(c in _CONS_CHARS for c in seg)
+    return has_v and not has_c
+
+
 # ------------------------------------------------------------ monotonic alignment
 def align_pairs(x_ids, y_ids, S, gap):
     """Needleman-Wunsch on token-id seq x vs segment-id seq y using score matrix
@@ -103,7 +116,7 @@ def align_pairs(x_ids, y_ids, S, gap):
 class Decipherer:
     def __init__(self, gap=-6.0, pmi_k=0.5, beta=1.5, tau=8.0, n_iter=14,
                  lensim_pow=2.0, rel_pow=1.0, seg_min_langs=2, align_scale=0.5,
-                 aff_keep=0.15, damp=0.5, freq_prior=0.5, cog_floor=1.0,
+                 aff_keep=0.15, damp=0.5, freq_prior=0.5, cog_floor=1.0, vc_weight=0.0,
                  use_nonuralic=False, verbose=False):
         self.gap = gap            # gap penalty in the monotonic alignment (strong = near-diagonal)
         self.pmi_k = pmi_k        # additive smoothing in the PMI estimate
@@ -118,6 +131,7 @@ class Decipherer:
         self.damp = damp            # EM damping: blend new counts with previous
         self.freq_prior = freq_prior  # weight on log segment-prior in assignment (Occam: prefer common segs)
         self.cog_floor = cog_floor  # <1 gently upweights pairs whose decoded form matches the relative
+        self.vc_weight = vc_weight  # soft vowel/consonant class-consistency prior in the assignment
         self.use_nonuralic = use_nonuralic
         self.verbose = verbose
 
@@ -145,6 +159,7 @@ class Decipherer:
         self.segs = sorted(cand)
         self.seg_id = {s: i for i, s in enumerate(self.segs)}
         Sn = len(self.segs)
+        self.seg_isvowel = np.array([1.0 if seg_is_vowel(s) else 0.0 for s in self.segs])
 
         # ---- token frequencies
         tok_freq = np.zeros(T)
@@ -222,6 +237,12 @@ class Decipherer:
             # Occam prior weighted by relatedness: as wl locks onto the close relatives, prefer
             # the segments common in THEM (the target's likely inventory), not all-Uralic.
             ascore = pmi + self._weighted_prior(wl, aff)
+            if self.vc_weight > 0:
+                # soft vowel/consonant class prior: a token that aligns mostly to vowels should
+                # decode to a vowel (fixes cross-class errors like a vowel token -> /x/).
+                tot = Cacc.sum(axis=1)
+                vfrac = np.where(tot > 0, (Cacc @ self.seg_isvowel) / np.maximum(tot, 1e-9), 0.5)
+                ascore = ascore + self.vc_weight * (2 * vfrac - 1)[:, None] * (2 * self.seg_isvowel - 1)[None, :]
             sigma = self._assign(ascore)                      # global one-to-one map
             # relatedness: which relatives decode best -> weight their evidence up next round
             wl = self._relatedness(tw, concept_cribs, sigma, len(langs))
