@@ -138,14 +138,17 @@ def main():
             opt.zero_grad(); loss.backward(); opt.step(); tot += loss.item(); nb += 1
         if (ep+1) % 5 == 0 or ep == args.epochs-1:
             m = evaluate(net, X, cen, siz, cls, va, cat, clips, outW, outH, gh, gw, nf)
-            if m["macro"] > best: best = m["macro"]; best_state = {k: v.clone() for k, v in net.state_dict().items()}
+            # select best by detection IoU (the gate) rather than the weak CNN-head MCFS
+            score = m["det_iou"]
+            if score > best:
+                best = score; best_state = {k: v.clone() for k, v in net.state_dict().items()}
+                torch.save({"state": best_state, "args": vars(args)}, args.out)  # save on improvement
             dc = m["detcat"]
-            print(f"ep{ep+1:3d} loss={tot/nb:.3f} | detIoU={m['det_iou']:.3f} "
+            print(f"ep{ep+1:3d} loss={tot/nb:.3f} | detIoU={m['det_iou']:.3f} bestDet={best:.3f} "
                   f"[ppl {dc['people']:.2f} car {dc['car']:.2f} cat {dc['cat']:.2f} uav {dc['uav']:.2f}] "
-                  f"|| t4 MCFS={m['macro']:.4f} best={best:.4f} hit={m['hit']:.3f} clsAcc={m['clsacc']:.3f} "
+                  f"|| t4 MCFS(cnnhead)={m['macro']:.4f} hit={m['hit']:.3f} clsAcc={m['clsacc']:.3f} "
                   f"[{m['strat']}] ({time.time()-t0:.0f}s)", flush=True)
-    print(f"BEST valMCFS={best:.4f}")
-    if best_state: torch.save({"state": best_state, "args": vars(args)}, args.out)
+    print(f"BEST detIoU={best:.4f} (saved to {args.out})")
 
 @torch.no_grad()
 def decode(net, X, i, outW, outH, gh, gw, nf):
