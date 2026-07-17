@@ -42,7 +42,17 @@ all-one-group 0.00, all-singletons 0.00, share-consignor 0.70-0.71 (higher than 
   training). This is the honest estimate for the real test; AI baseline 0.55.
 - Seeding clusters by the artist-imputed consignor HURTS (0.60): imputation errors cause false
   merges. Kept only as a model feature.
-- Locked: masked-augment training (2 copies/pool), merge threshold 0.28.
+- Round 2: transitive artist->consignor bridge + price-same-half features raise TRAIN
+  no-consignor AUC 0.69 -> 0.74, but are NEUTRAL on the test-faithful masked CV (~0.62) because
+  they lean on consignor info the low-coverage test lacks. Kept (robust, no downside). Two-stage
+  reassignment refinement: no gain. Threshold set to faithful-CV peak 0.30.
+- **Ceiling analysis:** oracle-per-pool-threshold ARI = 0.648 (vs fixed 0.62), but the best
+  per-pool threshold is UNPREDICTABLE from pool features (all |corr| < 0.06) and a learned
+  adaptive threshold underperforms fixed. Artist tokens only 38% shared train/test (sellers 9%),
+  and per-artist memorisation would overfit. So ~0.62 is the honest realistic ceiling here; the
+  gap to the oracle-prob ceiling (0.99) is model quality on no-consignor pairs, bounded by the
+  test's low field coverage.
+- Locked: masked-augment training (2 copies/pool), merge threshold 0.30.
 
 ## Compliance
 Learned pairwise model over lot content only; no pool ids, ordering, or external data.

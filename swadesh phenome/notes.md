@@ -60,11 +60,20 @@ cog_floor 0.5, seg_min_langs 2, gap -6, align_scale 0.5, damp 0.5, n_iter 18.
 - Config selected by CV (Finnic + overall); cross-checked by maximising the real target's
   self-consistency (an unsupervised criterion), which agreed on cog_floor 0.5 and rel_pow ~2-3.
 
-## Open levers to push higher
-- Tune freq_prior / gap / align_scale / seg_min_langs / rel_pow on full CV (box sweep).
-- Multiple-relative consensus per concept (denoise alignment columns).
-- Phonetic-feature prior to merge near-identical variants and place rare tokens.
-- Pick EM iteration by an unsupervised objective (alignment mass) rather than fixed n_iter.
+## Round 2 (phonetic prior)
+- **Vowel/consonant class prior in the assignment (WIN, shipped, vc_weight=1.0):** a token that
+  aligns mostly to vowels decodes to a vowel. Eliminated all cross-class errors on ekk.
+  ekk 0.679 -> 0.721; real-target self-consistency 0.415 -> 0.424 (peak vc=1.0, deterministic in
+  the encipherment seed). After this, the remaining ekk errors are ALL same-class fine variants
+  (d̥/d, nʲ/ɲ, e/ɛ, u/ʊ, ɑː/a) -- partly transcription-convention mismatches, near the floor.
+- **Rejected after honest validation (kept for the record):**
+  - Finer phonetic-feature prior (place/manner/height/backness): hurt (ekk 0.721 -> 0.681) --
+    the features are too noisy and fight the accurate PMI. Binary V/C is the clean signal.
+  - freq_prior > 0.7: hurt (ekk 0.721 -> 0.632). seg_min_langs 1: hurt (real obj 0.424 -> 0.403,
+    too many noisy candidates); 3: noise-level. Kept freq_prior 0.7, seg_min_langs 2.
+- Final config: rel_pow 3, freq_prior 0.7, cog_floor 0.5, seg_min_langs 2, vc_weight 1.0,
+  gap -6, align_scale 0.5, damp 0.5, n_iter 18. CV mean 0.645, Finnic 0.896, ekk 0.721.
+  Estimate for the real (divergent Finnic, all 5 Finnic relatives available) ~0.70-0.75.
 
 ## Compliance
 Unsupervised; derived only from provided files. No external lookups, no hardcoded answers.
