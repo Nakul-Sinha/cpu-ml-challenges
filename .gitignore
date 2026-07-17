@@ -7,6 +7,8 @@
 !/ERIS_CPU_CHALLENGES_SKILL.md
 !/sparse frame/
 !/parser attatchment disagreement/
+!/swadesh phenome/
+!/art-auction-sale-reconstruction/
 
 # --- secrets: never commit keys (belt-and-suspenders) ---
 *.pem
