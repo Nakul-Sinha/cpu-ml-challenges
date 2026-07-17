@@ -41,7 +41,7 @@ def _pairs_from_pool(lots, g):
 
 
 def _fold(args):
-    f, thresholds, augment, seed, seed_eff = args
+    f, thresholds, augment, seed, seed_eff, refine = args
     df, fold = _DF, _FOLD
     # ---- train pairs from non-fold pools (+ optional masked augmentation)
     X, y = [], []
@@ -68,7 +68,7 @@ def _fold(args):
         row = df.iloc[i]; n = int(row["n_lots"]); tl = np.array([int(x) for x in str(row["grouping"]).split()])
         ml = mask_pool(pool_lots(row), rng, **KEEP)
         for t in thresholds:
-            lab = group_pool(ml, model, threshold=t, seed_eff=seed_eff)[:n]
+            lab = group_pool(ml, model, threshold=t, seed_eff=seed_eff, refine_iters=refine)[:n]
             out[t].append(adjusted_rand_score(tl, lab))
     return out
 
@@ -80,13 +80,15 @@ def main():
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--augment", type=int, default=0, help="masked copies per training pool")
     ap.add_argument("--seed_eff", action="store_true", help="seed clusters by artist-imputed consignor")
+    ap.add_argument("--refine", type=int, default=0, help="second-stage reassignment iterations")
     ap.add_argument("--thresholds", default="0.2,0.25,0.3,0.35")
     args = ap.parse_args()
     _init(args.data, args.folds, args.seed)
     thresholds = [float(t) for t in args.thresholds.split(",")]
     t0 = time.time()
     with Pool(min(args.folds, 8), initializer=_init, initargs=(args.data, args.folds, args.seed)) as pool:
-        res = pool.map(_fold, [(f, thresholds, args.augment, args.seed, args.seed_eff) for f in range(args.folds)])
+        res = pool.map(_fold, [(f, thresholds, args.augment, args.seed, args.seed_eff, args.refine)
+                               for f in range(args.folds)])
     agg = {t: [] for t in thresholds}
     for r in res:
         for t in thresholds:
