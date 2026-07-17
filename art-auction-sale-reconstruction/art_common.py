@@ -253,17 +253,22 @@ def prob_matrix(lots, model):
     return P, idx
 
 
-def group_pool(lots, model, threshold=0.5, min_clusters=6, seed_seller=True):
+def group_pool(lots, model, threshold=0.5, min_clusters=6, seed_seller=True, seed_eff=False):
     """Seed clusters by shared consignor (a near-deterministic same-sale cue), then greedily
     merge the two clusters with the highest average same-sale probability while that average
     exceeds `threshold` and more than `min_clusters` clusters remain. Conservative by design:
-    ARI rewards not merging different sales, so we only merge confident pairs."""
+    ARI rewards not merging different sales, so we only merge confident pairs.
+    seed_eff also seeds by the artist-imputed consignor for no-seller lots."""
     n = len(lots)
     idx = [i for i in range(n) if lots[i] is not None]
     P, _ = prob_matrix(lots, model)
+    ctx = pool_context(lots) if seed_eff else None
     clusters, seller_to = [], {}
     for i in idx:
-        s = lots[i]["seller"] if seed_seller else ""
+        if seed_eff:
+            s = eff_seller(lots[i], ctx)
+        else:
+            s = lots[i]["seller"] if seed_seller else ""
         if s:
             if s not in seller_to:
                 seller_to[s] = len(clusters); clusters.append([])
