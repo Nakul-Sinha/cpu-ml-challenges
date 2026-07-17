@@ -139,8 +139,12 @@ def main():
     thr, valmcc = best_threshold(yv, pv)
     print(f"[{time.time()-t0:.0f}s] val MCC={valmcc:.4f} at threshold={thr:.3f} (ensemble of {N_SEEDS})", flush=True)
 
-    # 2) retrain ensemble on ALL train data, predict test
-    nets = [train_one(data, len(word2i), len(char2i), pw, 100+s, EPOCHS) for s in range(N_SEEDS)]
+    # 2) final ensemble for test prediction. RETRAIN=1 retrains on ALL data (slightly better,
+    #    slower); default reuses the calibrated CV ensemble so val MCC matches the predictor exactly.
+    if int(os.environ.get("PR_RETRAIN", "0")):  # default: reuse calibrated CV ensemble (reproduces shipped submission)
+        nets = [train_one(data, len(word2i), len(char2i), pw, 100+s, EPOCHS) for s in range(N_SEEDS)]
+    else:
+        nets = nets_cv
     te_data = encode(te, word2i, char2i, False)
     tp = predict(nets, te_data)
     print(f"[{time.time()-t0:.0f}s] predicted {len(tp)} test tokens", flush=True)
