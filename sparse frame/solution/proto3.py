@@ -16,6 +16,7 @@ def parse_args():
     ap.add_argument("--bs", type=int, default=48); ap.add_argument("--lr", type=float, default=4e-3)
     ap.add_argument("--seed", type=int, default=0); ap.add_argument("--threads", type=int, default=10)
     ap.add_argument("--warmup", type=int, default=3); ap.add_argument("--out", default="/mnt/work/eris/proto3_best.pt")
+    ap.add_argument("--balance", type=int, default=1)  # class-balanced sampling (macro metric weights cats equally)
     return ap.parse_args()
 
 def build_cache(root, outW, outH, cache_dir):
@@ -129,12 +130,17 @@ def main():
         loss = Lhm*1.0 + Loff*1.0 + Lsz*3.0 + Lcls*0.7  # size downweighted; refinement provides final size
         return loss, (Lhm.item(), Loff.item(), Lsz.item(), Lcls.item())
 
+    # class-balanced sampling weights (oversample scarce car/people to match macro objective)
+    cls_tr = cls[tr]; counts = np.bincount(cls_tr, minlength=4)
+    sw = 1.0/np.maximum(counts[cls_tr], 1); sw = sw/sw.sum()
     best = -1; best_state = None
     for ep in range(args.epochs):
         for g in opt.param_groups: g["lr"] = args.lr*lr_at(ep)
-        net.train(); rng.shuffle(tr); t0 = time.time(); tot = 0; nb = 0
-        for b in range(0, len(tr), args.bs):
-            loss, parts = run_batch(tr[b:b+args.bs], True)
+        net.train(); t0 = time.time(); tot = 0; nb = 0
+        order = rng.choice(tr, size=len(tr), replace=True, p=sw) if args.balance else tr.copy()
+        if not args.balance: rng.shuffle(order)
+        for b in range(0, len(order), args.bs):
+            loss, parts = run_batch(order[b:b+args.bs], True)
             opt.zero_grad(); loss.backward(); opt.step(); tot += loss.item(); nb += 1
         if (ep+1) % 5 == 0 or ep == args.epochs-1:
             m = evaluate(net, X, cen, siz, cls, va, cat, clips, outW, outH, gh, gw, nf)
