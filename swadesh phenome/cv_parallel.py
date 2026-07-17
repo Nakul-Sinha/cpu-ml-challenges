@@ -51,7 +51,7 @@ def main():
                             ("rel_pow", float, 1.0), ("align_scale", float, 0.5),
                             ("seg_min_langs", int, 2), ("aff_keep", float, 0.15),
                             ("damp", float, 0.5), ("freq_prior", float, 0.5),
-                            ("cog_floor", float, 1.0)]:
+                            ("cog_floor", float, 1.0), ("vc_weight", float, 0.0)]:
         ap.add_argument(f"--{name}", type=typ, default=dflt)
     args = ap.parse_args()
 
@@ -59,7 +59,7 @@ def main():
               tau=args.tau, lensim_pow=args.lensim_pow, rel_pow=args.rel_pow,
               align_scale=args.align_scale, seg_min_langs=args.seg_min_langs,
               aff_keep=args.aff_keep, damp=args.damp, freq_prior=args.freq_prior,
-              cog_floor=args.cog_floor)
+              cog_floor=args.cog_floor, vc_weight=args.vc_weight)
 
     _init(args.data)
     folds = args.langs.split(",") if args.langs else _URALIC

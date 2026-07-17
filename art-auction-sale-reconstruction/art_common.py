@@ -144,9 +144,10 @@ def pool_context(lots):
     # artist -> the unique consignor it appears with (if unambiguous), for seller imputation
     artist_one_seller = {a: next(iter(s)) for a, s in artist_sellers.items() if len(s) == 1}
     prices_sorted = np.sort(prices) if prices else np.array([])
+    pmed = float(np.median(prices_sorted)) if len(prices_sorted) else np.nan
     return {"ac": ac, "nc": nc, "oc": oc, "mc": mc, "n": max(nlot, 1),
-            "seller_cov": nseller / max(nlot, 1), "prices": prices_sorted,
-            "artist_one_seller": artist_one_seller}
+            "seller_cov": nseller / max(nlot, 1), "prices": prices_sorted, "pmed": pmed,
+            "artist_one_seller": artist_one_seller, "artist_sellers": artist_sellers}
 
 
 def eff_seller(lot, ctx):
@@ -203,7 +204,7 @@ def pair_features(a, b, ctx=None):
         f.append(0.0)
     # ---- pool-context / rarity features: a shared attribute rare in the pool is stronger ----
     if ctx is None:
-        f += [0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.0, 0.0, 1.0]
+        f += [0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.0, 0.0, 1.0, 0.0, 0.5]
     else:
         n = ctx["n"]
         # rarity-weighted shared attribute = 1/count-in-pool when the pair matches, else 0
@@ -222,17 +223,32 @@ def pair_features(a, b, ctx=None):
         f.append(1.0 if (ea and eb and ea == eb) else 0.0)
         f.append(1.0 if (ea and eb and ea != eb) else 0.0)
         f.append(1.0 if (not ea or not eb) else 0.0)
+        # transitive artist->consignor bridge: a's artist co-occurs with b's consignor (or v.v.)
+        asl = ctx["artist_sellers"]
+        bridge = 0.0
+        if b["seller"] and a["artist"] in asl and b["seller"] in asl[a["artist"]]:
+            bridge = 1.0
+        if a["seller"] and b["artist"] in asl and a["seller"] in asl[b["artist"]]:
+            bridge = 1.0
+        f.append(bridge)
+        # price on the same side of the pool median (coarse same price-register signal)
+        pm = ctx["pmed"]
+        if not np.isnan(pa) and not np.isnan(pb) and not np.isnan(pm):
+            f.append(1.0 if ((pa >= pm) == (pb >= pm)) else 0.0)
+        else:
+            f.append(0.5)
     return f
 
 
-N_FEAT = 25
+N_FEAT = 27
 FEAT_NAMES = ["seller_match", "seller_mismatch", "seller_unknown", "artist_match",
               "nat_match", "nat_mismatch", "nat_unknown", "obj_match", "obj_mismatch",
               "mat_match", "mat_mismatch", "mat_unknown", "cur_match", "cur_mismatch",
               "price_absdiff", "price_missing",
               "artist_rarity", "nat_rarity", "obj_rarity", "mat_rarity",
               "price_rankgap", "pool_seller_cov",
-              "effseller_match", "effseller_mismatch", "effseller_unknown"]
+              "effseller_match", "effseller_mismatch", "effseller_unknown",
+              "artist_bridge", "price_same_half"]
 
 
 def prob_matrix(lots, model):
@@ -253,7 +269,8 @@ def prob_matrix(lots, model):
     return P, idx
 
 
-def group_pool(lots, model, threshold=0.5, min_clusters=6, seed_seller=True, seed_eff=False):
+def group_pool(lots, model, threshold=0.5, min_clusters=6, seed_seller=True, seed_eff=False,
+               refine_iters=0, refine_margin=0.05):
     """Seed clusters by shared consignor (a near-deterministic same-sale cue), then greedily
     merge the two clusters with the highest average same-sale probability while that average
     exceeds `threshold` and more than `min_clusters` clusters remain. Conservative by design:
@@ -287,6 +304,41 @@ def group_pool(lots, model, threshold=0.5, min_clusters=6, seed_seller=True, see
             break
         clusters[bi] += clusters[bj]
         del clusters[bj]
+
+    # optional second stage: let each no-consignor lot move to the cluster it fits best
+    # (fixes greedy-merge mistakes). Consignor-bearing lots stay put (near-deterministic anchor).
+    for _ in range(refine_iters):
+        moved = False
+        cl_of = {}
+        for ci, c in enumerate(clusters):
+            for i in c:
+                cl_of[i] = ci
+        for i in idx:
+            if lots[i]["seller"]:
+                continue
+            cur = cl_of[i]
+            # avg prob of i to each cluster excluding i itself
+            best_c, best_a = cur, -1.0
+            cur_a = 0.0
+            for ci, c in enumerate(clusters):
+                others = [q for q in c if q != i]
+                if not others:
+                    a = 0.0
+                else:
+                    a = float(np.mean([P[i, q] for q in others]))
+                if ci == cur:
+                    cur_a = a
+                if a > best_a:
+                    best_a, best_c = a, ci
+            if best_c != cur and best_a > cur_a + refine_margin and best_a > threshold:
+                clusters[cur].remove(i)
+                clusters[best_c].append(i)
+                cl_of[i] = best_c
+                moved = True
+        clusters = [c for c in clusters if c]
+        if not moved:
+            break
+
     labels = np.zeros(n, dtype=int)
     for ci, c in enumerate(clusters):
         for i in c:
