@@ -18,6 +18,12 @@
 
 ## Goal: MCFS 0.4+
 
+## Progress log
+- Classical single-frame detection (density/erode/coherence) all stuck at ~22% IoU>=0.5; camera-motion background dominates. Detection needs to be learned + multi-frame.
+- proto_cnn.py (soft-argmax localization): localization would not train (weak heatmap peaks). Abandoned.
+- proto2.py (grid cell-classification detector, softmax-CE over stride-4 grid, single positive cell/frame; heads for t0-t4 heatmap+offset+size+class): localization trains. At ep6 detIoU(t0-3)=0.26 and climbing, clsAcc 0.65. t4 via track extrapolation (lin2/linfit) blended with direct t4 head; blend/strategy tuned on val each eval. Full 70-epoch run in progress.
+- Runtime note: ~67s/epoch at 320x180 on 10 threads; will need speedups (lower res / fewer epochs) to fit grader 1.5h with margin once converged.
+
 ## Approaches to try (compare on local val, macro-MCFS aligned)
 - A (classical): density-based cluster detection per frame (parse red/blue dots, robust to camera-motion noise) + trajectory extrapolation -> t4 box; geometry+appearance classifier (sklearn).
 - B (learned end-to-end): CNN on stacked t0-t3 motion channels -> t4 box regression + class softmax, with geometric augmentation (skill Geometric/Motion recipe). torch CPU.
