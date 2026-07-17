@@ -1,0 +1,43 @@
+# --- default: ignore everything at repo root ---
+/*
+
+# --- re-include only the files/dirs this repo tracks ---
+!/.gitignore
+!/README.md
+!/ERIS_CPU_CHALLENGES_SKILL.md
+!/sparse frame/
+!/parser attatchment disagreement/
+
+# --- secrets: never commit keys (belt-and-suspenders) ---
+*.pem
+*.key
+**/my-keys/
+**/divyams-key/
+id_rsa*
+
+# --- datasets / heavy artifacts inside tracked challenge dirs ---
+sparse frame/dataset/
+parser attatchment disagreement/dataset/
+**/dataset/
+**/images/
+*.tar.gz
+*.parquet
+*.png
+*.jpg
+*.jpeg
+*.npy
+*.npz
+*.pt
+*.pth
+*.onnx
+*.pkl
+*.joblib
+
+# --- python cruft ---
+**/__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.venv/
+venv/
+
+# NOTE: submission.csv is a small deliverable and is intentionally NOT ignored.
