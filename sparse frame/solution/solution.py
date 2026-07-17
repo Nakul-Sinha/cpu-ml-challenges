@@ -252,8 +252,11 @@ def appearance(red, blue, box):
     vspread = ys.std()/max(1, hh) if len(ys) else 0; hspread = xs.std()/max(1, ww) if len(xs) else 0
     return np.array([fill, pol, topf-botf, leftf-rightf, solidity, ncc, vspread, hspread, nlit/(area+1)], np.float32)
 
-def forecast(c, s, strat="linfit"):
+def forecast(c, s, strat="damp", damp=0.3):
+    # best on local validation: refined center + damped velocity extrapolation, size from refined t3
+    c = np.array(c); s = np.array(s)
     if strat == "last": return c[3], s[3]
+    if strat == "damp": return c[3] + damp*(c[3]-c[2]), s[3]
     if strat == "lin2": return 2*c[3]-c[2], s[3]
     if strat == "linfit":
         t = np.arange(4)[:, None]; A = np.hstack([t, np.ones_like(t)])
@@ -320,7 +323,7 @@ def main():
     rows = []
     for clip in test_clips:
         rc, rs, cnn_prob, feat = process_clip(net, te_img, clip, outW, outH)
-        c4, s4 = forecast(rc, rs, "linfit")
+        c4, s4 = forecast(rc, rs, "damp", 0.3)
         x, y, w, h = to_box(c4, s4)
         x = float(np.clip(x, -w*0.5, FRAME_W)); y = float(np.clip(y, -h*0.5, FRAME_H))
         w = float(max(2.0, w)); h = float(max(2.0, h))
