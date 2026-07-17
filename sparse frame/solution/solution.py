@@ -17,7 +17,7 @@ Pipeline:
 Reads only <dir>/train.csv, <dir>/images/{train,test}/, <dir>/test.csv. Writes <out_csv> and
 mirrors to ./working/submission.csv. Honest ML: no ids, no leakage, no external data.
 """
-import sys, os, csv, time, collections
+import sys, os, csv, time, math, collections
 import numpy as np
 from PIL import Image
 import cv2
@@ -27,7 +27,8 @@ from sklearn.ensemble import HistGradientBoostingClassifier
 # ----------------------------- config -----------------------------
 RES = (256, 144)            # coarse-detector input WxH
 MAX_EPOCHS = int(os.environ.get("SOL_MAX_EPOCHS", "55"))
-TRAIN_TIME_BUDGET = int(os.environ.get("SOL_TIME_BUDGET", str(48 * 60)))  # seconds; keeps best checkpoint
+TRAIN_TIME_BUDGET = int(os.environ.get("SOL_TIME_BUDGET", str(45 * 60)))  # seconds total for detector(s)
+N_DET = int(os.environ.get("SOL_N_DET", "3"))  # max detectors to try (best-of-N by val center acc)
 CLIP_LIMIT = int(os.environ.get("SOL_CLIP_LIMIT", "0"))  # 0 = all; >0 caps clips (smoke tests only)
 THREADS = int(os.environ.get("SOLUTION_THREADS", "10"))
 SEED = 0
@@ -131,11 +132,11 @@ def gather_cell(mp, cell):
     B, F5, C, N = mp.shape
     return mp.gather(3, cell.view(B, F5, 1, 1).expand(B, F5, C, 1)).squeeze(3)
 
-def train_detector(X, cen, siz, cls, outW, outH, log=print):
+def train_detector(X, cen, siz, cls, outW, outH, log=print, seed=SEED, time_budget=TRAIN_TIME_BUDGET):
     gh, gw = outH//4, outW//4; nf = 4
-    torch.manual_seed(SEED); np.random.seed(SEED)
+    torch.manual_seed(seed); np.random.seed(seed)
     net = Net(); opt = torch.optim.AdamW(net.parameters(), lr=LR, weight_decay=1e-4)
-    rng = np.random.default_rng(SEED)
+    rng = np.random.default_rng(seed)
     N = X.shape[0]; idx = np.arange(N)
     def lr_at(ep):
         if ep < WARMUP: return (ep+1)/WARMUP
@@ -167,11 +168,22 @@ def train_detector(X, cen, siz, cls, outW, outH, log=print):
             opt.zero_grad(); loss.backward(); opt.step()
         best_state = {k: v.clone() for k, v in net.state_dict().items()}  # keep latest (cosine end = best)
         elapsed = time.time()-t_start
-        log(f"  det ep{ep+1}/{MAX_EPOCHS} loss={loss.item():.3f} ({time.time()-t0:.0f}s, total {elapsed/60:.1f}m)")
-        if elapsed > TRAIN_TIME_BUDGET:
+        log(f"  det s{seed} ep{ep+1}/{MAX_EPOCHS} loss={loss.item():.3f} ({time.time()-t0:.0f}s, total {elapsed/60:.1f}m)")
+        if elapsed > time_budget:
             log(f"  time budget reached at ep{ep+1}; stopping"); break
     net.load_state_dict(best_state); net.eval()
     return net
+
+@torch.no_grad()
+def cen30(net, X, cen, idx, outW, outH):
+    """Mean fraction of t0-3 frames whose predicted center is within 30 px of GT (seed selection)."""
+    hit = []
+    for i in idx:
+        c, _, _ = decode(net, X[i].astype(np.float32), outW, outH, tta=False)
+        for t in range(4):
+            d = math.hypot((c[t, 0]-cen[i, t, 0])*FRAME_W, (c[t, 1]-cen[i, t, 1])*FRAME_H)
+            hit.append(d < 30)
+    return float(np.mean(hit)) if hit else 0.0
 
 @torch.no_grad()
 def decode(net, x_np, outW, outH, tta=True):
@@ -304,9 +316,22 @@ def main():
             cen[i, t] = [(x+w/2)/FRAME_W, (y+h/2)/FRAME_H]; siz[i, t] = [w/FRAME_W, h/FRAME_H]
         cls[i] = CAT2I[cat[clip]]
 
-    # ---- train detector (time-budgeted) ----
-    print(f"[{time.time()-t_all:.0f}s] training detector", flush=True)
-    net = train_detector(Xtr, cen, siz, cls, outW, outH)
+    # ---- best-of-N detector: seed 0 gets a full budget (guarantees one strong detector on slow
+    #      hardware); extra seeds run only if time remains, and the best by held-out center accuracy
+    #      is kept. Ensembling detectors was worse than the best single, so we SELECT not average.
+    print(f"[{time.time()-t_all:.0f}s] training detector(s), best-of-{N_DET}", flush=True)
+    vrng = np.random.default_rng(0)
+    vidx = vrng.choice(len(train_clips), size=max(40, len(train_clips)//10), replace=False)
+    tmask = np.ones(len(train_clips), bool); tmask[vidx] = False; tidx = np.where(tmask)[0]
+    t_det0 = time.time(); net = None; best_score = -1
+    for seed in range(N_DET):
+        spent = time.time()-t_det0
+        per = TRAIN_TIME_BUDGET if seed == 0 else (TRAIN_TIME_BUDGET - spent)
+        if seed > 0 and per < 8*60: break  # not enough time for another useful detector
+        cand = train_detector(Xtr[tidx], cen[tidx], siz[tidx], cls[tidx], outW, outH, seed=seed, time_budget=per)
+        sc = cen30(cand, Xtr, cen, vidx, outW, outH)
+        print(f"[{time.time()-t_all:.0f}s] seed{seed} val cen@30={sc:.3f} (best {max(sc,best_score):.3f})", flush=True)
+        if sc > best_score: best_score, net = sc, cand
 
     # ---- build classifier features from refined TRAIN boxes ----
     print(f"[{time.time()-t_all:.0f}s] extracting train features", flush=True)
