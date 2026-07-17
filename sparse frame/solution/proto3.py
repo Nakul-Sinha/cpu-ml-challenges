@@ -69,10 +69,10 @@ class Net(nn.Module):
         self.nf = nf
         self.stem = nn.Sequential(nn.Conv2d(cin, 32, 3, 2, 1, bias=False), nn.BatchNorm2d(32), nn.ReLU(True))  # /2
         self.l1 = Res(32, 64, 2)     # /4
-        self.l2 = nn.Sequential(Res(64, 96), Res(96, 96))   # /4
+        self.l2 = Res(64, 96)        # /4 (trimmed 1 block for speed)
         self.l3 = nn.Sequential(Res(96, 128, 2), Res(128, 128))  # /8
         self.up = nn.Sequential(nn.Conv2d(128, 96, 1, bias=False), nn.BatchNorm2d(96), nn.ReLU(True))
-        self.fuse = nn.Sequential(Res(96, 96), Res(96, 96))
+        self.fuse = Res(96, 96)      # trimmed 1 block for speed
         self.hm = nn.Conv2d(96, nf, 1)
         self.off = nn.Conv2d(96, 2*nf, 1)
         self.wh = nn.Conv2d(96, 2*nf, 1)
@@ -126,7 +126,7 @@ def main():
         Loff = F.smooth_l1_loss(gather_cell(off, tcell), toff, beta=0.1)
         Lsz = F.smooth_l1_loss(gather_cell(wh, tcell), tsz, beta=0.02)
         Lcls = F.cross_entropy(logit, yt)
-        loss = Lhm*1.0 + Loff*1.0 + Lsz*5.0 + Lcls*0.7
+        loss = Lhm*1.0 + Loff*1.0 + Lsz*3.0 + Lcls*0.7  # size downweighted; refinement provides final size
         return loss, (Lhm.item(), Loff.item(), Lsz.item(), Lcls.item())
 
     best = -1; best_state = None
@@ -138,17 +138,16 @@ def main():
             opt.zero_grad(); loss.backward(); opt.step(); tot += loss.item(); nb += 1
         if (ep+1) % 5 == 0 or ep == args.epochs-1:
             m = evaluate(net, X, cen, siz, cls, va, cat, clips, outW, outH, gh, gw, nf)
-            # select best by detection IoU (the gate) rather than the weak CNN-head MCFS
-            score = m["det_iou"]
+            # select by CENTER accuracy (refinement provides final size, so center is what matters)
+            score = m["cen_acc"]
             if score > best:
                 best = score; best_state = {k: v.clone() for k, v in net.state_dict().items()}
                 torch.save({"state": best_state, "args": vars(args)}, args.out)  # save on improvement
-            dc = m["detcat"]
-            print(f"ep{ep+1:3d} loss={tot/nb:.3f} | detIoU={m['det_iou']:.3f} bestDet={best:.3f} "
-                  f"[ppl {dc['people']:.2f} car {dc['car']:.2f} cat {dc['cat']:.2f} uav {dc['uav']:.2f}] "
-                  f"|| t4 MCFS(cnnhead)={m['macro']:.4f} hit={m['hit']:.3f} clsAcc={m['clsacc']:.3f} "
-                  f"[{m['strat']}] ({time.time()-t0:.0f}s)", flush=True)
-    print(f"BEST detIoU={best:.4f} (saved to {args.out})")
+            cc = m["cencat"]
+            print(f"ep{ep+1:3d} loss={tot/nb:.3f} | cen@30={m['cen_acc']:.3f} best={best:.3f} "
+                  f"[ppl {cc['people']:.2f} car {cc['car']:.2f} cat {cc['cat']:.2f} uav {cc['uav']:.2f}] "
+                  f"detIoU={m['det_iou']:.3f} clsAcc={m['clsacc']:.3f} ({time.time()-t0:.0f}s)", flush=True)
+    print(f"BEST cen@30={best:.4f} (saved to {args.out})")
 
 @torch.no_grad()
 def decode(net, X, i, outW, outH, gh, gw, nf):
@@ -180,11 +179,13 @@ def forecast(c4, s4, strat, bl=0.5):
 def evaluate(net, X, cen, siz, cls, va, cat, clips, outW, outH, gh, gw, nf):
     net.eval()
     dec = {i: decode(net, X, i, outW, outH, gh, gw, nf) for i in va}
-    detcat = collections.defaultdict(list); det = []
+    detcat = collections.defaultdict(list); det = []; cenhit = []; cenhit_cat = collections.defaultdict(list)
     for i in va:
         c, s, _ = dec[i]
         for t in range(4):
             v = iou_xywh(to_box(c[t], s[t]), to_box(cen[i, t], siz[i, t])); det.append(v); detcat[cat[clips[i]]].append(v)
+            d = np.hypot((c[t, 0]-cen[i, t, 0])*FRAME_W, (c[t, 1]-cen[i, t, 1])*FRAME_H)
+            cenhit.append(d < 30); cenhit_cat[cat[clips[i]]].append(d < 30)
     gtb = [to_box(cen[i, 4], siz[i, 4]) for i in va]; gtc = [int(cls[i]) for i in va]
     best = None
     for strat in ["lin2", "last", "linfit", "lin_half"]:
@@ -195,7 +196,9 @@ def evaluate(net, X, cen, siz, cls, va, cat, clips, outW, outH, gh, gw, nf):
         if best is None or macro > best["macro"]:
             clsacc = float(np.mean([np.argmax(p) == g for p, g in zip(pr, gtc)]))
             best = {"macro": macro, "hit": hit, "mIoU": mIoU, "clsacc": clsacc, "strat": strat,
-                    "det_iou": float(np.mean(det)), "detcat": {k: float(np.mean(v)) for k, v in detcat.items()}}
+                    "det_iou": float(np.mean(det)), "detcat": {k: float(np.mean(v)) for k, v in detcat.items()},
+                    "cen_acc": float(np.mean(cenhit)),
+                    "cencat": {k: float(np.mean(v)) for k, v in cenhit_cat.items()}}
     return best
 
 if __name__ == "__main__":

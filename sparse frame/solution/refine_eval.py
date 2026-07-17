@@ -12,31 +12,9 @@ import proto3
 from cls_ceiling import feats_from_track, brier_macro
 from cls_appearance import appearance
 from eval_ckpt import decode_tta, to_box, forecast
+from refine import refine_box
 from sklearn.ensemble import HistGradientBoostingClassifier
 from sklearn.metrics import accuracy_score
-
-def refine_box(red, blue, box, expand=2.4, dog_sigma=8.0, thr=0.12):
-    H, W = red.shape
-    x, y, w, h = box; cx, cy = x+w/2, y+h/2
-    sw = min(max(w*expand, 24), 440); sh = min(max(h*expand, 20), 330)
-    x0 = int(max(0, cx-sw/2)); x1 = int(min(W, cx+sw/2)); y0 = int(max(0, cy-sh/2)); y1 = int(min(H, cy+sh/2))
-    if x1-x0 < 4 or y1-y0 < 4: return box
-    comb = red[y0:y1, x0:x1]+blue[y0:y1, x0:x1]
-    blur = cv2.GaussianBlur(comb, (0, 0), dog_sigma)
-    dog = np.clip(comb-blur, 0, None)
-    m = (dog > thr).astype(np.uint8)
-    if m.sum() < 6: m = (comb > 0).astype(np.uint8)
-    n, lab, stats, cent = cv2.connectedComponentsWithStats(m, 8)
-    if n <= 1: return box
-    lcx, lcy = cx-x0, cy-y0
-    best = None; bs = -1
-    for i in range(1, n):
-        bx, by, bw, bh, ar = stats[i]
-        if ar < 4: continue
-        ccx, ccy = cent[i]; dist = np.hypot(ccx-lcx, ccy-lcy)
-        score = ar/(1+0.15*dist)
-        if score > bs: bs = score; best = (float(x0+bx), float(y0+by), float(bw), float(bh))
-    return best if best else box
 
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("root"); ap.add_argument("ckpt")
