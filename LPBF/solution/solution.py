@@ -12,9 +12,9 @@ FAMS = ["gray", "color"]
 POS_R = {"gray": 4.0, "color": 7.0}
 FAM_MED_SIZE = {"gray": 25, "color": 29}
 CUES = ["gray", "grad", "lstd", "hf", "tophat", "blackhat"]
-TH_MAIN = 0.05
-FLOOR = 0.08
-MAX_BOX = 8
+TH_MAIN = 0.12
+GATE = 0.40
+MAX_BOX = 6
 NMS_IOU = 0.30
 SEED = 0
 CLS_PARAMS = dict(max_iter=400, learning_rate=0.06, max_leaf_nodes=31,
@@ -351,8 +351,10 @@ def predict_image(fe, anchors, cls, regs, fam):
         boxes.append(clip_box(box_from(ncx, ncy, ns), fe.W, fe.H))
     keep = nms(boxes, list(p), iou_thr=NMS_IOU)
     kept = sorted([(float(p[i]), boxes[i]) for i in keep], key=lambda z: -z[0])
+    if not kept or kept[0][0] < GATE:
+        return []
     out = [kb for kb in kept if kb[0] >= TH_MAIN]
-    if not out and kept and kept[0][0] >= FLOOR:
+    if not out:
         out = [kept[0]]
     return out[:MAX_BOX]
 
