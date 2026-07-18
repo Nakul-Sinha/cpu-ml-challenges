@@ -57,9 +57,10 @@ def _one(row):
                 m = (gx, gy, gs); break
         labs.append(0 if m is None else 1)
         rtgt.append((m[0] - c["cx"], m[1] - c["cy"], m[2] - _odd(c["s"])) if m else (np.nan, np.nan, np.nan))
+    sprof = np.stack([fe.size_profile(c["cx"], c["cy"], list(range(15, 40, 2))) for c in cands]).astype(np.float32)
     return dict(iid=row["image_id"], fam=fam, gts=gts, feats=feats, labs=np.array(labs),
                 boxes=boxes, cx=np.array(cx), cy=np.array(cy), sz=np.array(sz),
-                rtgt=np.array(rtgt, np.float32))
+                rtgt=np.array(rtgt, np.float32), sprof=sprof)
 
 
 def precompute(df):
@@ -198,19 +199,22 @@ def main():
     # box-offset regression: predict (dcx,dcy,ds) to the true box. Paired
     # comparison (same folds) of unrefined vs refined at fixed configs.
     REGP = dict(max_iter=250, learning_rate=0.05, max_leaf_nodes=15, min_samples_leaf=25, random_state=0)
+    def augf(d):
+        return np.concatenate([d["feats"], d["sprof"]], axis=1)
     def refined_boxes(d, cls, regs):
         p = cls.predict_proba(d["feats"])[:, 1]
-        dcx = regs[0].predict(d["feats"]); dcy = regs[1].predict(d["feats"]); ds = regs[2].predict(d["feats"])
+        A = augf(d)
+        dcx = regs[0].predict(A); dcy = regs[1].predict(A); ds = regs[2].predict(A)
         rb = [C.clip_box(D.box_from(d["cx"][i] + dcx[i], d["cy"][i] + dcy[i], _odd(d["sz"][i] + ds[i])), 448, 448)
               for i in range(len(d["feats"]))]
         return p, rb
     cfgs = [(0.03, 10), (0.04, 8), (0.05, 8), (0.06, 8), (0.08, 8)]
-    unref = {c: [] for c in cfgs}; refd = {c: [] for c in cfgs}; b85 = {c: [] for c in cfgs}
+    unref = {c: [] for c in cfgs}; refd = {c: [] for c in cfgs}; b85 = {c: [] for c in cfgs}; b75 = {c: [] for c in cfgs}
     for k in range(NFOLD):
         tr = [d for d in data if id2fold[d["iid"]] != k]; va = [d for d in data if id2fold[d["iid"]] == k]
         X = np.concatenate([d["feats"] for d in tr if len(d["labs"])]); y = np.concatenate([d["labs"] for d in tr if len(d["labs"])])
         cls = HistGradientBoostingClassifier(random_state=0, **MODELS["base"]).fit(X, y)
-        Xp = np.concatenate([d["feats"][d["labs"] == 1] for d in tr if (d["labs"] == 1).any()])
+        Xp = np.concatenate([augf(d)[d["labs"] == 1] for d in tr if (d["labs"] == 1).any()])
         T = np.concatenate([d["rtgt"][d["labs"] == 1] for d in tr if (d["labs"] == 1).any()])
         regs = [HistGradientBoostingRegressor(**REGP).fit(Xp, T[:, j]) for j in range(3)]
         su, sr = [], []
@@ -224,11 +228,12 @@ def main():
             sr.append((d["iid"], d["gts"], sorted([(float(p[i]), rb[i]) for i in kr], key=lambda z: -z[0])))
         for c in cfgs:
             unref[c].append(select(su, c[0], max_box=c[1])[0])
-            s, dd = select(sr, c[0], max_box=c[1]); refd[c].append(s); b85[c].append(dd["m85"])
-    print("PAIRED unrefined vs refined (base model):")
+            s, dd = select(sr, c[0], max_box=c[1]); refd[c].append(s); b85[c].append(dd["m85"]); b75[c].append(dd["m75"])
+    print("PAIRED unrefined vs refined (base model, size-profile-augmented regressor):")
     for c in cfgs:
-        print("  th=%.2f mb=%d : unref=%.4f  refined=%.4f (+%.4f) @.85ref=%.3f" %
-              (c[0], c[1], np.mean(unref[c]), np.mean(refd[c]), np.mean(refd[c]) - np.mean(unref[c]), np.mean(b85[c])))
+        print("  th=%.2f mb=%d : unref=%.4f  refined=%.4f (+%.4f) @.75ref=%.3f @.85ref=%.3f" %
+              (c[0], c[1], np.mean(unref[c]), np.mean(refd[c]), np.mean(refd[c]) - np.mean(unref[c]),
+               np.mean(b75[c]), np.mean(b85[c])))
 
     results = sorted(((np.mean(v), np.std(v), cfg) for cfg, v in agg.items()), reverse=True)
     print("\nTop 12 configs (CV mean +/- std):")
