@@ -110,3 +110,26 @@ negative_image_penalty times duplicate_penalty.
   isolated smoke test passes. Beats AI baseline 0.1775 by ~78 %.
   @.85 (weight 0.25) stays low because per-image box SIZE is near-unpredictable
   from content, which caps IoU>=0.85; this is the main barrier to 0.35.
+
+- Round-3 (real leaderboard feedback: v2 scored 0.2347, well below the local
+  0.316 -> the local CV was optimistic and, more importantly, was blind to the
+  test negative images):
+  - FIXED a CV leakage: anchors/prior/background were built from ALL train data
+    (val locations leaked). cv_honest.py rebuilds them per fold from the train
+    portion only -> honest positive-only CV = 0.296 (leakage was only ~0.02).
+  - The remaining gap is the TEST NEGATIVE IMAGES. The earlier "test has ~no
+    negatives" call was WRONG: overlaying predictions on the test images shows
+    genuinely blank / uniform-grid images (no standout anomaly) that the old
+    aggressive emission (avg 5.9 boxes, predict-on-every-image) boxed anyway. The
+    metric's negative_image_penalty then multiplies the whole score by as low as
+    0.55, and each false-alerted negative also drops that image's AP from 1.0 to
+    0. Correctly predicting EMPTY on a negative instead ADDS AP 1.0 on the heavily
+    weighted @.75/@.85 terms, so negative handling is the single biggest lever.
+  - v3 change: a negative GATE (predict empty when the top box score < 0.40) plus
+    higher emission threshold (0.12) and fewer boxes (max 6). The gate empties the
+    ~5 % least-confident test images (verified: uniform-grid / blank), costs only
+    ~0.004 on the positive-only CV, and protects/earns the negative terms.
+    Caveat: a top-score gate only catches LOW-scoring negatives; textured
+    negatives the ranker is overconfident on cannot be separated by score alone
+    (their score distribution overlaps positives), so this is a partial fix.
+    Await the next leaderboard number to calibrate the gate further.
