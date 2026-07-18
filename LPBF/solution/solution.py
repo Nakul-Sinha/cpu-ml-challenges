@@ -10,7 +10,7 @@ import cv2
 
 FAMS = ["gray", "color"]
 POS_R = {"gray": 4.0, "color": 7.0}
-FAM_MED_SIZE = {"gray": 25, "color": 29}
+FAM_MED_SIZE = {}
 CUES = ["gray", "grad", "lstd", "hf", "tophat", "blackhat"]
 TH_MAIN = 0.12
 GATE = {"gray": 0.40, "color": 0.55}
@@ -301,7 +301,7 @@ def gen_candidates(fe, anchors, fam):
         d = min((abs(a["cx"] - px) + abs(a["cy"] - py) for a in anchors), default=99.0)
         if d <= 4:
             continue
-        cands.append(dict(cx=float(px), cy=float(py), s=float(FAM_MED_SIZE[fam]),
+        cands.append(dict(cx=float(px), cy=float(py), s=float(FAM_MED_SIZE.get(fam, 27.0)),
                           acount=0.0, adist=float(d)))
     return cands
 
@@ -369,6 +369,10 @@ def main():
 
     train_df = pd.read_csv(os.path.join(PUB, "train.csv"))
     test_df = pd.read_csv(os.path.join(PUB, "test.csv"))
+    for f in FAMS:
+        szs = [max(b[2] - b[0], b[3] - b[1]) for _, r in train_df.iterrows()
+               if family(r["height"]) == f for b in parse_boxes(r.get("boxes", ""))]
+        FAM_MED_SIZE[f] = float(np.median(szs)) if szs else 27.0
     anchors = {f: build_anchors(train_df, f) for f in FAMS}
     prior = {f: prior_heatmap(train_df, f, 448 if f == "color" else 358, 448) for f in FAMS}
     bg = {f: build_background(train_df, f, PUB) for f in FAMS}
