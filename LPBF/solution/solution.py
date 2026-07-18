@@ -1,21 +1,23 @@
-"""LPBF Visual Alert Box Localization — official, self-contained CPU solution.
+"""LPBF Visual Alert Box Localization - official, self-contained CPU solution.
 
 Runs end-to-end: reads dataset/public/{train,test}.csv + images, trains a
-spatial-prior + visual-cue presence ranker, localizes square alert boxes, writes
-working/submission.csv. No GPU, no internet, no precomputed predictions.
+spatial-prior + visual-cue presence ranker plus a box-offset regressor, localizes
+square alert boxes, writes working/submission.csv. No GPU, no internet, no
+precomputed predictions. CPU-only, deterministic.
 
 Usage: python solution.py [dataset_public_dir] [out_csv]
 Defaults: dataset/public  and  working/submission.csv
 
-Approach (see approach.md): the target boxes are axis-aligned squares (odd side
-~19-35 px) that recur at a small set of registered locations across images. We
-build spatial-prior anchor locations from the training boxes (per image family),
-union them with multi-cue saliency peaks, describe each candidate with contrast /
-edge / texture / brightness / colour center-surround features plus the learned
-spatial prior, and train a gradient-boosted classifier to decide which candidates
-are real alert boxes in each image. Boxes use the per-anchor prior size (content
-based size estimation was not reliable). NMS removes duplicates and a calibrated
-threshold keeps predictions sparse.
+Approach (see approach.md). Target boxes are axis-aligned squares (odd side
+~19-35 px) that recur at a small set of registered locations across two image
+families (gray 448x358 powder bed, colour 448x448 grid of parts). We build
+per-family spatial anchor locations from the training boxes, union them with
+multi cue saliency peaks (contrast, edges, texture, colour, deviation from a
+per-family median background), describe each candidate with center-surround
+features plus the learned spatial prior, and train a gradient boosted classifier
+to decide which candidates are real alert boxes. A gradient boosted box-offset
+regressor then refines each box toward the true location and size. NMS removes
+duplicates and a calibrated, negative-safe threshold keeps predictions sparse.
 """
 import os
 import sys
@@ -24,15 +26,18 @@ import numpy as np
 import pandas as pd
 import cv2
 
-# ------------------------------------------------------------------ config
 FAMS = ["gray", "color"]
 POS_R = {"gray": 4.0, "color": 7.0}       # px: candidate<->GT match radius (labels)
 FAM_MED_SIZE = {"gray": 25, "color": 29}
-TH_MAIN = 0.12                              # emit candidates scoring >= this
+CUES = ["gray", "grad", "lstd", "hf", "tophat", "blackhat"]
+TH_MAIN = 0.05                             # emit candidates scoring >= this
 FLOOR = 0.08                               # else force top-1 if its score >= this
-MAX_BOX = 6
+MAX_BOX = 8
 NMS_IOU = 0.30
 SEED = 0
+CLS_PARAMS = dict(max_iter=400, learning_rate=0.06, max_leaf_nodes=31,
+                  l2_regularization=1.0, min_samples_leaf=20)
+REG_PARAMS = dict(max_iter=250, learning_rate=0.05, max_leaf_nodes=15, min_samples_leaf=25)
 
 
 def log(*a):
@@ -131,9 +136,9 @@ class Integrals:
     def mean_std(self, x0, y0, x1, y1):
         x0, y0, x1, y1 = int(x0), int(y0), int(x1), int(y1)
         n = max(1, (x1 - x0) * (y1 - y0))
-        m = self._rs(self.S, x0, y0, x1, y1) / n
-        v = max(0.0, self._rs(self.S2, x0, y0, x1, y1) / n - m * m)
-        return m, np.sqrt(v)
+        mm = self._rs(self.S, x0, y0, x1, y1) / n
+        v = max(0.0, self._rs(self.S2, x0, y0, x1, y1) / n - mm * mm)
+        return mm, np.sqrt(v)
 
 
 def robust_norm(m):
@@ -162,7 +167,7 @@ def cue_maps(gray):
     return dict(grad=grad, lstd=lstd, tophat=tophat, blackhat=blackhat, hf=hf, sal=sal)
 
 
-# ------------------------------------------------------------------ prior anchors
+# ------------------------------------------------------------------ prior / bg
 def build_anchors(df, fam, cell=2, min_count=2, merge=3):
     pts, sizes = [], []
     for _, r in df.iterrows():
@@ -209,6 +214,20 @@ def prior_heatmap(df, fam, H, W, sigma=3.0):
     return cv2.GaussianBlur(hm, (0, 0), sigma) / max(1, n)
 
 
+def build_background(df, fam, pub):
+    imgs = []
+    for _, r in df.iterrows():
+        if family(r["height"]) != fam:
+            continue
+        bgr = cv2.imread(os.path.join(pub, r["image_path"]), cv2.IMREAD_COLOR)
+        if bgr is None:
+            continue
+        imgs.append(cv2.cvtColor(bgr, cv2.COLOR_BGR2GRAY))
+    if not imgs:
+        return None
+    return np.median(np.stack(imgs), axis=0).astype(np.float32)
+
+
 def peak_candidates(sal, max_peaks, min_dist, rel_thresh):
     d = int(min_dist)
     dil = cv2.dilate(sal, cv2.getStructuringElement(cv2.MORPH_RECT, (2 * d + 1, 2 * d + 1)))
@@ -219,11 +238,8 @@ def peak_candidates(sal, max_peaks, min_dist, rel_thresh):
 
 
 # ------------------------------------------------------------------ features
-CUES = ["gray", "grad", "lstd", "hf", "tophat", "blackhat"]
-
-
 class FeatureExtractor:
-    def __init__(self, bgr, fam, prior_hm):
+    def __init__(self, bgr, fam, prior_hm, bg):
         self.fam = fam
         self.H, self.W = bgr.shape[:2]
         g = cv2.cvtColor(bgr, cv2.COLOR_BGR2GRAY).astype(np.float32)
@@ -234,6 +250,18 @@ class FeatureExtractor:
               "tophat": m["tophat"], "blackhat": m["blackhat"],
               "B": bgr[..., 0].astype(np.float32), "G": bgr[..., 1].astype(np.float32),
               "R": bgr[..., 2].astype(np.float32)}
+        if fam == "color":
+            rb = np.abs(ch["R"] - ch["B"]); k = 7
+            m1 = cv2.boxFilter(rb, cv2.CV_32F, (k, k)); m2 = cv2.boxFilter(rb * rb, cv2.CV_32F, (k, k))
+            rb_tex = np.sqrt(np.clip(m2 - m1 * m1, 0, None))
+            col = robust_norm(cv2.GaussianBlur(rb, (0, 0), 2)) + robust_norm(rb_tex)
+            self.sal = self.sal + 0.8 * cv2.GaussianBlur(col.astype(np.float32), (0, 0), 2)
+        self.has_bg = bg is not None and bg.shape == g.shape
+        if self.has_bg:
+            resid = (g - float(g.mean())) - (bg - float(bg.mean()))
+            ch["resid"] = np.abs(resid); ch["sresid"] = resid
+            self.sal = self.sal + 1.0 * robust_norm(
+                cv2.GaussianBlur(np.abs(resid).astype(np.float32), (0, 0), 2))
         self.integ = {k: Integrals(v) for k, v in ch.items()}
         self.integ["sal"] = Integrals(self.sal)
         self.g_mean = float(g.mean()); self.g_std = float(g.std() + 1e-6)
@@ -259,6 +287,15 @@ class FeatureExtractor:
         f.append(gstd / 64.0)
         mi, rg = self._ring(self.integ["sal"], cx, cy, s, m)
         f.append(mi); f.append(mi - rg)
+        if self.has_bg:
+            ri, rr = self._ring(self.integ["resid"], cx, cy, s, m)
+            f.append(ri / 64.0); f.append((ri - rr) / 64.0)
+            si = self.integ["sresid"].mean(cx - s / 2, cy - s / 2, cx + s / 2, cy + s / 2)
+            f.append(si / 64.0)
+            _, rstd = self.integ["resid"].mean_std(cx - s / 2, cy - s / 2, cx + s / 2, cy + s / 2)
+            f.append(rstd / 64.0)
+        else:
+            f.extend([0.0, 0.0, 0.0, 0.0])
         for key in ["R", "B"]:
             mi, rg = self._ring(self.integ[key], cx, cy, s, m)
             f.append((mi - rg) / 255.0)
@@ -280,10 +317,8 @@ def gen_candidates(fe, anchors, fam):
     for a in anchors:
         cands.append(dict(cx=float(a["cx"]), cy=float(a["cy"]), s=float(a["med_size"]),
                           acount=float(a["count"]), adist=0.0))
-    if fam == "color":
-        peaks = peak_candidates(fe.sal, 55, 8, 0.30)
-    else:
-        peaks = peak_candidates(fe.sal, 40, 9, 0.35)
+    peaks = (peak_candidates(fe.sal, 55, 8, 0.30) if fam == "color"
+             else peak_candidates(fe.sal, 40, 9, 0.35))
     for (px, py) in peaks:
         d = min((abs(a["cx"] - px) + abs(a["cy"] - py) for a in anchors), default=99.0)
         if d <= 4:
@@ -294,33 +329,49 @@ def gen_candidates(fe, anchors, fam):
 
 
 # ------------------------------------------------------------------ pipeline
-def train_model(df, anchors, prior):
-    from sklearn.ensemble import HistGradientBoostingClassifier
-    X, y = [], []
+def train(df, anchors, prior, bg):
+    from sklearn.ensemble import HistGradientBoostingClassifier, HistGradientBoostingRegressor
+    X, y, Xp, T = [], [], [], []
     for _, r in df.iterrows():
         fam = family(r["height"])
         bgr = load_bgr(PUB, r["image_path"])
         if bgr is None:
             continue
-        fe = FeatureExtractor(bgr, fam, prior[fam])
-        gcen = [((x0 + x1) / 2.0, (y0 + y1) / 2.0) for (x0, y0, x1, y1) in parse_boxes(r["boxes"])]
+        fe = FeatureExtractor(bgr, fam, prior[fam], bg[fam])
+        gc = [((x0 + x1) / 2.0, (y0 + y1) / 2.0, max(x1 - x0, y1 - y0))
+              for (x0, y0, x1, y1) in parse_boxes(r["boxes"])]
         for c in gen_candidates(fe, anchors[fam], fam):
-            X.append(fe.features(c["cx"], c["cy"], c["s"], c["acount"], c["adist"]))
-            y.append(1 if any(abs(gx - c["cx"]) <= POS_R[fam] and abs(gy - c["cy"]) <= POS_R[fam]
-                              for gx, gy in gcen) else 0)
-    X = np.stack(X); y = np.array(y)
-    model = HistGradientBoostingClassifier(max_iter=400, learning_rate=0.06, max_leaf_nodes=31,
-        l2_regularization=1.0, min_samples_leaf=20, random_state=SEED).fit(X, y)
-    return model, X.shape
+            fv = fe.features(c["cx"], c["cy"], c["s"], c["acount"], c["adist"])
+            X.append(fv)
+            mm = None
+            for (gx, gy, gs) in gc:
+                if abs(gx - c["cx"]) <= POS_R[fam] and abs(gy - c["cy"]) <= POS_R[fam]:
+                    mm = (gx, gy, gs); break
+            if mm is None:
+                y.append(0)
+            else:
+                y.append(1)
+                Xp.append(fv)
+                T.append((mm[0] - c["cx"], mm[1] - c["cy"], mm[2] - odd(c["s"])))
+    X = np.stack(X); y = np.array(y); Xp = np.stack(Xp); T = np.array(T, np.float32)
+    cls = HistGradientBoostingClassifier(random_state=SEED, **CLS_PARAMS).fit(X, y)
+    regs = [HistGradientBoostingRegressor(random_state=SEED, **REG_PARAMS).fit(Xp, T[:, j]) for j in range(3)]
+    return cls, regs, X.shape
 
 
-def predict_image(fe, anchors, model, fam):
+def predict_image(fe, anchors, cls, regs, fam):
     cands = gen_candidates(fe, anchors[fam], fam)
     if not cands:
         return []
     Xp = np.stack([fe.features(c["cx"], c["cy"], c["s"], c["acount"], c["adist"]) for c in cands])
-    p = model.predict_proba(Xp)[:, 1]
-    boxes = [clip_box(box_from(c["cx"], c["cy"], odd(c["s"])), fe.W, fe.H) for c in cands]
+    p = cls.predict_proba(Xp)[:, 1]
+    dcx = regs[0].predict(Xp); dcy = regs[1].predict(Xp); ds = regs[2].predict(Xp)
+    boxes = []
+    for i, c in enumerate(cands):
+        ncx = c["cx"] + float(np.clip(dcx[i], -10, 10))
+        ncy = c["cy"] + float(np.clip(dcy[i], -10, 10))
+        ns = odd(c["s"] + float(np.clip(ds[i], -12, 12)))
+        boxes.append(clip_box(box_from(ncx, ncy, ns), fe.W, fe.H))
     keep = nms(boxes, list(p), iou_thr=NMS_IOU)
     kept = sorted([(float(p[i]), boxes[i]) for i in keep], key=lambda z: -z[0])
     out = [kb for kb in kept if kb[0] >= TH_MAIN]
@@ -337,30 +388,30 @@ def main():
     os.makedirs(os.path.dirname(out_csv) or ".", exist_ok=True)
     log("public dir:", PUB)
 
-    train = pd.read_csv(os.path.join(PUB, "train.csv"))
-    test = pd.read_csv(os.path.join(PUB, "test.csv"))
-    anchors = {f: build_anchors(train, f) for f in FAMS}
-    prior = {f: prior_heatmap(train, f, 448 if f == "color" else 358, 448) for f in FAMS}
+    train_df = pd.read_csv(os.path.join(PUB, "train.csv"))
+    test_df = pd.read_csv(os.path.join(PUB, "test.csv"))
+    anchors = {f: build_anchors(train_df, f) for f in FAMS}
+    prior = {f: prior_heatmap(train_df, f, 448 if f == "color" else 358, 448) for f in FAMS}
+    bg = {f: build_background(train_df, f, PUB) for f in FAMS}
     log("anchors gray=%d color=%d" % (len(anchors["gray"]), len(anchors["color"])))
 
-    model, shp = train_model(train, anchors, prior)
-    log("trained ranker rows=%d dim=%d (%.0fs)" % (shp[0], shp[1], time.time() - t0))
+    cls, regs, shp = train(train_df, anchors, prior, bg)
+    log("trained ranker+regressor rows=%d dim=%d (%.0fs)" % (shp[0], shp[1], time.time() - t0))
 
-    rows = []
-    nb = 0
-    for _, r in test.iterrows():
+    rows = []; nb = 0
+    for _, r in test_df.iterrows():
         fam = family(r["height"])
         bgr = load_bgr(PUB, r["image_path"])
         if bgr is None:
             rows.append((r["image_id"], "")); continue
-        fe = FeatureExtractor(bgr, fam, prior[fam])
-        out = predict_image(fe, anchors, model, fam)
+        fe = FeatureExtractor(bgr, fam, prior[fam], bg[fam])
+        out = predict_image(fe, anchors, cls, regs, fam)
         nb += len(out)
         pred = " ".join("%.4f %d %d %d %d" % (s, b[0], b[1], b[2], b[3]) for (s, b) in out)
         rows.append((r["image_id"], pred))
     sub = pd.DataFrame(rows, columns=["image_id", "prediction_string"]).fillna("")
     sub.to_csv(out_csv, index=False)
-    log("wrote %s  rows=%d  total_boxes=%d  avg=%.2f  (%.0fs)"
+    log("wrote %s rows=%d boxes=%d avg=%.2f (%.0fs)"
         % (out_csv, len(sub), nb, nb / max(1, len(sub)), time.time() - t0))
 
 
