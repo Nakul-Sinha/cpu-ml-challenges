@@ -77,3 +77,36 @@ negative_image_penalty times duplicate_penalty.
   solution.py runs end-to-end in ~53 s (<< 1.5 h). Submission valid, avg 4.2 box/img.
   Next: raise ceiling (coverage + size), tighten emission for negative safety,
   close presence gap to the 0.365 oracle -> target > 0.35.
+
+- Compute moved to the ap-south-1 Xeon box (16 vCPU / 61 GB) for parallel CV
+  (fork joblib): full 5-fold sweep ~10 s vs ~90 s locally. Box also = grading
+  runtime parity.
+
+- Round-2 experiments (5-fold CV, paired where noisy):
+  - Per-family split of the ranker: worse (less data). Single model + family
+    feature is best.
+  - Colour-aware saliency (R-B contrast/texture): neutral, kept (lower variance).
+  - Background-residual features (deviation from per-family median image, global
+    brightness removed): +0.006 for the base model. Kept.
+  - Size-aware detection (score each location x size, argmax size): worse (0.253)
+    -> dilutes presence. Size is genuinely near-irreducible.
+  - HOG/LBP patch features with all data: still neutral. Dropped from final.
+  - TEST has ~no negatives: test per-image max-score distribution matches train
+    (only ~2 test images < 0.2, same as train) -> no negative-image bonus; local
+    CV is a faithful proxy. Kept a negative-safe emission floor anyway.
+  - Ceiling with all-data anchors: presence-perfect oracle = 0.40 (@.50 0.93,
+    @.75 0.33, @.85 0.09); true-size oracle ~0.48. Diagnostic: coverage 93 %,
+    model recall@.5 78 %, precision@.5 44 % -> ranking is the gap.
+  - **Box-offset regression** (GB regressor predicts (dcx,dcy,ds) to the true box
+    from the same features; applied to every candidate before NMS): robust +0.015
+    to +0.017 in every paired fold. A weak regressor (250 iters, 15 leaves) beats
+    a strong one (offsets overfit). Lower emission threshold (0.03-0.05) + mb 8-10
+    stacks. This is the main round-2 win.
+
+- v2 (branch lpbf/improve): + background-residual features + colour saliency +
+  **box-offset regression** + lower emission threshold. 5-fold CV ~= 0.316
+  (single-split verify of the self-contained solution.py = 0.3163: @.50 0.76,
+  @.75 0.25, @.85 0.07). Runs end-to-end in 20 s / 345 MB on the parity box;
+  isolated smoke test passes. Beats AI baseline 0.1775 by ~78 %.
+  @.85 (weight 0.25) stays low because per-image box SIZE is near-unpredictable
+  from content, which caps IoU>=0.85; this is the main barrier to 0.35.
