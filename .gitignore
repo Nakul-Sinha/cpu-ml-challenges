@@ -9,6 +9,7 @@
 !/parser attatchment disagreement/
 !/swadesh phenome/
 !/art-auction-sale-reconstruction/
+!/LPBF/
 
 # --- secrets: never commit keys (belt-and-suspenders) ---
 *.pem
