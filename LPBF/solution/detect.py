@@ -2,11 +2,13 @@
 Shared by model.py (training/eval) and solution.py (final pipeline) so train and
 inference stay identical.
 """
+import os
 import numpy as np
 import common as C
 from features import FeatureExtractor
 
 FAM_MED_SIZE = {"gray": 25, "color": 29}
+NO_PEAKS = os.environ.get("NO_PEAKS") == "1"
 
 
 def _nearest_anchor_dist(cx, cy, anchors):
@@ -23,6 +25,8 @@ def gen_candidates(fe, anchors, fam):
         cands.append(dict(cx=float(a["cx"]), cy=float(a["cy"]),
                           s=float(a["med_size"]), acount=float(a["count"]),
                           adist=0.0, src="anchor"))
+    if NO_PEAKS:
+        return cands
     # saliency peaks for coverage of novel locations + hard negatives.
     if fam == "color":
         peaks = C.peak_candidates(fe.sal, max_peaks=55, min_dist=8, rel_thresh=0.30)

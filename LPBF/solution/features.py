@@ -58,10 +58,29 @@ class FeatureExtractor:
             self.sal = self.sal + 0.8 * cv2.GaussianBlur(col.astype(np.float32), (0, 0), 2)
         self.integ = {k: C.Integrals(v) for k, v in chan.items()}
         self.integ["sal"] = C.Integrals(self.sal)
+        self.resid_map = chan["resid"] if self.has_bg else None
+        self.grad_map = maps["grad"]
+        self.sal_hi = float(np.percentile(self.sal, 90))
         # global stats for normalisation
         self.g_mean = float(g.mean())
         self.g_std = float(g.std() + 1e-6)
         self.prior_hm = prior_hm
+
+    def _peakfeats(self, cx, cy, s):
+        """Box-max / peak features (integral images give means only). A corner
+        anomaly is often a small peak the mean misses."""
+        h = int(s / 2)
+        x0 = int(np.clip(cx - h, 0, self.W - 1)); x1 = int(np.clip(cx + h, x0 + 1, self.W))
+        y0 = int(np.clip(cy - h, 0, self.H - 1)); y1 = int(np.clip(cy + h, y0 + 1, self.H))
+        sp = self.sal[y0:y1, x0:x1]
+        gp = self.grad_map[y0:y1, x0:x1]
+        out = [float(sp.max()), float((sp > self.sal_hi).mean()), float(gp.max()) / 255.0]
+        if self.resid_map is not None:
+            rp = self.resid_map[y0:y1, x0:x1]
+            out.append(float(rp.max()) / 64.0)
+        else:
+            out.append(0.0)
+        return out
 
     def patch_desc(self, cx, cy, s):
         """HOG + LBP + intensity-percentile descriptor of the candidate patch
@@ -156,6 +175,7 @@ class FeatureExtractor:
         # brightness extremes inside (bright/dark asymmetry vs global)
         gm_in = self.integ["gray"].mean(cx - s / 2, cy - s / 2, cx + s / 2, cy + s / 2)
         f.append((gm_in - self.g_mean) / self.g_std)
+        # (peak/max box features were tried here and regressed; reverted)
         # family indicator (one shared model can still specialise per family)
         f.append(1.0 if self.fam == "color" else 0.0)
         base = np.asarray(f, dtype=np.float32)
