@@ -201,6 +201,24 @@ def build_anchors(train_df, fam, cell=2, min_count=2, merge=3):
     return anchors
 
 
+def build_background(train_df, fam, pub):
+    """Per-pixel median image over the family's training images. The images are
+    spatially registered, so this is the 'typical' appearance; a per-image
+    deviation from it highlights the layer-specific anomalies that get boxed
+    (the challenge's 'local residual contrast'). Returns gray HxW float32 or None."""
+    imgs = []
+    for _, r in train_df.iterrows():
+        if family(r["height"]) != fam:
+            continue
+        bgr = cv2.imread(os.path.join(pub, r["image_path"]), cv2.IMREAD_COLOR)
+        if bgr is None:
+            continue
+        imgs.append(cv2.cvtColor(bgr, cv2.COLOR_BGR2GRAY))
+    if not imgs:
+        return None
+    return np.median(np.stack(imgs), axis=0).astype(np.float32)
+
+
 def prior_heatmap(train_df, fam, H, W, sigma=3.0):
     hm = np.zeros((H, W), np.float32)
     for _, r in train_df.iterrows():

@@ -7,8 +7,7 @@ color asymmetry, multi-scale center-surround) plus a learned spatial prior.
 """
 import numpy as np
 import cv2
-from skimage.feature import hog, local_binary_pattern
-import common as C
+import common as C  # skimage imported lazily inside patch_desc (optional feature)
 
 
 CUES = ["gray", "grad", "lstd", "hf", "tophat", "blackhat"]
@@ -17,7 +16,7 @@ _LBP_BINS = _LBP_P + 2  # 'uniform' -> P+2 bins
 
 
 class FeatureExtractor:
-    def __init__(self, bgr, fam, prior_hm=None, use_patch=False):
+    def __init__(self, bgr, fam, prior_hm=None, use_patch=False, bg=None):
         self.fam = fam
         self.use_patch = use_patch
         self.bgr = bgr
@@ -34,10 +33,29 @@ class FeatureExtractor:
             "tophat": maps["tophat"],
             "blackhat": maps["blackhat"],
         }
+        # deviation from the registered-family background = anomaly evidence
+        self.has_bg = bg is not None and bg.shape == g.shape
+        if self.has_bg:
+            # remove global brightness offset so residual isolates local anomalies
+            resid = (g - float(g.mean())) - (bg - float(bg.mean()))
+            chan["resid"] = np.abs(resid)
+            chan["sresid"] = resid
+            self.sal = self.sal + 1.0 * C.robust_norm(
+                cv2.GaussianBlur(np.abs(resid).astype(np.float32), (0, 0), 2))
         # colour channels (BGR)
         chan["B"] = bgr[..., 0].astype(np.float32)
         chan["G"] = bgr[..., 1].astype(np.float32)
         chan["R"] = bgr[..., 2].astype(np.float32)
+        # colour-aware saliency: the colour family's alert features are red/white
+        # lattices on a blue background, invisible to luminance texture alone.
+        if fam == "color":
+            rb = np.abs(chan["R"] - chan["B"])
+            k = 7
+            m1 = cv2.boxFilter(rb, cv2.CV_32F, (k, k))
+            m2 = cv2.boxFilter(rb * rb, cv2.CV_32F, (k, k))
+            rb_tex = np.sqrt(np.clip(m2 - m1 * m1, 0, None))
+            col = C.robust_norm(cv2.GaussianBlur(rb, (0, 0), 2)) + C.robust_norm(rb_tex)
+            self.sal = self.sal + 0.8 * cv2.GaussianBlur(col.astype(np.float32), (0, 0), 2)
         self.integ = {k: C.Integrals(v) for k, v in chan.items()}
         self.integ["sal"] = C.Integrals(self.sal)
         # global stats for normalisation
@@ -57,6 +75,7 @@ class FeatureExtractor:
         pct = np.percentile(p, [5, 25, 50, 75, 95])
         std = p.std() + 1e-6
         pn = (p - p.mean()) / std
+        from skimage.feature import hog, local_binary_pattern
         h = hog(pn, orientations=6, pixels_per_cell=(12, 12), cells_per_block=(2, 2),
                 block_norm="L2-Hys", feature_vector=True)
         u8 = np.clip(p, 0, 255).astype(np.uint8)
@@ -106,6 +125,18 @@ class FeatureExtractor:
         m_in, ring = self._ring_mean(self.integ["sal"], cx, cy, s, m)
         f.append(m_in)
         f.append(m_in - ring)
+
+        # deviation from the registered background (anomaly evidence)
+        if self.has_bg:
+            ri, rr = self._ring_mean(self.integ["resid"], cx, cy, s, m)
+            f.append(ri / 64.0)             # mean |deviation| inside
+            f.append((ri - rr) / 64.0)      # inside vs surround deviation
+            si = self.integ["sresid"].mean(cx - s / 2, cy - s / 2, cx + s / 2, cy + s / 2)
+            f.append(si / 64.0)             # signed deviation (brighter/darker than typical)
+            _, rstd = self.integ["resid"].mean_std(cx - s / 2, cy - s / 2, cx + s / 2, cy + s / 2)
+            f.append(rstd / 64.0)
+        else:
+            f.extend([0.0, 0.0, 0.0, 0.0])
 
         # colour asymmetry (helps the colour family: red/white features on blue)
         for key in ["R", "B"]:
