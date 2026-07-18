@@ -133,3 +133,16 @@ negative_image_penalty times duplicate_penalty.
     negatives the ranker is overconfident on cannot be separated by score alone
     (their score distribution overlaps positives), so this is a partial fix.
     Await the next leaderboard number to calibrate the gate further.
+
+- Round-4 (leaderboard feedback: v3 gate=0.40 scored 0.3125, up from 0.2347):
+  - The gate WORKED and 0.3125 > the positive-only CV 0.296, which proves the
+    negatives ADD score (a correct empty = AP 1.0 on the weighted terms). Catching
+    more negatives is the direct path to 0.35.
+  - The negatives are almost all COLOUR (gray powder-bed images reliably score
+    high). Rendering test images by ascending top-score shows a clean boundary:
+    up to ~0.55 everything is a uniform grid of tiny dashes (negatives); bright
+    bars / rings (real positives) appear at 0.59+.
+  - v4: per-family gate {gray: 0.40, colour: 0.55}. Empties 11 colour images (all
+    verified uniform-grid negatives, 0 gray), avg 4.0 boxes. Gray gate stays low
+    so gray positives are never dropped. Confirm with the next leaderboard number,
+    then consider colour gate ~0.58.
