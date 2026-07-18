@@ -1,25 +1,7 @@
-"""LPBF Visual Alert Box Localization - official, self-contained CPU solution.
-
-Runs end-to-end: reads dataset/public/{train,test}.csv + images, trains a
-spatial-prior + visual-cue presence ranker plus a box-offset regressor, localizes
-square alert boxes, writes working/submission.csv. No GPU, no internet, no
-precomputed predictions. CPU-only, deterministic.
-
-Usage: python solution.py [dataset_public_dir] [out_csv]
-Defaults: dataset/public  and  working/submission.csv
-
-Approach (see approach.md). Target boxes are axis-aligned squares (odd side
-~19-35 px) that recur at a small set of registered locations across two image
-families (gray 448x358 powder bed, colour 448x448 grid of parts). We build
-per-family spatial anchor locations from the training boxes, union them with
-multi cue saliency peaks (contrast, edges, texture, colour, deviation from a
-per-family median background), describe each candidate with center-surround
-features plus the learned spatial prior, and train a gradient boosted classifier
-to decide which candidates are real alert boxes. A gradient boosted box-offset
-regressor then refines each box toward the true location and size. NMS removes
-duplicates and a calibrated, negative-safe threshold keeps predictions sparse.
-"""
 import os
+os.environ.setdefault("OMP_NUM_THREADS", "1")
+os.environ.setdefault("OPENBLAS_NUM_THREADS", "1")
+os.environ.setdefault("MKL_NUM_THREADS", "1")
 import sys
 import time
 import numpy as np
@@ -27,11 +9,11 @@ import pandas as pd
 import cv2
 
 FAMS = ["gray", "color"]
-POS_R = {"gray": 4.0, "color": 7.0}       # px: candidate<->GT match radius (labels)
+POS_R = {"gray": 4.0, "color": 7.0}
 FAM_MED_SIZE = {"gray": 25, "color": 29}
 CUES = ["gray", "grad", "lstd", "hf", "tophat", "blackhat"]
-TH_MAIN = 0.05                             # emit candidates scoring >= this
-FLOOR = 0.08                               # else force top-1 if its score >= this
+TH_MAIN = 0.05
+FLOOR = 0.08
 MAX_BOX = 8
 NMS_IOU = 0.30
 SEED = 0
@@ -44,7 +26,6 @@ def log(*a):
     print(*a, flush=True)
 
 
-# ------------------------------------------------------------------ io / boxes
 def find_public_dir(explicit=None):
     if explicit and os.path.isdir(explicit):
         return explicit
@@ -115,7 +96,6 @@ def nms(boxes, scores, iou_thr=0.30):
     return keep
 
 
-# ------------------------------------------------------------------ integral imgs
 class Integrals:
     def __init__(self, g):
         g = g.astype(np.float64)
@@ -167,7 +147,6 @@ def cue_maps(gray):
     return dict(grad=grad, lstd=lstd, tophat=tophat, blackhat=blackhat, hf=hf, sal=sal)
 
 
-# ------------------------------------------------------------------ prior / bg
 def build_anchors(df, fam, cell=2, min_count=2, merge=3):
     pts, sizes = [], []
     for _, r in df.iterrows():
@@ -237,7 +216,6 @@ def peak_candidates(sal, max_peaks, min_dist, rel_thresh):
     return [(int(xs[i]), int(ys[i])) for i in order]
 
 
-# ------------------------------------------------------------------ features
 class FeatureExtractor:
     def __init__(self, bgr, fam, prior_hm, bg):
         self.fam = fam
@@ -328,7 +306,6 @@ def gen_candidates(fe, anchors, fam):
     return cands
 
 
-# ------------------------------------------------------------------ pipeline
 def train(df, anchors, prior, bg):
     from sklearn.ensemble import HistGradientBoostingClassifier, HistGradientBoostingRegressor
     X, y, Xp, T = [], [], [], []
