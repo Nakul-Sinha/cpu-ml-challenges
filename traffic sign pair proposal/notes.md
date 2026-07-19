@@ -52,5 +52,10 @@ Real in-script CV training; NO hardcoded predictions / ID-order signal / externa
 Box1 (EPYC 16 vCPU / 124 GB): `ssh -i "/g/Datacurve/cpu-challenges/my-keys/eris key.pem" -o BatchMode=yes -o ConnectTimeout=15 ec2-user@ec2-34-227-176-167.compute-1.amazonaws.com`
 Venv: `~/venv/bin/python` (torch 2.8+cpu, torchvision 0.23+cpu, sklearn 1.6, pandas 2.3, numpy 2.0, cv2 5.0; NO timm). Work: `/mnt/work/traffic` (has `dataset/`). Scratch `/mnt/work` 276 GB. Root disk only ~4.9 GB free => keep all caches under `/mnt/work`.
 
+## Git / version control
+Shared repo `Nakul-Sinha/eris-cpu-challenges` is worked by concurrent sessions => NEVER `git checkout`/`add -A` (moves shared HEAD / stages SSH keys). Use the temp-index helper `scratchpad/git_push_scoped.sh <branch> "<msg>" "traffic sign pair proposal"`: builds each commit in a temp index vs fresh origin/main (or branch tip), force-adds ONLY scoped text/code files (never dataset/keys), pushes to a dedicated branch without touching HEAD/working-tree. Branch: `traffic-sign/solve`. Commit at every milestone; PR->squash-merge at the end.
+
 ## Log
-- (setup) Box1 chosen, dataset transferred, venv verified. Baseline pending.
+- (setup) Box1 chosen, dataset transferred, venv verified.
+- (iter1) fable planner -> plan.md (E0 grouped folds prereq; E1 pretrained flat / E2 scratch floor / E3 2-head; E4a per-class offset tuning; E6 geometric-GBDT arm). opus building harness + baseline.
+- (git) branch traffic-sign/solve pushed (scaffolding). Helper + gh credential path verified.
