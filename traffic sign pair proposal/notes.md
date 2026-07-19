@@ -59,3 +59,9 @@ Shared repo `Nakul-Sinha/eris-cpu-challenges` is worked by concurrent sessions =
 - (setup) Box1 chosen, dataset transferred, venv verified.
 - (iter1) fable planner -> plan.md (E0 grouped folds prereq; E1 pretrained flat / E2 scratch floor / E3 2-head; E4a per-class offset tuning; E6 geometric-GBDT arm). opus building harness + baseline.
 - (git) branch traffic-sign/solve pushed (scaffolding). Helper + gh credential path verified.
+- (wave1) 3 concurrent arms, StratifiedKFold(5,seed42), safe augs, TTA{id,h,v,hv}, class-weighted CE + LS0.05:
+  - W1-A flat resnet18 @192 12ep: OOF 0.5904 (mf1 .606 / bal .611 / minrec .496). Best worst-class recall. under-predicts SEP_OFFSET.
+  - W1-B 2-head (band x align) resnet18 @192 12ep: OOF 0.5839 (mf1 .615 / bal .616 / minrec .406). Higher F1/bal, weaker minrec. band3-acc .795, align-acc .750. best epoch/fold [6,7,7,7,10] => still climbing (undertrained).
+  - W1-C resnet34 @192: only 2ep/fold (CPU contention, 194s/ep) => 0.4558 undertrained. resnet34 too slow on CPU; DEPRIORITIZE.
+  - Levers confirmed: pretrained resnet18 workhorse; offset tuning ~+0.03; flat & 2-head complementary => ensemble candidate. Hard classes: JOINT_ALIGNED, SEPARATION_OFFSET.
+  - Contention lesson: 3 concurrent arms slowed epochs to ~87-95s; fixed-epoch arms completed, adaptive-budget arm (r34) got cut. For wave2 prefer 2 concurrent arms or fewer epochs.
