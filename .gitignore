@@ -44,3 +44,4 @@ parser attatchment disagreement/dataset/
 venv/
 
 # NOTE: submission.csv is a small deliverable and is intentionally NOT ignored.
+!/traffic sign pair proposal/
