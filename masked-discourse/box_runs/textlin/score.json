@@ -1,0 +1,50 @@
+{
+  "family": "textlin (multinomial LogisticRegression on TF-IDF + dense)",
+  "score": 53.13879721242806,
+  "mode": "viterbi",
+  "viterbi": 53.13879721242806,
+  "posterior": 52.4279,
+  "TypeMacroF1": 0.465814460192826,
+  "AnchorMacroF1": 0.42442586015003547,
+  "TypeScore": 0.5187333333333333,
+  "OrderedScore": 0.7589666666666666,
+  "ParentScore": 0.9989333333333332,
+  "type_percls": {
+    "answer": 0.695,
+    "elaboration": 0.427,
+    "question": 0.529,
+    "appreciation": 0.352,
+    "agreement": 0.325
+  },
+  "anchor_percls": {
+    "answer": 0.404,
+    "elaboration": 0.259,
+    "question": 0.665,
+    "appreciation": 0.397,
+    "agreement": 0.397
+  },
+  "config": {
+    "estimator": "LogisticRegression(multinomial, solver=lbfgs, max_iter=500, tol=1e-3)",
+    "C": 0.3,
+    "class_weight": "balanced",
+    "role_specific_models": false,
+    "note": "single shared model with role/pos one-hots beat 3 role-specific models (~51-52)",
+    "text_features": [
+      "thread_title word (1,2)-grams, min_df=2, sublinear_tf",
+      "thread_title char_wb (3,5)-grams, min_df=3, sublinear_tf",
+      "forum char_wb (2,5)-grams, min_df=2, sublinear_tf (key for 57% unseen test forums)"
+    ],
+    "dense_features": "90-dim StandardScaler'd basis from common.extract_nodes: role/pos/route_len, depth/gaps/view stats, par_kind+par_type one-hots, kid/desc/sib type counts+fractions over 6 vis types, between-chain types, thread vis-type distribution, terminal flag, title flags, profile flags",
+    "oof": "5-fold common.make_folds (seed 42), vectorizers+scaler fit per-fold on train side only (no leakage)",
+    "test": "mean of the 5 fold models' predict_proba on test",
+    "output_class_order": "common.TYPES [answer, elaboration, question, appreciation, agreement]"
+  },
+  "hpo_findings": {
+    "C_sweep": "peak at C=0.3 (0.15->52.6, 0.20->52.9, 0.25->53.0, 0.30->53.14, 0.40->52.9)",
+    "class_weight": "balanced beats none on viterbi TypeMacroF1 (0.466 vs 0.439); none gives slightly better AnchorMacroF1 under posterior",
+    "decode_mode": "viterbi > posterior for balanced (53.14 vs 52.43)",
+    "role_specific": "worse than single shared model everywhere",
+    "enrichment_tried_and_rejected": "forum word-unigram tokens + pos0/anchor interaction terms + extra dense (105-dim) slightly HURT (~52.8); geomean(balanced,none) blend lifts AnchorMacroF1 (0.439) but not total (best 53.13, ties). Original 90-dim + 3 vectorizers is the family optimum.",
+    "weak_classes": "agreement (F1 0.325) and appreciation (0.352) are the macro-F1 bottleneck; elaboration weak specifically at anchor (0.259)"
+  }
+}
