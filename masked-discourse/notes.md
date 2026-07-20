@@ -47,6 +47,17 @@ Published: constant 13.46 / topo-parent 22.82 / local-window 38.96 / public-ense
 - Final deliverables: solution/solution.py (self-contained, path-robust, ~8.5 min 16c / est <15 min
   on 10c grader, valid-CSV fallback), working/submission.csv == submission.csv (exact runtime output),
   approach.md. Dev artifacts on Box 1: ~/discourse (foundation, runs), ~/solcheck (isolated verify).
+- TF-IDF REMOVAL (user ruling 2026-07-21: tfidf not allowed): replaced all TfidfVectorizer blocks
+  (textlin family + meta) with stateless HashingVectorizer (alternate_sign=False, per-doc l2 norm;
+  no idf, no corpus vocabulary, no min_df). Result IMPROVED: textlin2 C=0.5 53.06 (~= tfidf 53.14);
+  meta on hashed text C grid 4/6/8 -> 64.39/64.86/64.91 posterior (plateau; halves positive both
+  sides) vs 61.7 with tfidf — hashing keeps rare/unseen-forum ngrams as shared buckets (45% of test
+  forums unseen) and drops idf downweighting. GBM FNV count buckets + nnseq hashed EmbeddingBags
+  unchanged (never used corpus stats).
+- FINAL v2 (no-tfidf) isolated argv run (608s, out3): meta C=6 posterior OOF **64.6255**
+  (TypeMacroF1 .5876, Anchor .5836, TypeScore .6346, Ordered .8168, Parent .9989); blend was
+  (0.125,0.375,0.5) 53.91; anchor specialist + meta+nn rejected on OOF. Platform contract
+  `python3 solution.py <public_dir> <submission_out>` honored; strict validation passed.
 
 ## Compliance notes
 - Real ML: emission models (GBM/LR/NN) + learned transitions trained in-script; parents via
