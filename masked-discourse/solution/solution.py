@@ -7,15 +7,16 @@ Pipeline (everything fit from ./dataset/public/train.csv at run time):
      present, else ROOT).
   2. Train three diverse per-node type-emission families with shared 5-fold CV:
        A. LightGBM multiclass on 183 dense structural/context features,
-       B. Logistic regression on title/forum TF-IDF + 90 dense features,
+       B. Logistic regression on stateless hashed title/forum n-gram features
+          (no idf, no corpus vocabulary) + 90 dense features,
        C. Torch BiGRU + MLP joint-route taggers (seed-averaged),
      producing out-of-fold probabilities for every masked train node and
      fold-averaged probabilities for test nodes.
   3. Blend the family probabilities (log-linear weights selected on OOF with
      the exact competition metric), then train a stacked logistic-regression
      meta-model on [family log-probs | blend | neighbor-node blend probs |
-     structural features | TF-IDF text] with the same fold protocol, plus a
-     dedicated anchor-position specialist geo-mixed at the route's last node.
+     structural features | hashed text features] with the same fold protocol,
+     plus a dedicated anchor-position specialist geo-mixed at the last node.
   4. Decode each route with position-conditioned label transitions estimated
      from the training targets (max-marginal / Viterbi, mode selected on OOF)
      and write the alternating type/parent token sequences.
@@ -561,7 +562,7 @@ def run_gbm(Xtr, Xte, y, node_fold, seeds=(42, 7, 123), n_est=170):
 
 
 # ---------------------------------------------------------------------------
-# family B: TF-IDF + logistic regression
+# family B: hashed text n-grams + logistic regression
 # ---------------------------------------------------------------------------
 
 def textlin_dense(recs):
@@ -612,13 +613,23 @@ def textlin_dense(recs):
 
 
 def make_text_vecs():
-    from sklearn.feature_extraction.text import TfidfVectorizer
-    return ([TfidfVectorizer(analyzer='word', ngram_range=(1, 2), min_df=2,
-                             sublinear_tf=True, lowercase=True, strip_accents='unicode'),
-             TfidfVectorizer(analyzer='char_wb', ngram_range=(3, 5), min_df=3,
-                             sublinear_tf=True, lowercase=True)],
-            TfidfVectorizer(analyzer='char_wb', ngram_range=(2, 5), min_df=2,
-                            sublinear_tf=True, lowercase=True))
+    """Stateless hashed n-gram encoders: no idf weighting, no corpus vocabulary,
+    no document-frequency statistics — purely per-sample transforms."""
+    from sklearn.feature_extraction.text import HashingVectorizer
+    return ([HashingVectorizer(analyzer='word', ngram_range=(1, 2), n_features=2**12,
+                               alternate_sign=False, norm='l2', lowercase=True,
+                               strip_accents='unicode'),
+             HashingVectorizer(analyzer='char_wb', ngram_range=(3, 5), n_features=2**13,
+                               alternate_sign=False, norm='l2', lowercase=True)],
+            HashingVectorizer(analyzer='char_wb', ngram_range=(2, 5), n_features=2**11,
+                              alternate_sign=False, norm='l2', lowercase=True))
+
+
+def hash_text(tit, forum):
+    from scipy import sparse
+    tvecs, fvec = make_text_vecs()
+    return sparse.hstack([v.transform(list(tit)) for v in tvecs] +
+                         [fvec.transform(list(forum))]).tocsr()
 
 
 def predict_full(clf, X):
@@ -629,34 +640,21 @@ def predict_full(clf, X):
     return full / full.sum(1, keepdims=True)
 
 
-def run_textlin(Dtr, Dte, tit_tr, for_tr, tit_te, for_te, y, node_fold, C=0.3):
+def run_textlin(Dtr, Dte, tit_tr, for_tr, tit_te, for_te, y, node_fold, C=0.5):
     from sklearn.preprocessing import StandardScaler
     from sklearn.linear_model import LogisticRegression
     from scipy import sparse
+    Ttr = hash_text(tit_tr, for_tr)
+    Tte = hash_text(tit_te, for_te)
     oof = np.zeros((Dtr.shape[0], 5))
     test = np.zeros((Dte.shape[0], 5))
     for f in range(5):
         tm = node_fold != f
         vm = ~tm
-        idx = np.where(tm)[0]
-        tvecs, fvec = make_text_vecs()
-        for v in tvecs:
-            v.fit([tit_tr[i] for i in idx])
-        fvec.fit([for_tr[i] for i in idx])
-
-        def tf(tit, forum):
-            return sparse.hstack([v.transform(tit) for v in tvecs] +
-                                 [fvec.transform(forum)]).tocsr()
-
         sc = StandardScaler().fit(Dtr[tm])
-        Xtr = sparse.hstack([tf([tit_tr[i] for i in np.where(tm)[0]],
-                                [for_tr[i] for i in np.where(tm)[0]]),
-                             sparse.csr_matrix(sc.transform(Dtr[tm]))]).tocsr()
-        Xva = sparse.hstack([tf([tit_tr[i] for i in np.where(vm)[0]],
-                                [for_tr[i] for i in np.where(vm)[0]]),
-                             sparse.csr_matrix(sc.transform(Dtr[vm]))]).tocsr()
-        Xte = sparse.hstack([tf(tit_te, for_te),
-                             sparse.csr_matrix(sc.transform(Dte))]).tocsr()
+        Xtr = sparse.hstack([Ttr[tm], sparse.csr_matrix(sc.transform(Dtr[tm]))]).tocsr()
+        Xva = sparse.hstack([Ttr[vm], sparse.csr_matrix(sc.transform(Dtr[vm]))]).tocsr()
+        Xte = sparse.hstack([Tte, sparse.csr_matrix(sc.transform(Dte))]).tocsr()
         m = LogisticRegression(C=C, class_weight='balanced', solver='lbfgs',
                                max_iter=500, tol=1e-3)
         m.fit(Xtr, y[tm])
@@ -971,40 +969,22 @@ def run_meta(P3_oof, P3_test, Bo, Bt, prev_tr, next_tr, prev_te, next_te,
         y = y[keep_tr]
         node_fold = node_fold[keep_tr]
 
-    def vecs():
-        from sklearn.feature_extraction.text import TfidfVectorizer
-        return [TfidfVectorizer(analyzer='word', ngram_range=(1, 2), min_df=2, sublinear_tf=True),
-                TfidfVectorizer(analyzer='char_wb', ngram_range=(3, 5), min_df=3, sublinear_tf=True),
-                TfidfVectorizer(analyzer='char_wb', ngram_range=(2, 5), min_df=2, sublinear_tf=True)]
-
-    tit_tr = np.array(tit_tr, dtype=object)
-    for_tr = np.array(for_tr, dtype=object)
-    tit_te = np.array(tit_te, dtype=object)
-    for_te = np.array(for_te, dtype=object)
-
-    def tf(vs, ti, fo):
-        return sparse.hstack([vs[0].transform(ti), vs[1].transform(ti),
-                              vs[2].transform(fo)]).tocsr()
+    Ttr = hash_text(tit_tr, for_tr)
+    Tte = hash_text(tit_te, for_te)
 
     oof = np.zeros((len(Dtr), NT))
     for f in range(5):
         trm = np.where(node_fold != f)[0]
         prm = np.where(node_fold == f)[0]
         sc = StandardScaler().fit(Dtr[trm])
-        vs = vecs()
-        vs[0].fit(tit_tr[trm]); vs[1].fit(tit_tr[trm]); vs[2].fit(for_tr[trm])
-        Xtr = sparse.hstack([sparse.csr_matrix(sc.transform(Dtr[trm])),
-                             tf(vs, tit_tr[trm], for_tr[trm])]).tocsr()
-        Xpr = sparse.hstack([sparse.csr_matrix(sc.transform(Dtr[prm])),
-                             tf(vs, tit_tr[prm], for_tr[prm])]).tocsr()
+        Xtr = sparse.hstack([sparse.csr_matrix(sc.transform(Dtr[trm])), Ttr[trm]]).tocsr()
+        Xpr = sparse.hstack([sparse.csr_matrix(sc.transform(Dtr[prm])), Ttr[prm]]).tocsr()
         m = LogisticRegression(C=C, class_weight='balanced', max_iter=4000, tol=1e-3)
         m.fit(Xtr, y[trm])
         oof[prm] = predict_full(m, Xpr)
     sc = StandardScaler().fit(Dtr)
-    vs = vecs()
-    vs[0].fit(tit_tr); vs[1].fit(tit_tr); vs[2].fit(for_tr)
-    Xtr = sparse.hstack([sparse.csr_matrix(sc.transform(Dtr)), tf(vs, tit_tr, for_tr)]).tocsr()
-    Xte = sparse.hstack([sparse.csr_matrix(sc.transform(Dte)), tf(vs, tit_te, for_te)]).tocsr()
+    Xtr = sparse.hstack([sparse.csr_matrix(sc.transform(Dtr)), Ttr]).tocsr()
+    Xte = sparse.hstack([sparse.csr_matrix(sc.transform(Dte)), Tte]).tocsr()
     m = LogisticRegression(C=C, class_weight='balanced', max_iter=4000, tol=1e-3)
     m.fit(Xtr, y)
     test = predict_full(m, Xte)
@@ -1180,7 +1160,7 @@ def run_pipeline(train, test, ids, test_ids, lens, test_lens, targets,
     Bt /= Bt.sum(1, keepdims=True)
 
     # ---------------- meta stacker (struct features = textlin dense basis) ----------------
-    Cs = [2.5, 1.5] if time_left() > 900 else [2.5]
+    Cs = [6.0, 4.0, 8.0] if time_left() > 1100 else [6.0]
     m_best = None
     for C in Cs:
         m_oof, m_test = run_meta((g_oof, t_oof, n_oof), (g_test, t_test, n_test),
