@@ -22,6 +22,10 @@ Pipeline (everything fit from ./dataset/public/train.csv at run time):
 
 A wall-clock budget manager keeps the run inside the grading limit and a
 fallback path always writes a valid submission.
+
+Runtime command: python3 solution.py <public_dir> <submission_out>
+(Both arguments are optional; without them the script auto-discovers the data
+directory and writes ./working/submission.csv.)
 """
 import os
 import re
@@ -52,8 +56,11 @@ def log(msg):
 # ---------------------------------------------------------------------------
 
 def find_data_root():
-    cands = ['dataset/public', 'dataset', '.', './public', '../dataset/public',
-             '/kaggle/input']
+    cands = []
+    if len(sys.argv) > 1 and sys.argv[1]:
+        cands.append(sys.argv[1])
+    cands += ['dataset/public', 'dataset', '.', './public', '../dataset/public',
+              '/kaggle/input']
     for c in cands:
         if os.path.exists(os.path.join(c, 'train.csv')) and \
            os.path.exists(os.path.join(c, 'test.csv')):
@@ -1014,7 +1021,12 @@ def main():
     train = pd.read_csv(os.path.join(root, 'train.csv'))
     test = pd.read_csv(os.path.join(root, 'test.csv'))
     sample = pd.read_csv(os.path.join(root, 'sample_submission.csv'))
-    os.makedirs('working', exist_ok=True)
+    out_file = sys.argv[2] if len(sys.argv) > 2 and sys.argv[2] else \
+        os.path.join('working', 'submission.csv')
+    out_dir = os.path.dirname(out_file)
+    if out_dir:
+        os.makedirs(out_dir, exist_ok=True)
+    log(f'submission target: {out_file}')
 
     ids = train['sample_id'].tolist()
     test_ids = test['sample_id'].tolist()
@@ -1026,7 +1038,8 @@ def main():
     folds_rows = make_folds(train)
 
     # fallback submission writer (used on catastrophic failure and at the end)
-    def write_submission(seqs_idx_by_row, path='working/submission.csv'):
+    def write_submission(seqs_idx_by_row, path=None):
+        path = path or out_file
         out_rows = {}
         for r, sid in enumerate(test_ids):
             toks = []
@@ -1135,9 +1148,15 @@ def run_pipeline(train, test, ids, test_ids, lens, test_lens, targets,
     nn_budget = min(0.55 * max(time_left() - 600, 0), 1500)
     seeds_per_arch = 3 if nn_budget > 700 else 2
     log(f'nnseq budget {nn_budget:.0f}s -> {seeds_per_arch} seeds/arch')
-    n_oof, n_test, n_models = run_nnseq(train, test, folds_rows, seeds_per_arch)
-    log(f'nnseq ({n_models} models) OOF '
-        f'{max(oof_score(n_oof, "viterbi"), oof_score(n_oof, "posterior")):.4f}')
+    try:
+        n_oof, n_test, n_models = run_nnseq(train, test, folds_rows, seeds_per_arch)
+        log(f'nnseq ({n_models} models) OOF '
+            f'{max(oof_score(n_oof, "viterbi"), oof_score(n_oof, "posterior")):.4f}')
+    except Exception as e:
+        log(f'nnseq family failed ({e}); substituting uninformative probs '
+            f'(blend search will zero it out)')
+        n_oof = np.full((n_tr, NT), 1.0 / NT)
+        n_test = np.full((n_te, NT), 1.0 / NT)
 
     # ---------------- blend weight search ----------------
     logs = [np.log(np.clip(P, 1e-9, 1)) for P in (g_oof, t_oof, n_oof)]
