@@ -1,0 +1,12 @@
+{
+  "TypeMacroF1": 0.45162907319268797,
+  "AnchorMacroF1": 0.43185092590846114,
+  "TypeScore": 0.5206,
+  "OrderedScore": 0.7597666666666667,
+  "ParentScore": 0.9989333333333332,
+  "score": 52.71674810804915,
+  "mode": "viterbi",
+  "posterior_score": 52.4766,
+  "raw_argmax_macroF1": 0.4728,
+  "members": "gru5 + mlp5 arithmetic mean (50 models)"
+}
