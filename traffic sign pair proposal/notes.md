@@ -65,3 +65,15 @@ Shared repo `Nakul-Sinha/eris-cpu-challenges` is worked by concurrent sessions =
   - W1-C resnet34 @192: only 2ep/fold (CPU contention, 194s/ep) => 0.4558 undertrained. resnet34 too slow on CPU; DEPRIORITIZE.
   - Levers confirmed: pretrained resnet18 workhorse; offset tuning ~+0.03; flat & 2-head complementary => ensemble candidate. Hard classes: JOINT_ALIGNED, SEPARATION_OFFSET.
   - Contention lesson: 3 concurrent arms slowed epochs to ~87-95s; fixed-epoch arms completed, adaptive-budget arm (r34) got cut. For wave2 prefer 2 concurrent arms or fewer epochs.
+- (wave2) resolution + geom-aux. Individual (tuned): flat@224 0.594, 2head@224 **0.604 (best single**, align-acc .777 up from .750), geomaux@192 0.601, flat@192 0.598, 2head@192 0.594.
+  - BEST ENSEMBLE (nested-honest tuned) = flat@224 + 2head@224 + geomaux@192 = **0.6358** (mf1 .644 / bal .648 / minrec .585). BEATS 0.63.
+  - Ensembles needing >=0.63 ALL require BOTH @224 arms; geomaux (@192, cheap) adds +0.032 diversity (w2a+w2b alone only 0.604). Single-@224 configs cap ~0.628.
+  - @224 is slow on CPU (~68s/ep uncontended, ~118s contended, 5-fold 12-14ep ~180min).
+  - Offset tuning applies big -1.6 to INDEP (easy/over-predicted) to boost coupled-class recall; nested-honest so it generalizes.
+  - working/submission.csv = 3-arm research ensemble (honest ~0.636).
+
+## Finalization plan (task #4) — CRITICAL
+Research ensemble (5-fold, 12-14ep, 2x@224) is TOO SLOW to ship. Final solution.py must reproduce the 3-arm recipe IN-BUDGET (batch budget = 1.5h/10cores/62GB per the OpenAPI sibling challenge; older memory said 60min -> be adaptive + safeguard).
+- Train {flat@224, 2head@224, geomaux@192} CONCURRENTLY (multiprocessing, ~3-4 threads each) with ADAPTIVE epoch count from a timed probe; 4-5 fold; keep best epoch by val comp; hard safeguard ~85min -> stop + submit.
+- In-script: OOF -> fit per-class additive logit offsets (coordinate ascent on comp_score) -> apply to fold-mean test probs -> write working/submission.csv. NO hardcoded predictions/offsets; all fit at runtime. Path-robust (harness auto-detect).
+- MEASURE actual OOF comp + wall-clock on Box2 (Xeon parity ~grader) before shipping. Confirm >=0.63 with margin; if short, boost (more epochs / seed-diverse @224 / weighted ensemble).
