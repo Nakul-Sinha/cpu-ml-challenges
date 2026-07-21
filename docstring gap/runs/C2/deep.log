@@ -1,0 +1,35 @@
+=== DEEP DOC_FIRST START Tue Jul 21 08:00:16 UTC 2026 ===
+/dev/nvme1n1p1  8.0G  4.4G  3.6G  56% /
+
+#### RUN tag=hintdeep lr=0.0003 mode=doc_first budget=600s bs=24 ####
+train pool=100000 (buckets2-19)  eval=1500 (bucket0)
+  t=0 (zero-shot) chrF=0.1986
+  t=  5.0min seen=2184 sps=7.3 loss=2.291 chrF=0.2780
+  t= 10.0min seen=4368 sps=7.3 loss=2.149 chrF=0.3075
+  DONE hintdeep: 182 steps, 4368 samples, 7.3 samples/s train-only
+  curve -> runs/C2/curve_hintdeep.csv
+  ckpt -> runs/C2/ft_hint
+
+wall 832s
+=== deep hint done -> DUMP Tue Jul 21 08:14:15 UTC 2026 ===
+=== INTEGRATION DUMP (500 rows, mode=doc_first, ckpt=runs/C2/ft_hint) ===
+  chrF on dump: 0.3133
+  seq_logprob vs f corr: 0.384
+  saved runs/C2/t5_dump_ft_500.csv
+=== dump done -> UNION ORACLE Tue Jul 21 08:14:49 UTC 2026 ===
+T5 FT dump rows: 500
+
+=== MEANS over 500 rows (bucket-0 sample) ===
+  retrieval PICK  (B1)      : 0.2669
+  T5 FT standalone          : 0.3133
+  retrieval ORACLE (B2 pool): 0.5671
+  UNION oracle (B2 ∪ T5)    : 0.6071  (lift over pool +0.0400)
+  T5 pred already in B2 pool: 162/500 (32.4%)
+
+=== AGREEMENT ===
+  retrieval PICK good (f>0.8): 41 rows -> mean T5 f = 0.5135
+  retrieval PICK bad  (f<0.3): 352 rows -> T5 rescues (f>0.5): 53/352  mean T5 f = 0.2487
+  T5 f > retrieval ORACLE   : 80/500 rows (T5 adds coverage the pool lacks)
+  corr(retrieval PICK f, T5 f) = 0.324
+  corr(T5 seq_logprob, T5 f)   = 0.384
+=== ALL_DEEP_DONE Tue Jul 21 08:14:58 UTC 2026 ===

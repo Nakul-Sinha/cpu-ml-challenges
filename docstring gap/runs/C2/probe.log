@@ -1,0 +1,34 @@
+=== ZERO-SHOT FORMAT SWEEP (t5-small) ===
+eval rows: 1500 (bucket-0 sample)
+  plain        chrF=0.1653  65.1s  23.0 rows/s
+  code_first   chrF=0.1939  83.7s  17.9 rows/s
+  doc_first    chrF=0.1986  86.3s  17.4 rows/s
+
+=== FLAN-T5-SMALL zero-shot reference (500 rows) ===
+  flan plain        chrF=0.0856  24.3s
+  flan code_first   chrF=0.1198  32.1s
+  flan instruct    chrF=0.0958
+=== INFERENCE SPEED (t5-small, greedy, threads=7) ===
+  fp32 bs= 16:   12.8 rows/s    203.7 tok/s  50k-> 65.1 min
+  fp32 bs= 32:   17.6 rows/s    280.5 tok/s  50k-> 47.3 min
+  fp32 bs= 64:   19.9 rows/s    316.8 tok/s  50k-> 41.9 min
+  fp32 chrF (zero-shot, code_first, 1024 rows): 0.2015
+
+  --- dynamic int8 quantization ---
+/home/ec2-user/docgap/runs/C2/t5_probe.py:183: DeprecationWarning: torch.ao.quantization is deprecated and will be removed in 2.10. 
+For migrations of users: 
+1. Eager mode quantization (torch.ao.quantization.quantize, torch.ao.quantization.quantize_dynamic), please migrate to use torchao eager mode quantize_ API instead 
+2. FX graph mode quantization (torch.ao.quantization.quantize_fx.prepare_fx,torch.ao.quantization.quantize_fx.convert_fx, please migrate to use torchao pt2e quantization API instead (prepare_pt2e, convert_pt2e) 
+3. pt2e quantization has been migrated to torchao (https://github.com/pytorch/ao/tree/main/torchao/quantization/pt2e) 
+see https://github.com/pytorch/ao/issues/2259 for more details
+  qmodel = torch.quantization.quantize_dynamic(model, {torch.nn.Linear}, dtype=torch.qint8).eval()
+  int8 bs= 16:   24.9 rows/s    395.2 tok/s  50k-> 33.5 min
+  int8 bs= 32:   22.3 rows/s    355.1 tok/s  50k-> 37.3 min
+  int8 bs= 64:   27.0 rows/s    430.1 tok/s  50k-> 30.9 min
+  int8 chrF (same subset): 0.1908  (delta -0.0107)
+=== INTEGRATION DUMP (500 rows) ===
+  chrF on dump: 0.1983
+  seq_logprob vs f corr: 0.122
+  saved runs/C2/t5_dump_zs_500.csv
+
+total 683.4s

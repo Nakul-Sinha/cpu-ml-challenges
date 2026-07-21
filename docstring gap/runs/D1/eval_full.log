@@ -1,0 +1,25 @@
+=== FULL EVAL START Tue Jul 21 09:35:11 UTC 2026 ===
+[data] train_fit(2-19)=209022 val0=11462 val1=11489 threads=7 ft_s=960 ckpt=None
+[fits even] n=104493 25s
+[fits odd] n=104529 26s
+[train phase tag0] X(1339054, 78) 159s
+[train phase tag1] X(1344392, 78) 162s
+[fits full] n=209022 50s
+[c1-base] Xtr(2683446, 78) Xv(773503, 78) Xv1(777124, 78) all-fork-done @ 10.9min
+Training until validation scores don't improve for 40 rounds
+Early stopping, best iteration is:
+[289]	valid_0's ndcg@1: 0.446624
+[c1-only] bucket-0 chrF=0.3189  pool_oracle=0.6285
+[t5-ft]   0.8min step=13 seen=312 sps=6.9 loss=2.802
+[t5-ft]   1.5min step=26 seen=624 sps=6.8 loss=1.890
+[t5-ft]   2.3min step=40 seen=960 sps=7.1 loss=2.176
+[t5-ft]   3.1min step=54 seen=1296 sps=7.1 loss=2.071
+[t5-ft]   3.8min step=68 seen=1632 sps=7.2 loss=1.801
+[t5-ft]   4.5min step=81 seen=1944 sps=7.2 loss=1.975
+[t5-ft]   5.3min step=94 seen=2256 sps=7.2 loss=2.126
+[t5-ft]   6.0min step=108 seen=2592 sps=7.2 loss=2.311
+[t5-ft]   6.8min step=122 seen=2928 sps=7.2 loss=2.077
+[t5-ft]   7.5min step=135 seen=3240 sps=7.2 loss=1.523
+[t5-ft]   8.3min step=149 seen=3576 sps=7.2 loss=1.787
+[t5-ft]   9.0min step=162 seen=3888 sps=7.2 loss=2.218
+=== FULL EVAL DONE Tue Jul 21 09:58:37 UTC 2026 ===

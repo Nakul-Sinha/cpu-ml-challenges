@@ -1,0 +1,12 @@
+{
+  "n_val_fullbucket0": 11462,
+  "cap": 80,
+  "oracle_ungated": 0.5865779986868984,
+  "exact_hit": 0.2279706857441982,
+  "mean_pool": 68.59596928982725,
+  "max_pool": 80,
+  "naive_top1_chrf": 0.15757761892996855,
+  "fit_s": 26.275073289871216,
+  "build_fullbucket0_s": 137.7902545928955,
+  "extrap50k_ungated_s": 601.0742217453128
+}
