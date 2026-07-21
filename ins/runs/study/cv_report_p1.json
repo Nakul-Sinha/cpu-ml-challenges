@@ -1,0 +1,284 @@
+{
+  "config": "P1 detector upgrades on N3 base: de=BiGRU-ensemble, en=frozen, it=LGBM re-scorer boost + group-vote[de,en]",
+  "headline_nested": 0.5706,
+  "nonnested": 0.5865,
+  "canonical_check_nested": 0.5706,
+  "canonical_check_nonnested": 0.5865,
+  "n3_base_nested": 0.5503,
+  "delta_vs_n3": 0.0203,
+  "ai_baseline": 0.56,
+  "beats_ai_baseline": true,
+  "ladder": {
+    "N3 base (reproduce)": {
+      "nested": 0.5503,
+      "nonnested": 0.5617,
+      "ne_lang": {
+        "de": 0.4237,
+        "en": 0.8067,
+        "it": 0.4205
+      },
+      "nn_lang": {
+        "de": 0.4391,
+        "en": 0.8256,
+        "it": 0.4205
+      },
+      "fp": {
+        "de": [
+          80,
+          216
+        ],
+        "en": [
+          1,
+          71
+        ],
+        "it": [
+          56,
+          182
+        ]
+      }
+    },
+    "+de BiGRU (a=.6 robust)": {
+      "nested": 0.5693,
+      "nonnested": 0.5844,
+      "ne_lang": {
+        "de": 0.4808,
+        "en": 0.8067,
+        "it": 0.4205
+      },
+      "nn_lang": {
+        "de": 0.5072,
+        "en": 0.8256,
+        "it": 0.4205
+      },
+      "fp": {
+        "de": [
+          57,
+          216
+        ],
+        "en": [
+          1,
+          71
+        ],
+        "it": [
+          56,
+          182
+        ]
+      }
+    },
+    "+de BiGRU (a,thr nest)": {
+      "nested": 0.5712,
+      "nonnested": 0.584,
+      "ne_lang": {
+        "de": 0.4865,
+        "en": 0.8067,
+        "it": 0.4205
+      },
+      "nn_lang": {
+        "de": 0.5058,
+        "en": 0.8256,
+        "it": 0.4205
+      },
+      "fp": {
+        "de": [
+          49,
+          216
+        ],
+        "en": [
+          1,
+          71
+        ],
+        "it": [
+          56,
+          182
+        ]
+      }
+    },
+    "+it re-scorer": {
+      "nested": 0.5516,
+      "nonnested": 0.5638,
+      "ne_lang": {
+        "de": 0.4237,
+        "en": 0.8067,
+        "it": 0.4243
+      },
+      "nn_lang": {
+        "de": 0.4391,
+        "en": 0.8256,
+        "it": 0.4267
+      },
+      "fp": {
+        "de": [
+          80,
+          216
+        ],
+        "en": [
+          1,
+          71
+        ],
+        "it": [
+          57,
+          182
+        ]
+      }
+    },
+    "+both SHIP (de a=.6)": {
+      "nested": 0.5706,
+      "nonnested": 0.5865,
+      "ne_lang": {
+        "de": 0.4808,
+        "en": 0.8067,
+        "it": 0.4243
+      },
+      "nn_lang": {
+        "de": 0.5072,
+        "en": 0.8256,
+        "it": 0.4267
+      },
+      "fp": {
+        "de": [
+          57,
+          216
+        ],
+        "en": [
+          1,
+          71
+        ],
+        "it": [
+          57,
+          182
+        ]
+      }
+    },
+    "+both ref (de a,thr nest)": {
+      "nested": 0.5725,
+      "nonnested": 0.586,
+      "ne_lang": {
+        "de": 0.4865,
+        "en": 0.8067,
+        "it": 0.4243
+      },
+      "nn_lang": {
+        "de": 0.5058,
+        "en": 0.8256,
+        "it": 0.4267
+      },
+      "fp": {
+        "de": [
+          49,
+          216
+        ],
+        "en": [
+          1,
+          71
+        ],
+        "it": [
+          57,
+          182
+        ]
+      }
+    }
+  },
+  "upper_ref_de_a_thr_nested": {
+    "nested": 0.5725,
+    "nonnested": 0.586,
+    "ne_lang": {
+      "de": 0.4865,
+      "en": 0.8067,
+      "it": 0.4243
+    },
+    "nn_lang": {
+      "de": 0.5058,
+      "en": 0.8256,
+      "it": 0.4267
+    },
+    "fp": {
+      "de": [
+        49,
+        216
+      ],
+      "en": [
+        1,
+        71
+      ],
+      "it": [
+        57,
+        182
+      ]
+    }
+  },
+  "ops": {
+    "ship_de_a_fixed": 0.6,
+    "ship_de_thr_by_fold": {
+      "0": 0.19,
+      "1": 0.31,
+      "2": 0.29,
+      "3": 0.35,
+      "4": 0.31
+    },
+    "ref_de_a_thr_by_fold": {
+      "0": [
+        0.75,
+        0.17
+      ],
+      "1": [
+        0.75,
+        0.31
+      ],
+      "2": [
+        0.75,
+        0.31
+      ],
+      "3": [
+        0.6,
+        0.35
+      ],
+      "4": [
+        0.75,
+        0.33
+      ]
+    },
+    "en_frozen": true,
+    "it_boost_by_fold": {
+      "0": [
+        "rescorer",
+        0.6
+      ],
+      "1": [
+        "rescorer",
+        0.6
+      ],
+      "2": [
+        "rescorer",
+        0.6
+      ],
+      "3": [
+        "rescorer",
+        0.4
+      ],
+      "4": [
+        "rescorer",
+        0.5
+      ]
+    },
+    "it_boost_nonnested": [
+      "rescorer",
+      0.6
+    ],
+    "it_spine": 0.45,
+    "it_gate": 0.8
+  },
+  "pr_auc": {
+    "de": {
+      "shared": 0.1938,
+      "gru": 0.2799
+    },
+    "en": {
+      "shared": 0.829,
+      "gru": 0.8969
+    },
+    "it": {
+      "shared": 0.2933,
+      "gru": 0.337
+    }
+  }
+}

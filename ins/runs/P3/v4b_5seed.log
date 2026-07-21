@@ -1,0 +1,55 @@
+[fold 0] fit (4s)
+[fold 1] fit (8s)
+[fold 2] fit (13s)
+[fold 3] fit (17s)
+[fold 4] fit (21s)
+[prepare 23s]
+[P2 transducers fit 23s]
+[GRU fold 0] pos_w=5.15 seeds=5 (77s)
+[GRU fold 1] pos_w=4.87 seeds=5 (133s)
+[GRU fold 2] pos_w=4.91 seeds=5 (188s)
+[GRU fold 3] pos_w=5.00 seeds=5 (246s)
+[GRU fold 4] pos_w=4.76 seeds=5 (303s)
+[both levers trained 307s]
+[de/en caches 315s]
+[it caches (base+P2) 369s]
+
+================ P3 v4 LADDER (group-vote de+en, hi.60/lo.40) ================
+  N3 base (reproduce)            nested=0.5503 nonnest=0.5617  [de 0.4237 en 0.8067 it 0.4205]  FP de=80/216 it=56/182
+  +P1 (de BiGRU + it rescorer)   nested=0.5706 nonnest=0.5865  [de 0.4808 en 0.8067 it 0.4243]  FP de=57/216 it=57/182
+  +P2 (it enhanced transducer)   nested=0.5504 nonnest=0.5619  [de 0.4237 en 0.8067 it 0.4209]  FP de=80/216 it=56/182
+  +P1+P2 JOINT (de a=.6)         nested=0.5707 nonnest=0.5866  [de 0.4808 en 0.8067 it 0.4246]  FP de=57/216 it=57/182
+        de multi_marked   rec=0.477(n=109) lm0.204
+        de multi_plain    rec=0.582(n=134) lm0.299
+        de single_marked  rec=0.684(n=193) lm0.565
+        de single_plain   rec=0.028(n=107) lm0.092
+        it multi_marked   rec=0.000(n=48)
+        it multi_plain    rec=0.373(n=241) lm0.508
+        it single_marked  rec=0.100(n=10)
+        it single_plain   rec=0.356(n=388) lm0.378
+  +P1+P2 ref (de a,thr nest)     nested=0.5726 nonnest=0.5861  [de 0.4865 en 0.8067 it 0.4246]  FP de=49/216 it=57/182
+
+---- token PR-AUC (shared vs GRU vs it-rescorer) ----
+  de: shared=0.1938 GRU=0.2799
+  en: shared=0.8290 GRU=0.8969
+  it: shared=0.2933 GRU=0.3370 it-rescorer=0.3174
+
+================ SELECTED OPERATING POINTS (for solution.py) ================
+  de: a=0.6 thr_nonnested=0.19  thr_by_fold={0: np.float64(0.19), 1: np.float64(0.31), 2: np.float64(0.29), 3: np.float64(0.35), 4: np.float64(0.31)}
+  en: a=0 thr_nonnested=0.39  thr_by_fold={0: np.float64(0.05), 1: np.float64(0.39), 2: np.float64(0.39), 3: np.float64(0.39), 4: np.float64(0.75)}
+  it: spine=0.45 gate=0.8 boost=(rescorer,0.6) transducer=P2  by_fold={0: ('rescorer', 0.6), 1: ('rescorer', 0.6), 2: ('rescorer', 0.6), 3: ('rescorer', 0.4), 4: ('rescorer', 0.5)}
+  de (a,thr) ref by-fold: [(0.75, np.float64(0.17)), (0.75, np.float64(0.31)), (0.75, np.float64(0.31)), (0.6, np.float64(0.35)), (0.75, np.float64(0.33))]
+
+================ SHIP-FIXED honest nested (de fixed @a=.6, en nested, it fixed rescorer0.6+P2) ================
+  de_thr=0.15  nested=0.5789 nonnest=0.5852  [de 0.5030 en 0.8067 it 0.4269]
+  de_thr=0.19  nested=0.5803 nonnest=0.5866  [de 0.5072 en 0.8067 it 0.4269]
+  de_thr=0.25  nested=0.5781 nonnest=0.5843  [de 0.5005 en 0.8067 it 0.4269]
+  de_thr=0.29  nested=0.5777 nonnest=0.5840  [de 0.4995 en 0.8067 it 0.4269]
+  de_thr=0.31  nested=0.5777 nonnest=0.5840  [de 0.4996 en 0.8067 it 0.4269]
+  de_thr=0.35  nested=0.5756 nonnest=0.5819  [de 0.4932 en 0.8067 it 0.4269]
+
+canonical elru.score_frames  JOINT non-nested=0.5866  nested=0.5707
+OOF rows valid: 1259/1259
+
+HEADLINE v4 nested = 0.5707  (N3 0.5503, AI baseline 0.56: BEAT)   [376s]
+wrote cv_report_v4.json, oof_edits_v4.csv

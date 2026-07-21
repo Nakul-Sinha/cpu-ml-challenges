@@ -1,0 +1,66 @@
+{
+  "agent": "N2 (German + Replacement + EN derisking)",
+  "base": "M4 ship (M2+M3 + group-vote[de,en])",
+  "config_shipped": "n2_ext = M4 base + de_markrun_generator + masc_only_hook",
+  "headline_nested_elru": 0.5471,
+  "base_nested_elru": 0.5423,
+  "nested_delta": 0.0048,
+  "nonnested_elru": 0.5593,
+  "base_nonnested_elru": 0.5517,
+  "nonnested_delta": 0.0077,
+  "per_lang_nested": {
+    "de": {"base": 0.4094, "n2": 0.4237, "delta": 0.0143},
+    "en": {"base": 0.8067, "n2": 0.8067, "delta": 0.0000},
+    "it": {"base": 0.4109, "n2": 0.4109, "delta": 0.0000}
+  },
+  "per_lang_nonnested": {
+    "de": {"base": 0.4161, "n2": 0.4391, "delta": 0.0230},
+    "en": {"base": 0.8256, "n2": 0.8256, "delta": 0.0000},
+    "it": {"base": 0.4133, "n2": 0.4133, "delta": 0.0000}
+  },
+  "unchanged_fp_nonnested": {"de": [80, 216], "en": [1, 71], "it": [56, 182], "note": "IDENTICAL to base - no overprediction added"},
+  "deliverable_1_markrun": {
+    "mechanism": "candidate generator: runs of 2+ adjacent marked tokens whose post-mark suffix is a learned feminine class (transducer mark-template suffixes + M2 fem/gendered); admitted via M2 span_scorer (fem gate) independent of detector threshold; A2 _predict_multi composes per-token replacement",
+    "de_multi_marked_recall": {"iter1_lossmap": 0.204, "base_M4": 0.138, "n2": 0.394},
+    "de_single_marked_recall": {"base": 0.560, "n2": 0.528, "note": "small dip from merging adjacent singles that are separate truth spans; net strongly positive (+28 multi vs -6 single)"},
+    "markrun_alone_nested_delta": 0.0010,
+    "eda_detection": "84/109 de multi_marked spans have ZERO tokens firing at thr .07; 87/109 are pure adjacent-marked runs",
+    "prob_gate_ablation": "MINP=0.15 gate is a no-op (emitted runs are all under-detected); kept always-on"
+  },
+  "deliverable_2_masc_only": {
+    "mechanism": "REPLACEMENT_HOOK after M2 collapse_hook: for de paired forms whose collapse target is not in memory (unseen stem), emit masculine token only (shorter-LCP-suffix conjunct)",
+    "oof_fallback_chrf": {"identity": 0.4740, "masc_only": 0.6989, "fem_only": 0.6659, "sufrw_participle": 0.4740},
+    "winner": "masc_only",
+    "unseen_stem_miss_count": 70,
+    "paired_edits_total": 83,
+    "mascfb_alone_nested_delta": 0.0038
+  },
+  "deliverable_3_de_threshold_robustness": {
+    "curve": [
+      {"de_thr": 0.05, "nonnested_elru": 0.5565, "de_lang": 0.4307, "de_ed_oof": 0.589, "test_ed_frac": 0.899, "test_ratio": 1.56},
+      {"de_thr": 0.07, "nonnested_elru": 0.5593, "de_lang": 0.4391, "de_ed_oof": 0.538, "test_ed_frac": 0.829, "test_ratio": 1.44},
+      {"de_thr": 0.10, "nonnested_elru": 0.5584, "de_lang": 0.4362, "de_ed_oof": 0.487, "test_ed_frac": 0.744, "test_ratio": 1.29},
+      {"de_thr": 0.15, "nonnested_elru": 0.5465, "de_lang": 0.4005, "de_ed_oof": 0.431, "test_ed_frac": 0.651, "test_ratio": 1.13},
+      {"de_thr": 0.20, "nonnested_elru": 0.5440, "de_lang": 0.3931, "de_ed_oof": 0.405, "test_ed_frac": 0.597, "test_ratio": 1.03},
+      {"de_thr": 0.30, "nonnested_elru": 0.5337, "de_lang": 0.3621, "de_ed_oof": 0.354, "test_ed_frac": 0.519, "test_ratio": 0.90}
+    ],
+    "max_cv": {"de_thr": 0.07, "elru": 0.5593, "ratio": 1.44},
+    "robust_le_1_25": {"de_thr": 0.15, "elru": 0.5465, "ratio": 1.13, "cv_cost_vs_max": -0.0129},
+    "recommendation": "Ship de_thr=0.10: only -0.0009 CV vs max, cuts test overprediction ratio 1.44->1.29 (near the 1.25 target). de_thr=0.15 for strict ratio<=1.25 at -0.0129 cost. Max-CV shipper stays de_thr=0.07."
+  },
+  "deliverable_4_en_shift_stress": {
+    "en_nested_normal": 0.8067,
+    "en_nested_masked": 0.8067,
+    "delta": 0.0000,
+    "holds_above_0_75": true,
+    "masking_effect": "0 of 2208 en tokens change prob when all 14 slash/mark detector features are zeroed; slash/mark tokens already receive prob ~0.0000. en edited-span detection is entirely plain-token closed-class lexicon driven (tok_rate/en_cc) -> provably invariant to slash-free test text",
+    "en_norm_memory": "norm_mem keys are punct-normalized via _normkey (strips edge punctuation), so punctuation-attached variants map to the same key; 42 en TEST tokens hit norm_mem",
+    "conclusion": "No en strengthening needed; en is already robust to the test slash-rate shift (train 15.7% -> test 3.4% slash rows)"
+  },
+  "deliverable_5_it_deletion": "not pursued (time-boxed); M3 measured 0/4 precision; duplicate-adjacency del_hook already exists in m3_ext (off)",
+  "compliance": "all learning from train.csv at runtime; per-fold leak-free stores; no literal encoded content strings (only punctuation/mark literals); real LGBM detector unchanged; test used only for inference-time edited-row-rate diagnostic (sanctioned); nested threshold selection; both nested+nonnested reported",
+  "artifacts": {
+    "box": "~/insled/runs/N2/{n2_ext.py, n2_measure.py, n2_eda.py, n2_endiag.py, N2_results.json}",
+    "local": "G:/Datacurve/cpu-challenges/ins/runs/N2/ (same files)"
+  }
+}

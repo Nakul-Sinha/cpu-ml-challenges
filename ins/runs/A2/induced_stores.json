@@ -1,0 +1,54 @@
+{
+ "n_exact": 575,
+ "n_norm": 486,
+ "n_mark_tpl": 6,
+ "n_mark_tpl_bo": 2,
+ "n_suffix_rules": 13,
+ "sample_mark_tpl": {
+  "de|:|xà": [
+   "",
+   " pwéu ",
+   "xà"
+  ],
+  "de|*|xà": [
+   "",
+   " pwéu ",
+   "xà"
+  ],
+  "de|*|xààéà": [
+   "",
+   " äàw ",
+   "xààéà"
+  ],
+  "de|:|xààéà": [
+   "",
+   " äàw ",
+   "xààéà"
+  ],
+  "de|:|xà.": [
+   "",
+   " pwéu wéu fävkèàwxzéà ",
+   "xà"
+  ],
+  "de|*|u": [
+   "",
+   " pwéu ",
+   "u"
+  ]
+ },
+ "sample_suffix": {
+  "it|g": "l/g",
+  "it|èh": "hl/èh",
+  "en|qok": "",
+  "it|yè": "è",
+  "en|qok.": ".",
+  "it|è,": "yxxy,",
+  "it|ﬀw": "gxxgag",
+  "de|à": "*xààéà",
+  "de|éà": "*xààéà",
+  "en|Ul": "Sflj",
+  "en|W/fl": "Sflj",
+  "it|U": "My/U",
+  "it|g/l": "l"
+ }
+}

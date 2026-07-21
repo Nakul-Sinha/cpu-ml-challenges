@@ -10,6 +10,11 @@
 !/swadesh phenome/
 !/art-auction-sale-reconstruction/
 !/LPBF/
+!/counter rename/
+!/fatal doppler/
+!/masked-discourse/
+!/ins/
+!/docstring gap/
 
 # --- secrets: never commit keys (belt-and-suspenders) ---
 *.pem
@@ -24,6 +29,7 @@ parser attatchment disagreement/dataset/
 **/dataset/
 **/images/
 *.tar.gz
+*.zip
 *.parquet
 *.png
 *.jpg
