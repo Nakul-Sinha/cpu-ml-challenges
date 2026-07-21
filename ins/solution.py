@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Institutional Edit Ledger Recovery -- SHIP solution (P3 v4, flat single file).
 
 One self-contained, flat Python module: every class/function defined once at module
@@ -26,12 +25,9 @@ for _v in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "NUMEXP
     os.environ.setdefault(_v, "8")
 
 _T0 = time.time()
-_WALL_GUARD = 3000.0   # safety net; this pipeline runs in ~1-2 min
+_WALL_GUARD = 3000.0
 
 
-# ======================================================================
-#  canonical submission-validity check (validate_edits)
-# ======================================================================
 def validate_edits(edits, text_len):
     """Submission validity check from the task spec (the grader scores separately)."""
     if not isinstance(edits, list) or len(edits) > 8:
@@ -53,9 +49,6 @@ def validate_edits(edits, text_len):
     return True
 
 
-# ======================================================================
-#  A2 -- P2 enhanced transducer (multi-token decomposition + append rules)
-# ======================================================================
 WS = re.compile('\\S+')
 
 _MARKS = set(':*∗/')
@@ -355,9 +348,6 @@ class Transducer:
         return ''.join(out)
 
 
-# ======================================================================
-#  A1 -- LightGBM token detector + assembly + extension registries
-# ======================================================================
 TOKEN_FEATURE_EXTRAS = []
 
 SPAN_CANDIDATE_GENERATORS = []
@@ -750,9 +740,6 @@ def build_edits(row_id, text, lang, tk, probs, thr, transducer, stores, max_edit
     return edits
 
 
-# ======================================================================
-#  M2 -- German paired-form specialist (collapse + span generator)
-# ======================================================================
 MARKS = set(':*∗/')
 
 _WS = re.compile('\\S+')
@@ -976,9 +963,6 @@ def collapse_hook(lang, src, context, stores):
     return None
 
 
-# ======================================================================
-#  M3 -- Italian / English / deletion specialist
-# ======================================================================
 _STRIP = '.,;:()»«"\'“”’`-–—'
 
 _SLASHFORM = re.compile('[^\\W\\d_]/[^\\W\\d_]', re.UNICODE)
@@ -1304,9 +1288,6 @@ def np_scorer(cands, tokens, lang, text, aux):
     return keep
 
 
-# ======================================================================
-#  M4 -- compose M2 + M3 onto the base pipeline
-# ======================================================================
 def stash_transducer(train_df, stores):
     if '_transducer' not in stores:
         stores['_transducer'] = Transducer().fit(train_df)
@@ -1336,9 +1317,6 @@ def m4_register():
     return
 
 
-# ======================================================================
-#  N2 -- German marked-run generator + masc-only fallback
-# ======================================================================
 _EDGE = '.,;:()»«"\'“”’`-–—'
 
 USE_MARKRUN = os.environ.get('N2_MARKRUN', '1') == '1'
@@ -1474,9 +1452,6 @@ def n2_register():
     return
 
 
-# ======================================================================
-#  group-consistency document vote
-# ======================================================================
 def _transduce_full(transducer, lang, src, ctx, stores):
     rep, hookname = (None, '')
     for hook in REPLACEMENT_HOOKS:
@@ -1610,9 +1585,6 @@ def group_consistency(assign_edits, rows_by_id, group_by_id, transducers, stores
 SHIP_VOTE_LANGS = {'de', 'en'}
 
 
-# ======================================================================
-#  N1 -- Italian NP-gate assembly
-# ======================================================================
 _SLASH = re.compile('[^\\W\\d_]/[^\\W\\d_]', re.UNICODE)
 
 IT_SPINE_THR = 0.45
@@ -1758,9 +1730,6 @@ def assemble_it(tk, text, pr, gate, gate_scores, T, st):
     return edits
 
 
-# ======================================================================
-#  P3 SHIP RUNTIME -- BiGRU tagger, IT re-scorer, artifact fit + assembly
-# ======================================================================
 import numpy as np
 
 import pandas as pd
@@ -2219,9 +2188,6 @@ def build_submission(train, test, de_thr=DE_THR):
     return (assemble_submission(art, de_thr=de_thr), art['test_rows'])
 
 
-# ======================================================================
-#  path autodetect, IO, strict validation, wall-clock guard, main()
-# ======================================================================
 def _has_data(d):
     return d and os.path.isfile(os.path.join(d, 'train.csv')) and os.path.isfile(os.path.join(d, 'test.csv'))
 
