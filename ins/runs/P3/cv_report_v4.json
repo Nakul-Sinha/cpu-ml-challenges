@@ -1,0 +1,291 @@
+{
+  "config": "P3 v4: N3 base + P1(de BiGRU a=.6 + it rescorer) + P2(it enhanced transducer) + group-vote[de,en]",
+  "headline_nested": 0.5707,
+  "nonnested": 0.5866,
+  "canonical_check_nested": 0.5707,
+  "canonical_check_nonnested": 0.5866,
+  "oof_rows_valid": "1259/1259",
+  "n3_base_nested": 0.5503,
+  "delta_vs_n3": 0.0204,
+  "ai_baseline": 0.56,
+  "beats_ai_baseline": true,
+  "ladder": {
+    "N3 base (reproduce)": {
+      "nested": 0.5503,
+      "nonnested": 0.5617,
+      "ne_lang": {
+        "de": 0.4237,
+        "en": 0.8067,
+        "it": 0.4205
+      },
+      "nn_lang": {
+        "de": 0.4391,
+        "en": 0.8256,
+        "it": 0.4205
+      },
+      "fp": {
+        "de": [
+          80,
+          216
+        ],
+        "en": [
+          1,
+          71
+        ],
+        "it": [
+          56,
+          182
+        ]
+      }
+    },
+    "+P1 (de BiGRU + it rescorer)": {
+      "nested": 0.5706,
+      "nonnested": 0.5865,
+      "ne_lang": {
+        "de": 0.4808,
+        "en": 0.8067,
+        "it": 0.4243
+      },
+      "nn_lang": {
+        "de": 0.5072,
+        "en": 0.8256,
+        "it": 0.4267
+      },
+      "fp": {
+        "de": [
+          57,
+          216
+        ],
+        "en": [
+          1,
+          71
+        ],
+        "it": [
+          57,
+          182
+        ]
+      }
+    },
+    "+P2 (it enhanced transducer)": {
+      "nested": 0.5504,
+      "nonnested": 0.5619,
+      "ne_lang": {
+        "de": 0.4237,
+        "en": 0.8067,
+        "it": 0.4209
+      },
+      "nn_lang": {
+        "de": 0.4391,
+        "en": 0.8256,
+        "it": 0.4209
+      },
+      "fp": {
+        "de": [
+          80,
+          216
+        ],
+        "en": [
+          1,
+          71
+        ],
+        "it": [
+          56,
+          182
+        ]
+      }
+    },
+    "+P1+P2 JOINT (de a=.6)": {
+      "nested": 0.5707,
+      "nonnested": 0.5866,
+      "ne_lang": {
+        "de": 0.4808,
+        "en": 0.8067,
+        "it": 0.4246
+      },
+      "nn_lang": {
+        "de": 0.5072,
+        "en": 0.8256,
+        "it": 0.4269
+      },
+      "fp": {
+        "de": [
+          57,
+          216
+        ],
+        "en": [
+          1,
+          71
+        ],
+        "it": [
+          57,
+          182
+        ]
+      }
+    },
+    "+P1+P2 ref (de a,thr nest)": {
+      "nested": 0.5726,
+      "nonnested": 0.5861,
+      "ne_lang": {
+        "de": 0.4865,
+        "en": 0.8067,
+        "it": 0.4246
+      },
+      "nn_lang": {
+        "de": 0.5058,
+        "en": 0.8256,
+        "it": 0.4269
+      },
+      "fp": {
+        "de": [
+          49,
+          216
+        ],
+        "en": [
+          1,
+          71
+        ],
+        "it": [
+          57,
+          182
+        ]
+      }
+    }
+  },
+  "ref_de_a_thr": {
+    "nested": 0.5726,
+    "nonnested": 0.5861,
+    "ne_lang": {
+      "de": 0.4865,
+      "en": 0.8067,
+      "it": 0.4246
+    },
+    "nn_lang": {
+      "de": 0.5058,
+      "en": 0.8256,
+      "it": 0.4269
+    },
+    "fp": {
+      "de": [
+        49,
+        216
+      ],
+      "en": [
+        1,
+        71
+      ],
+      "it": [
+        57,
+        182
+      ]
+    }
+  },
+  "ops": {
+    "de_a": 0.6,
+    "de_thr_nonnested": 0.19,
+    "de_thr_by_fold": {
+      "0": 0.19,
+      "1": 0.31,
+      "2": 0.29,
+      "3": 0.35,
+      "4": 0.31
+    },
+    "en_thr_nonnested": 0.39,
+    "en_thr_by_fold": {
+      "0": 0.05,
+      "1": 0.39,
+      "2": 0.39,
+      "3": 0.39,
+      "4": 0.75
+    },
+    "it_spine": 0.45,
+    "it_gate": 0.8,
+    "it_boost_source": "rescorer",
+    "it_boost_w": 0.6,
+    "it_boost_by_fold": {
+      "0": [
+        "rescorer",
+        0.6
+      ],
+      "1": [
+        "rescorer",
+        0.6
+      ],
+      "2": [
+        "rescorer",
+        0.6
+      ],
+      "3": [
+        "rescorer",
+        0.4
+      ],
+      "4": [
+        "rescorer",
+        0.5
+      ]
+    },
+    "it_transducer": "P2",
+    "en_frozen": true,
+    "group_vote": [
+      "en",
+      "de"
+    ],
+    "group_hi": 0.6,
+    "group_lo": 0.4
+  },
+  "ship_fixed_de_thr_scan": {
+    "0.15": {
+      "nested": 0.5789,
+      "nonnested": 0.5852,
+      "de": 0.503,
+      "it": 0.4269
+    },
+    "0.19": {
+      "nested": 0.5803,
+      "nonnested": 0.5866,
+      "de": 0.5072,
+      "it": 0.4269
+    },
+    "0.25": {
+      "nested": 0.5781,
+      "nonnested": 0.5843,
+      "de": 0.5005,
+      "it": 0.4269
+    },
+    "0.29": {
+      "nested": 0.5777,
+      "nonnested": 0.584,
+      "de": 0.4995,
+      "it": 0.4269
+    },
+    "0.31": {
+      "nested": 0.5777,
+      "nonnested": 0.584,
+      "de": 0.4996,
+      "it": 0.4269
+    },
+    "0.35": {
+      "nested": 0.5756,
+      "nonnested": 0.5819,
+      "de": 0.4932,
+      "it": 0.4269
+    }
+  },
+  "it_baseline_boost_op": [
+    "rescorer",
+    0.6
+  ],
+  "pr_auc": {
+    "de": {
+      "shared": 0.1938,
+      "gru": 0.2799
+    },
+    "en": {
+      "shared": 0.829,
+      "gru": 0.8969
+    },
+    "it": {
+      "shared": 0.2933,
+      "gru": 0.337
+    }
+  }
+}

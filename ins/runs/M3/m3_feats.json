@@ -1,0 +1,74 @@
+{
+  "mode": "feats",
+  "nonnested": 0.5167,
+  "nested": 0.5016,
+  "lang": {
+    "de": 0.3664,
+    "en": 0.7715,
+    "it": 0.412
+  },
+  "recall": {
+    "de_multi_marked": [
+      31,
+      109
+    ],
+    "de_single_plain": [
+      9,
+      107
+    ],
+    "de_single_marked": [
+      115,
+      193
+    ],
+    "it_multi_plain": [
+      131,
+      241
+    ],
+    "it_single_plain": [
+      159,
+      388
+    ],
+    "de_multi_plain": [
+      43,
+      134
+    ],
+    "it_multi_marked": [
+      2,
+      48
+    ],
+    "de_deletion": [
+      1,
+      9
+    ],
+    "en_single_marked": [
+      5,
+      13
+    ],
+    "it_deletion": [
+      19,
+      38
+    ],
+    "it_single_marked": [
+      1,
+      10
+    ],
+    "en_single_plain": [
+      38,
+      50
+    ],
+    "en_multi_plain": [
+      13,
+      14
+    ],
+    "en_multi_marked": [
+      9,
+      11
+    ]
+  },
+  "del_diag": {
+    "n_true_del": 47,
+    "del_pred": 4,
+    "del_hit": 0
+  },
+  "seconds": 33.2
+}

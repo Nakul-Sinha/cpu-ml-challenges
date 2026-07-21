@@ -1,0 +1,294 @@
+{
+  "config": "N3 joint: M4 base + N2(de markrun+masc_only) + N1(it gated-NP) + group-vote[de,en]",
+  "headline_nested_elru": 0.5503,
+  "nonnested_elru": 0.5617,
+  "canonical_oof_check_nonnested": 0.5617,
+  "canonical_oof_check_nested": 0.5503,
+  "beats_ai_baseline_nested": false,
+  "ai_baseline": 0.56,
+  "base_m4_nested": 0.5423,
+  "base_m4_nonnested": 0.5517,
+  "delta_vs_m4_nested": 0.008,
+  "delta_vs_m4_nonnested": 0.01,
+  "ladder": {
+    "M4 ship": {
+      "nested": 0.5423,
+      "nonnested": 0.5517,
+      "nested_lang": {
+        "de": 0.4094,
+        "en": 0.8067,
+        "it": 0.4109
+      },
+      "nonnested_lang": {
+        "de": 0.4161,
+        "en": 0.8256,
+        "it": 0.4133
+      }
+    },
+    "+N1 (it gated-NP)": {
+      "nested": 0.5455,
+      "nonnested": 0.5541,
+      "nested_lang": {
+        "de": 0.4094,
+        "en": 0.8067,
+        "it": 0.4205
+      },
+      "nonnested_lang": {
+        "de": 0.4161,
+        "en": 0.8256,
+        "it": 0.4205
+      }
+    },
+    "+N2 (de markrun+masc)": {
+      "nested": 0.5471,
+      "nonnested": 0.5593,
+      "nested_lang": {
+        "de": 0.4237,
+        "en": 0.8067,
+        "it": 0.4109
+      },
+      "nonnested_lang": {
+        "de": 0.4391,
+        "en": 0.8256,
+        "it": 0.4133
+      }
+    },
+    "+N1+N2 (fixed it spine)": {
+      "nested": 0.5503,
+      "nonnested": 0.5617,
+      "nested_lang": {
+        "de": 0.4237,
+        "en": 0.8067,
+        "it": 0.4205
+      },
+      "nonnested_lang": {
+        "de": 0.4391,
+        "en": 0.8256,
+        "it": 0.4205
+      }
+    },
+    "joint retune (it spine grid)": {
+      "nested": 0.549,
+      "nonnested": 0.5617,
+      "nested_lang": {
+        "de": 0.4237,
+        "en": 0.8067,
+        "it": 0.4164
+      },
+      "nonnested_lang": {
+        "de": 0.4391,
+        "en": 0.8256,
+        "it": 0.4205
+      }
+    }
+  },
+  "ops": {
+    "de_thr": 0.07,
+    "en_thr": 0.39,
+    "it_spine": 0.45,
+    "it_gate": 0.8,
+    "de_thr_robust": 0.11,
+    "group_vote": [
+      "en",
+      "de"
+    ],
+    "group_hi": 0.6,
+    "group_lo": 0.4
+  },
+  "it_op_shipped": [
+    0.45,
+    0.8
+  ],
+  "it_op_by_fold_fixedspine": {
+    "0": [
+      0.45,
+      0.8
+    ],
+    "1": [
+      0.45,
+      0.8
+    ],
+    "2": [
+      0.45,
+      0.8
+    ],
+    "3": [
+      0.45,
+      0.8
+    ],
+    "4": [
+      0.45,
+      0.8
+    ]
+  },
+  "retune_findings": {
+    "fixed_spine_nested": 0.5503,
+    "it_spine_grid_nested": 0.549,
+    "group_vote_it_nested": 0.5388,
+    "nested_selected_hilo_nested": 0.5503,
+    "nested_hilo_by_fold": {
+      "0": [
+        0.5,
+        0.4
+      ],
+      "1": [
+        0.5,
+        0.4
+      ],
+      "2": [
+        0.55,
+        0.45
+      ],
+      "3": [
+        0.55,
+        0.45
+      ],
+      "4": [
+        0.55,
+        0.45
+      ]
+    },
+    "conclusion": "Every added tuning DOF fails to lift the HONEST nested number: it-spine-grid overfits (0.5490<0.5503); group-vote-it net-negative (0.5388); nested-selected hi/lo ties fixed .60/.40 (0.5503) -- the non-nested-tuned hi/lo gain was selection optimism. Minimal-DOF additive N1+N2 is the honest optimum."
+  },
+  "cv_optimal_variant": {
+    "nested": 0.5503,
+    "nonnested": 0.5617,
+    "nested_lang": {
+      "de": 0.4237,
+      "en": 0.8067,
+      "it": 0.4205
+    }
+  },
+  "robust_variant": {
+    "de_thr": 0.11,
+    "oof_elru_nonnested_op": 0.5597,
+    "oof_elru_nested": 0.5534,
+    "nested_lang": {
+      "de": 0.433,
+      "en": 0.8067,
+      "it": 0.4205
+    },
+    "note": "de fixed a-priori at 0.11 for transfer safety (chosen from N2 edited-ratio analysis, NOT by maximizing CV), so de generalization carries no selection optimism; nested here fixes de, nests en, fixes it op"
+  },
+  "nested_detail": {
+    "de": {
+      "edited_mean": 0.3612,
+      "unchanged_mean": 0.6111,
+      "n_edited": 295,
+      "n_unchanged": 216,
+      "lang_score": 0.4237
+    },
+    "en": {
+      "edited_mean": 0.747,
+      "unchanged_mean": 0.9859,
+      "n_edited": 63,
+      "n_unchanged": 71,
+      "lang_score": 0.8067
+    },
+    "it": {
+      "edited_mean": 0.3299,
+      "unchanged_mean": 0.6923,
+      "n_edited": 432,
+      "n_unchanged": 182,
+      "lang_score": 0.4205
+    }
+  },
+  "nonnested_detail": {
+    "de": {
+      "edited_mean": 0.3756,
+      "unchanged_mean": 0.6296,
+      "n_edited": 295,
+      "n_unchanged": 216,
+      "lang_score": 0.4391
+    },
+    "en": {
+      "edited_mean": 0.7722,
+      "unchanged_mean": 0.9859,
+      "n_edited": 63,
+      "n_unchanged": 71,
+      "lang_score": 0.8256
+    },
+    "it": {
+      "edited_mean": 0.3299,
+      "unchanged_mean": 0.6923,
+      "n_edited": 432,
+      "n_unchanged": 182,
+      "lang_score": 0.4205
+    }
+  },
+  "unchanged_fp": {
+    "de": [
+      80,
+      216
+    ],
+    "en": [
+      1,
+      71
+    ],
+    "it": [
+      56,
+      182
+    ]
+  },
+  "submission_v3": {
+    "rows": 445,
+    "edited": 292,
+    "edit_rates": {
+      "de": {
+        "edited": 107,
+        "total": 129,
+        "frac": 0.829,
+        "train": 0.577,
+        "ratio": 1.44,
+        "flag": false
+      },
+      "en": {
+        "edited": 34,
+        "total": 117,
+        "frac": 0.291,
+        "train": 0.47,
+        "ratio": 0.62,
+        "flag": false
+      },
+      "it": {
+        "edited": 151,
+        "total": 199,
+        "frac": 0.759,
+        "train": 0.704,
+        "ratio": 1.08,
+        "flag": false
+      }
+    }
+  },
+  "submission_v3_robust": {
+    "rows": 445,
+    "edited": 278,
+    "de_thr": 0.11,
+    "edit_rates": {
+      "de": {
+        "edited": 93,
+        "total": 129,
+        "frac": 0.721,
+        "train": 0.577,
+        "ratio": 1.25,
+        "flag": false
+      },
+      "en": {
+        "edited": 34,
+        "total": 117,
+        "frac": 0.291,
+        "train": 0.47,
+        "ratio": 0.62,
+        "flag": false
+      },
+      "it": {
+        "edited": 151,
+        "total": 199,
+        "frac": 0.759,
+        "train": 0.704,
+        "ratio": 1.08,
+        "flag": false
+      }
+    }
+  }
+}

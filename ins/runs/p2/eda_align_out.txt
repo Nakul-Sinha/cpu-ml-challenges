@@ -1,0 +1,60 @@
+=== aligned nsrc==nrep counts (lang, ntok) ===
+  de n=2: 24 edits
+  de n=3: 1 edits
+  de n=4: 1 edits
+  de n=7: 1 edits
+  en n=2: 2 edits
+  it n=2: 115 edits
+  it n=3: 26 edits
+  it n=4: 4 edits
+  it n=5: 3 edits
+
+=== per-token transform kind (aligned only) ===
+  de append       26
+  de lexical      11
+  de suffix_swap  25
+  en has_mark     2
+  en lexical      2
+  it append       242
+  it has_mark     10
+  it lexical      38
+  it suffix_swap  49
+
+=== IT append-suffix map (src_last2 -> appended) top ===
+  it 'qè' -> '/y'  x25
+  it 'qg' -> '/l'  x16
+  it 'hè' -> '/hy'  x14
+  it 'èg' -> '/l'  x11
+  it 'èh' -> '/hl'  x11
+  it 'yh' -> '/uyhhl'  x8
+  it 'ky' -> '/-qkèty'  x8
+  it 'hg' -> '/hl'  x8
+  it 'aè' -> '/y'  x8
+  it 'è' -> '/hy'  x7
+  it 'kè' -> '/y'  x7
+  it 'lh' -> '/lhhl'  x6
+  it 'ky' -> '/Qyqqkèty'  x6
+  it 'QT' -> '/QTÀÀQUJT'  x5
+  it 'tg' -> '/l'  x5
+  it 'kè' -> '/dgkjlqkètè'  x5
+  it 'kè' -> '/qkètè'  x4
+  it 'Eh' -> '/Ehhl'  x4
+  it 'qy' -> '/yxxl'  x4
+  it 'U' -> '/My'  x4
+  it 'EM' -> '/EMME'  x4
+  it 'JB' -> '/E'  x4
+  it 'yè' -> '/uyhhy'  x4
+  it 'xg' -> '/l'  x4
+  it 'hè' -> '/lhhy'  x4
+
+=== DE append-suffix map top ===
+  de 'éu' -> '/xà'  x12
+  de 'év' -> '*wéu'  x2
+  de 'xà' -> '/é'  x2
+  de 'éu' -> '/wxé'  x2
+  de 'év' -> '/wéu'  x2
+  de 'éà' -> '/xà'  x2
+  de 'éﬂ' -> '/wéu'  x1
+  de 'äu' -> '/xà'  x1
+  de 'uk' -> '/xà'  x1
+  de 'xà' -> '/xˮu'  x1
