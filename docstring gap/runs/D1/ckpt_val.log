@@ -1,0 +1,74 @@
+=== CKPT VAL START Tue Jul 21 09:19:56 UTC 2026 ===
+[data] train_fit(2-19)=209022 val0=2500 val1=11489 threads=7 ft_s=960 ckpt=runs/C2/ft_hint
+[fits even] n=104493 25s
+[fits odd] n=104529 26s
+[train phase tag0] X(271202, 78) 33s
+[train phase tag1] X(266522, 78) 33s
+[fits full] n=209022 52s
+[c1-base] Xtr(537724, 78) Xv(168480, 78) Xv1(777124, 78) all-fork-done @ 5.3min
+Training until validation scores don't improve for 40 rounds
+Early stopping, best iteration is:
+[43]	valid_0's ndcg@1: 0.434818
+[c1-only] bucket-0 chrF=0.2961  pool_oracle=0.6283
+[t5] loaded checkpoint runs/C2/ft_hint @ 5.7min
+[t5] int8 dynamic quantization ready
+[t5-cache] val0 gated@0.6=1475 done @ 6.6min
+[t5-gen] 1536/5071
+[t5-gen] 3008/5071
+[t5-gen] 4544/5071
+[t5-cache] train gated@0.6(cap)=5071 done @ 9.7min
+[augment] rows=8000 t5_new_cand=1725 t5_hit_pool=687 X(539449, 83)
+Training until validation scores don't improve for 40 rounds
+Early stopping, best iteration is:
+[105]	valid_0's ndcg@1: 0.443405
+[augment] rows=2500 t5_new_cand=437 t5_hit_pool=162 X(168917, 83)
+[decode] confident-T5 overrides applied: 34
+
+==== coverage 0.3 (thr=0.843 realized_cov=0.240 n_gated=599) ====
+   C1-only            chrF=0.2961
+   hybrid argmax      chrF=0.3039  (+0.0078)
+   hybrid +override   chrF=0.3032  (+0.0071)   [SHIPPED]
+   pool oracle        0.6322   realized/oracle=0.480
+   T5 pick-rate(gated)=0.469  win-rate(gated)=0.414  exact-hit=0.1064
+     tier l2r2  n=  205 gated_frac=0.00  C1=0.3684 -> hybrid=0.3732 (+0.0048)
+     tier l1r1  n= 1028 gated_frac=0.00  C1=0.2903 -> hybrid=0.2882 (-0.0021)
+     tier none  n= 1267 gated_frac=0.47  C1=0.2891 -> hybrid=0.3040 (+0.0149)
+[augment] rows=8000 t5_new_cand=3112 t5_hit_pool=1369 X(540836, 83)
+Training until validation scores don't improve for 40 rounds
+Early stopping, best iteration is:
+[10]	valid_0's ndcg@1: 0.463594
+[augment] rows=2500 t5_new_cand=868 t5_hit_pool=399 X(169348, 83)
+[decode] confident-T5 overrides applied: 81
+
+==== coverage 0.45 (thr=0.500 realized_cov=0.507 n_gated=1267) ====
+   C1-only            chrF=0.2961
+   hybrid argmax      chrF=0.2990  (+0.0029)
+   hybrid +override   chrF=0.2974  (+0.0013)   [SHIPPED]
+   pool oracle        0.6353   realized/oracle=0.468
+   T5 pick-rate(gated)=0.571  win-rate(gated)=0.410  exact-hit=0.1036
+     tier l2r2  n=  205 gated_frac=0.00  C1=0.3684 -> hybrid=0.3677 (-0.0007)
+     tier l1r1  n= 1028 gated_frac=0.00  C1=0.2903 -> hybrid=0.2788 (-0.0115)
+     tier none  n= 1267 gated_frac=1.00  C1=0.2891 -> hybrid=0.3011 (+0.0120)
+[augment] rows=8000 t5_new_cand=3514 t5_hit_pool=1557 X(541238, 83)
+Training until validation scores don't improve for 40 rounds
+Early stopping, best iteration is:
+[82]	valid_0's ndcg@1: 0.466205
+[augment] rows=2500 t5_new_cand=1003 t5_hit_pool=472 X(169483, 83)
+[decode] confident-T5 overrides applied: 72
+
+==== coverage 0.6 (thr=-1.020 realized_cov=0.590 n_gated=1475) ====
+   C1-only            chrF=0.2961
+   hybrid argmax      chrF=0.3186  (+0.0225)
+   hybrid +override   chrF=0.3148  (+0.0187)   [SHIPPED]
+   pool oracle        0.6361   realized/oracle=0.495
+   T5 pick-rate(gated)=0.490  win-rate(gated)=0.410  exact-hit=0.1132
+     tier l2r2  n=  205 gated_frac=0.00  C1=0.3684 -> hybrid=0.3709 (+0.0026)
+     tier l1r1  n= 1028 gated_frac=0.20  C1=0.2903 -> hybrid=0.3037 (+0.0134)
+     tier none  n= 1267 gated_frac=1.00  C1=0.2891 -> hybrid=0.3147 (+0.0256)
+
+#### BEST coverage=0.6 shipped chrF=0.3148 (C1 0.2961, +0.0187) @ 11.1min ####
+[save] runs/D1/val_pred_ckpt.csv (2500 rows)
+[t5-gen] 1536/6641
+[t5-gen] 3008/6641
+[t5-gen] 4544/6641
+=== CKPT VAL DONE Tue Jul 21 09:34:35 UTC 2026 ===

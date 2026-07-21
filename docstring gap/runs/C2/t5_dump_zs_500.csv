@@ -1,0 +1,501 @@
+id,masked_docstring,t5_pred,target_span,t5_seq_logprob,t5_f
+docgap_b3bc8e5ce986204b,Verifies that the challenge is a Bearer challenge [GAP] key = value pairs.,. Bearer,and returns the,-0.5260423421859741,0.12962962962962965
+docgap_8762a4bdf8193865,Wrap file generation in a transaction [GAP] if finishes.,",",moving to output,-0.7636431455612183,0.0
+docgap_14050f71861393f9,Filter [GAP] which a specific number of points is less than threshold.,"_defragment(self, threshold, mode='include'",the data for,-0.04223714396357536,0.08
+docgap_bf474702636f53db,Return a [GAP] representing this model.,model,json dictionary,-0.4262659549713135,0.044444444444444446
+docgap_dbc835e2cf25867f,Extends with a list and [GAP]-order,a list and a list and a list and a list,a z,-0.6025592684745789,0.02666666666666666
+docgap_fd00d5d3144856b8,Returns the residue number [GAP] Pybel or OpenBabel atom.,of the,of an,-0.592989444732666,0.3333333333333333
+docgap_a10ad08dccfe56dd,Utility function to summarize provenance [GAP] a Cohort.,in,files for,-0.7357099056243896,0.047619047619047616
+docgap_369d9bf1d5bbc5f3,Sanitize the current settings of [GAP]-Reply message.,the,the Map,-0.5453610420227051,0.3636363636363636
+docgap_fc944f4452da2cb6,Convert a string of roman [GAP] integer.,_to_int(roman_string): return value,numbers into an,-0.148903951048851,0.14074074074074075
+docgap_72dba91b3e0a5133,Flushes the [GAP] tables and sequences.,"self, style,",given database,-0.4591582417488098,0.09523809523809525
+docgap_d2a89781e42529cf,Remove Padding with zeroes + last byte equal [GAP] number of padding bytes,to the,to the,-0.7461610436439514,1.0
+docgap_97a796c14cc1b2b8,Get the raw SOAP [GAP] a request.,as,XML for,-1.110003113746643,0.0
+docgap_b0b5bfe0777730d8,List all the filesystems [GAP] system.,in the file,mounted on the,-0.9990594983100891,0.2833333333333333
+docgap_fce8987736002442,Register [GAP] class to the frontend.,_frontend_media(request):. Register_front,a Media,-0.2025819569826126,0.08527131782945736
+docgap_e27f933a0097743f,Helper function for taking an integer and [GAP] a hex string.,converting,returning,-1.2237998247146606,0.23809523809523808
+docgap_b4f7b5e19d246704,Reset our HEAD to the given commit optionally [GAP] and working tree.,to the given commit,synchronizing the index,-0.9133687019348145,0.1981981981981982
+docgap_8cf227eca4d7f0d2,Loads [GAP] into a private key object.,are converted,a private key,-0.5213501453399658,0.14285714285714285
+docgap_54beef51d2d5bc34,Parse the [GAP] command into a dictionary.,pse,NAME_IMPORT,-0.7619448304176331,0.0
+docgap_f45864d5917d0821,A simple anomaly detection using Seasonal Hybrid [GAP] Tests for a series of anomalies.,Hybrid,ESD,-0.5544258952140808,0.0
+docgap_6969b5208ea8c30a,Returns the TensorFlow expression [GAP] error of two target distribution.,of the,of the absolute difference,-0.6543840765953064,0.25925925925925924
+docgap_4670fc9efe7051b9,GET peering entries [GAP] the currency network,in,of every node inside,-0.39117130637168884,0.05555555555555556
+docgap_8d34aa41ba93cb19,Return the most appropriate text [GAP] a given message.,to,processor that can handle,-0.7503215074539185,0.028985507246376812
+docgap_a05f59f62e5be25d,Returns a subsequence from [GAP] specified indices.,_.__class__ for index in,given tuple omitting,-0.3832364082336426,0.08547008547008547
+docgap_42562e730d062490,Set the [GAP] bounds of the named parameter.,parameters to the,value and,-1.0401852130889893,0.06349206349206349
+docgap_08b93e8d4327b43e,Sorts the [GAP] by a column or row or list of labels.,labels,DataFrame,-0.50155109167099,0.06666666666666667
+docgap_d4cabede1064fde0,Returns [GAP] guess of intended case.,a,the best,-0.46513307094573975,0.0
+docgap_6db4523fc7d96a59,Converts negative indices to positive ones and [GAP] length-1 depending on lengthAllowed.,returns,indices above length to,-0.9579629302024841,0.05333333333333334
+docgap_afdec27d17b1a899,Browserify one or more library directories into a single javascript file. Generates source maps [GAP] Minifies the output in release mode.,.,in debug mode,-0.6785523295402527,0.0
+docgap_a418299d1ddc2b2d,Read a [GAP] a list of SquadExample objects.,list of SquadExample objects and,SQuAD json file into,-0.3767451345920563,0.12765957446808512
+docgap_12a2bd2e822950fb,returns a list of dicts that are [GAP] two dicts,dicts that are,used to compare,-0.7448240518569946,0.18055555555555558
+docgap_50abf156d002a684,Interactive convenience for displaying the [GAP] code string.,code string. The,AST of a Python,-1.1677045822143555,0.08974358974358974
+docgap_0e6ad56eb76458c6,Determines if the Activity is configured with input [GAP] output properties.,properties or,and,-0.5800607204437256,0.0
+docgap_ea181c7a71c2a885,Set a new global trigger or response limit for [GAP] identifier.,"self,",the given,-0.21788924932479858,0.037037037037037035
+docgap_bd97ce4bb20f7c70,Create an array mapping variant alleles into a [GAP] index.,dtype,different allele,-0.7441076636314392,0.0625
+docgap_38178888139749e2,Get [GAP] the message s header fields and values.,all,all,-0.6756307482719421,1.0
+docgap_3f74eaf22a714b3b,Cancels [GAP] calls its target method immediately,(),the timer and,-0.5426204204559326,0.0
+docgap_fd24f21ce0a9cd5d,Return list of features [GAP] importances in classification,_,and their,-0.35173892974853516,0.0
+docgap_707a08216adf01d6,Converts a url to an ascii%-encoded form where the first part is a scheme + domain + the second part is [GAP] of the url,a scheme + domain + the second part is a scheme + domain,a remainder,-0.29095953702926636,0.1021505376344086
+docgap_648a6cc78d9dede2,Return the original object if [GAP]-like object.,the original object is a,it is a datetime,-0.5077635645866394,0.26666666666666666
+docgap_92a69c257cb208d8,Fantope [GAP] of Aracite Aracite.,s,projection and selection,-0.7323068380355835,0.015384615384615384
+docgap_ccb4ca8e61f4fd79,Create the boto config [GAP] support standalone GSUtil.,to,file to,-0.8027666807174683,0.19999999999999998
+docgap_2d0a0bce556c8436,Updates the [GAP] the common: class: Reftrack actions.,common: class: Reftrack actions. Updates,restricted attributes of,-0.31036555767059326,0.12994350282485875
+docgap_013701d9651bec05,Converts a DiscourseDocumentGraph into a set of PAULA [GAP] same document.,s in the,XML files representing the,-0.6350314021110535,0.1839080459770115
+docgap_456a3ef0207b1a2e,Initializes the [GAP] and session pool for the given application.,application,database connection pool,-0.8074991703033447,0.17777777777777776
+docgap_915c3bc04e83ed59,Refresh [GAP] data from the API.,(self):. Refresh(self):. Re,the instance,-0.21374276280403137,0.049019607843137254
+docgap_de54f2700a54d5ab,Traverse the bone hierarchy [GAP] bodies.,of bone,and create physics,-0.5602132678031921,0.049999999999999996
+docgap_96d7d280cc79976c,Add a method to obj that returns the [GAP] the hierarchy.,hierarchy to,next item in,-0.7372927665710449,0.07017543859649122
+docgap_e258d61d586c094b,execute command [GAP] systemd-run inside container,run_systemdrun( return_code']. run,via,-0.5494105815887451,0.0
+docgap_3d7079b6574c5f88,Return the CIM-XML representation [GAP] instance as an object of a proper subclass of Element.,of the,of this,-0.3091895878314972,0.6250000000000001
+docgap_8f36b679c409fdb3,This function is used to create a multidot operation [GAP] single-dimensional tree tree.,for a,for a,-0.36317768692970276,1.0
+docgap_311160bd162bc8ce,Check to see if [GAP] is enabled to start on boot CLI Example: bash service. enabled < service name >,the boot,the named service,-1.034930944442749,0.16666666666666666
+docgap_c5d648b4de092dfd,Convert pressure trend to a string as used by the [GAP] office.,office or,UK met,-0.7171981334686279,0.06666666666666667
+docgap_b04bfb80be4ae741,Check the [GAP] an RSA private key.,key with,consistency of,-0.7667654752731323,0.1176470588235294
+docgap_9a0b07c562913c6c,boot an ec2 instance and [GAP] file,boot a,update the ec2 state,-0.8844360113143921,0.04761904761904761
+docgap_3b4e63c1d805118a,Start connecting to [GAP] on the _dst_addrs list.,the _dst_addrs list. Start connecting to,the next address,-0.4484826624393463,0.18300653594771238
+docgap_94e1a10f1672916b,Convert [GAP] pixel image coordinates given transform and UTM CRS.,the,WGS84 coordinates to,-0.5451552867889404,0.036036036036036036
+docgap_5605eb65c74ae5dd,loads the GP [GAP] a JSON string,with,object from,-1.518178939819336,0.032786885245901634
+docgap_21694ea545d467fe,\ Returns the data [GAP] blocks.,"_blocks, error_blocks, error_blocks.",and error,-0.2617565095424652,0.17500000000000002
+docgap_e7380fb5963251bb,Groups the [GAP] columns count or aggregate others.,group,rows by multiple,-0.5861949920654297,0.10416666666666666
+docgap_ad351b20851667af,Calculates a normalization factor from the geometric mean of the [GAP] all ref_targets normalized to a reference sample.,ref_targets. Calculates,expression of,-0.6511522531509399,0.0967741935483871
+docgap_f09fa0d2d26153e9,Return the [GAP] for a word.,word,Daitch-Mokotoff Soundex code,-0.9772757291793823,0.024539877300613498
+docgap_ee5ca23a4284ec1d,Declare [GAP] type. May overwrite existing entry.,"new_event_type(self, name, mergeable=F",a new event,-0.17268811166286469,0.1893939393939394
+docgap_433b46dad48b957c,Return the [GAP] file for a certain day matching certain criteria.,return,game,-0.8380304574966431,0.06451612903225806
+docgap_5105d3a993e3d10b,Returns the result of element-wise [GAP] operation with broadcasting.,broadcasting,greater than rhs comparison,-0.6017260551452637,0.09803921568627451
+docgap_97f8a13b193bdd52,Send a request [GAP] with future replies.,to return f. Send a request,to the server,-0.659824013710022,0.13333333333333333
+docgap_a325343f5883081e,Runs a command line and returns a dictionary containing the [GAP] command line and the exit code.,first,output of the,-0.9716046452522278,0.05128205128205127
+docgap_8b4b3cc910619022,Update the internal state [GAP] position detail.,of the,of the investor,-0.7081600427627563,0.43750000000000006
+docgap_0badf7d58ff8c272,This function returns a list of control group hierarchy [GAP] given subsystem.,for a,which belong to the,-0.6415809988975525,0.03508771929824562
+docgap_27c46d5bba30a8ee,Calculates the [GAP]-likelihood of data given noise parametrized by x.,fish_log_likelihood,poisson log,-0.3059787452220917,0.14666666666666667
+docgap_b9b1e75e30e4b145,Send the request s HTTP [GAP] and header fields.,header,status line,-0.7332586050033569,0.05555555555555555
+docgap_2139fc32598cf1f2,Plots the list [GAP] a single Brillouin Zone.,of,of points in,-0.9389263391494751,0.1
+docgap_82cd9d0bf21605c1,Refreshes the contacts service endpoint ensuring that the contacts data [GAP]-date.,is up to date,is up-to,-0.5644115805625916,0.37499999999999994
+docgap_ef8fc8633dc7e3da,Checks [GAP] a worker is carrying vespene.,if,if,-0.3870439827442169,1.0
+docgap_a48fbc15af5fb4dd,Extends shape [GAP] in case they differ from the existing endpoints.,", fromPos, toPos",with the given positions,-0.5653954744338989,0.08571428571428572
+docgap_b7479c88bbd8376f,Checks if a given Requirement is the [GAP] version available.,best,latest,-0.7267289161682129,0.3870967741935483
+docgap_33f2254a23084cef,Checks whether contents of repo are [GAP] standard set.,a,consistent with,-0.857478678226471,0.0
+docgap_7cb2bae2d6e4b387,Set [GAP] the metadata.,the metadata. Set,the active path for,-0.3582881689071655,0.1827956989247312
+docgap_c5b43c68161a2f2f,Given a [GAP] instruction turn it into a matrix and extract qubit indices.,tensor,gate,-0.9340980648994446,0.19354838709677416
+docgap_a92a55937b89cebd,Sets the timer for IS-[GAP] SPF calculation for IPv4,False,IS Partial,-0.8002898097038269,0.1
+docgap_03018c6f13bff4b6,Get the list of fields used to [GAP]-segment header.,generate the,write the multi,-0.7356441020965576,0.3333333333333333
+docgap_5e0d31d6f73eec8f,Calculate the weight factor of the [GAP] yields its hash key for every configured replica.,replica that,given node and,-0.6405080556869507,0.06349206349206349
+docgap_662fa4d854557e6c,Add [GAP] to this Personalization.,"_substitution(self, substitution):. Add_substitution",a new Substitution,-0.21375440061092377,0.28205128205128205
+docgap_e9bf484dc059be5b,Load a single object [GAP] a tarball file.,to,from,-0.7754760980606079,0.15384615384615383
+docgap_a85edae07f391b28,Writes the F90 module file from the specified code parser for all the modules [GAP] it.,in,inside of,-0.4458034336566925,0.14285714285714288
+docgap_e1733f35991f187c,Update the [GAP] with the new data.,data,dictionary,-0.8287578225135803,0.1090909090909091
+docgap_f7b6997eafd5a51b,Returns a list of points for [GAP]-wise linear function from the given offer and bid blocks.,the given offer and bid blocks. Returns a value,a piece,-0.8787533044815063,0.04761904761904762
+docgap_2db22cf87d0272f6,Delete [GAP] in a specific region,"_queue(name, region, opt=None, user",a SQS queue,-0.1445983201265335,0.14634146341463414
+docgap_9e5ae93866638656,Standardize the input data [GAP] API.,in the,for the indico,-0.5415740013122559,0.2888888888888889
+docgap_b1a8a5a0b47f8c16,Get CEE-Map Priority Table [GAP] PG ID,ID with,map cos2,-1.1450988054275513,0.03333333333333333
+docgap_87b40b8b49290934,Register a test suite in the module [GAP] suite.,test,containing a test,-0.7106107473373413,0.20618556701030927
+docgap_7b4e9b26fac34ca0,Checks the messages in filename for BMP characters and translates [GAP] into a list of tuples.,them,them,-0.6998149156570435,1.0
+docgap_6f406f24eb00c92a,This method rebins the image by [GAP] factor.,"rebin(self, factor,",a given,-0.39446213841438293,0.07936507936507936
+docgap_b5634e2a5668f9a0,Perform a basic permission check [GAP] the given forum and user.,between,on,-0.4618869721889496,0.06666666666666667
+docgap_fa66e06d4c09fcc5,Overlays the specified files into the given repository and version into the [GAP] returns None.,given repository and,given directory and,-0.5451623201370239,0.5686274509803921
+docgap_ddcc90eef061c5e3,Computes the reconstruction [GAP] column vector.,"Error(sp, inputVectors, activeCol",error of a binary,-0.12967319786548615,0.14814814814814814
+docgap_bc11c930d5614f92,Check [GAP] aeneas. tools. xls or aeneas. tools. youtube can be imported.,_tools(cls or,whether,-0.19470325112342834,0.04444444444444444
+docgap_442ff383f0915e17,Return command to update the [GAP] state to the current direction and level.,current,MPSSE GPIO,-0.44409245252609253,0.0
+docgap_1d788b77f50fda4b,Return the [GAP] cosine of x.,_apply_function_in_current_context(,inverse hyperbolic,-0.2408791482448578,0.09027777777777778
+docgap_e5e3918723d56c7d,Get [GAP] have never been written to.,input_variables you,all variables that,-0.4321487545967102,0.47916666666666663
+docgap_8abc583d2a42f169,Fetches all the prices for the [GAP] and currency.,str,given date,-0.6116808652877808,0.0392156862745098
+docgap_4c4c8fea4afcb836,Starts watching the path and [GAP] test jobs.,completing,running the,-0.8054524064064026,0.16666666666666666
+docgap_1c1f1b9dfab50eb6,Adds a sub editor to the layout at the right but before [GAP] button.,the,the reset,-0.8688878417015076,0.2666666666666667
+docgap_b4e8ec33039c4f90,Decode and [GAP] structure to dict and apply optional extra values.,use the extra,load underlying meta,-0.5894816517829895,0.09523809523809523
+docgap_dfdee5e772034dd0,Checks if the given settings are valid [GAP] indicating if it is valid.,",",and returns a boolean,-0.446800172328949,0.0
+docgap_67710e1611ef9fc7,This function takes a table and a field [GAP] name and returns a new dataframe with the values of the related key in the main dataframe.,'s,name and a field,-0.45393508672714233,0.0
+docgap_34c75b32eefe498c,1. 13 Audit the hardware MFA active for [GAP] account.,your,the root,-0.45102283358573914,0.0930232558139535
+docgap_ba2a2495fb1b3b6f,Initialize the biases of [GAP] 1 and all other gates to 0.,the gate to,the forget gate to,-0.5775004625320435,0.5833333333333333
+docgap_f339f63323295673,Fit lens [GAP] tracer and sensitivity tracer.,lens lens lens lens lens lens lens lens lens lens lens lens lens lens lens,data with a normal,-0.2445877194404602,0.019157088122605366
+docgap_d8551f0adaf7da1b,Set the Cerberus token based [GAP] auth type,on the,on,-0.4724046289920807,0.25
+docgap_c8b76b437e0417c4,Calculates the size of [GAP] payload.,the,the request,-0.6767074465751648,0.21052631578947367
+docgap_c5901af802ef67ad,This [GAP] creates a new withdrawal request for the asset and amount of coins and tokens.,process,function,-0.6351781487464905,0.06666666666666667
+docgap_53369cdee8eb50e0,This method is called by the user to check if the user has provided a certain parameter for [GAP] properly.,the parameter,the method to function,-0.5470829010009766,0.17777777777777778
+docgap_6442670bd57e6d22,Returns True if the field [GAP] a storage element.,is,contains,-0.3931843638420105,0.1111111111111111
+docgap_8d6f3efdb4d43d87,Checks [GAP] in fit. p.,are,for roundoff errors,-0.6720067262649536,0.0380952380952381
+docgap_07669362ccc55074,A method to [GAP] a trace for the caller s cause.,trace,raise an exception with,-1.1339131593704224,0.10144927536231885
+docgap_f7743261c467da12,Returns the group object with the given id or None if [GAP] group exists.,the,no such,-0.5532190203666687,0.06060606060606061
+docgap_156edf7f9c4f47bc,Create a new [GAP] a binary stream.,binary stream. Create,object from,-0.5439538955688477,0.07407407407407408
+docgap_c722009e448a4b3a,This is the main entry point for an XBRLParser. It takes a file_handle and returns [GAP] object.,an,a XBRL,-0.3838088810443878,0.08333333333333333
+docgap_a7c212c96599cd16,Pushes a new element node on [GAP] stack,the,top of the node,-0.7547028660774231,0.14814814814814814
+docgap_151b80610af65eb8,Print a string on a [GAP] with manual line breaks.,string,console,-0.6006227731704712,0.08333333333333333
+docgap_f7b255e9b3d5945c,Return the [GAP] a given app model.,app model to,history manager for,-0.4316808879375458,0.1282051282051282
+docgap_67d4ffefeea082bb,This function returns the minimum cost subcollection os S [GAP] elements of U in the specified universe.,and,that covers all,-0.8635251522064209,0.02469135802469136
+docgap_472c23d3aea085d6,Entry point for single [GAP] the defined app.,time is,use pipeline setup in,-0.2402876615524292,0.11594202898550725
+docgap_9488176a548ee6c3,Returns a list of all [GAP] positive balances,the,the symbols with,-0.416736364364624,0.13793103448275862
+docgap_8184307579255748,Initialize the Rollbar module with the given access [GAP] environment.,_token,token and,-0.09950606524944305,0.5
+docgap_1e09b73facee146b,Add element_by alias and extension methods ([GAP] or_none.,"using.value, *arg, **kwarg)",if_exists or,-0.5459705591201782,0.049019607843137254
+docgap_816e7b9e13ed5ea8,This function saves the port if [GAP] stored.,the port is,different from,-0.5863457918167114,0.11666666666666668
+docgap_f5c9e987cce4baf0,Predict the target of [GAP] final estimator.,self._final_estimator.predict self._final,the target with the,-0.1639838069677353,0.06666666666666667
+docgap_d87baef6bfbca034,Sums the string [GAP] object in a single flask,of the,of a single,-0.5056997537612915,0.19444444444444448
+docgap_493fe8d53d16ed20,Given a resource_url figure [GAP] resolve into,",",out what it would,-0.26349470019340515,0.0
+docgap_5ccfcb8f7519f482,Reassign pixmap [GAP] array to wrapper,s,or xpm string,-0.7816765308380127,0.03125
+docgap_8c19a7bd91c0678b,Places objects randomly until no collisions or [GAP] hit.,collisions,max iterations,-0.40536001324653625,0.1929824561403509
+docgap_73cde40ce25af5f6,Convert milliseconds since [GAP] UTC to datetime.,the,epoch,-0.7539001703262329,0.19047619047619044
+docgap_02f7e4a24e32a86f,Get complete stream info from [GAP] via describe_stream,the stream,AWS,-0.9381341934204102,0.0
+docgap_f9e9160726a1b09b,Returns [GAP] given path.,"self._handler.checksum(self, path, hash",the checksum of the,-0.13653185963630676,0.2641509433962264
+docgap_bdbd9f0cc269b96b,Send a script [GAP] device at highspeed.,to your,to a,-0.3875002861022949,0.32432432432432434
+docgap_fb81a58abdc49d8c,Calculate the accuracy score [GAP] node.,of the,of a,-1.033066987991333,0.3870967741935483
+docgap_fb76c06fe2702d04,Returns [GAP] address of the given interface name e. g. eth0,the,the IP,-0.24606911838054657,0.4444444444444445
+docgap_9c635751d1a03797,r [GAP] GPUs are on the same board.,vml,Check if two,-0.3049077093601227,0.0
+docgap_95df21fa09d5bf1e,Changes [GAP] for the current user.,are,the online status,-0.4932329058647156,0.04301075268817204
+docgap_5669c0c3cf4c442d,Gather information about lvolumes [GAP] their label size and raw path,",",gathering,-0.7698830366134644,0.0
+docgap_916cc45aadf348d9,Display a message and then return true if the user responds [GAP] affirmations.,to,with one of the,-0.555549681186676,0.05128205128205129
+docgap_504fd10d2af577e2,Replace out-of-[GAP] with UNK.,the-box,vocab words,-0.9055280089378357,0.05128205128205129
+docgap_1ded9845e106324f,Create a sequence of lookups with vars taking [GAP] over the section which takes priority over the DEFAULTSECT.,priority,priority,-0.22313463687896729,1.0
+docgap_b442348c8342647c,Return a new [GAP] crossing self and other.,"self.__class__(self, other) + other.",individual,-0.4154524803161621,0.016260162601626015
+docgap_6187c4ec690bed91,Create an error from a JSON-deserialized object [GAP] error.,. Create an,holding the serialized,-0.23614484071731567,0.10714285714285716
+docgap_852713a8c6fcbb1f,Get the most generic [GAP] iterable column.,and,data type for,-0.6760507225990295,0.057971014492753624
+docgap_6f1f5db537cf3770,Function returns the [GAP] R matrix on step k.,R matrix on step k. Return the,inverse square root of,-0.6162273287773132,0.12056737588652483
+docgap_e4a5603688d67946,Returns an iterator which [GAP] instance.,is an,returns one _NuMapTask,-0.8352051973342896,0.07575757575757576
+docgap_fa71e89478f46214,Get [GAP] for some work spec.,dict(. Get dict(. Get dict(,a summary dictionary,-0.2597457766532898,0.1349206349206349
+docgap_76f11aae22db6ad6,Generate XML object model [GAP] file or text.,by converting,from XML,-0.7757679224014282,0.0625
+docgap_d2f9b31ace8f897d,Read an object [GAP] Ansible Tower API.,in the,from the,-0.9643198251724243,0.37037037037037035
+docgap_d9dcc58d289e3412,Make an [GAP] return the cache entry,error:,image and,-0.24088850617408752,0.03333333333333333
+docgap_eaebd8543422af80,Make sure that [GAP] array have good type and size.,the correct,all items in,-0.6309875845909119,0.05555555555555555
+docgap_4b7e962b4bc25b6a,Return a list of updates [GAP] collection.,to the,in the,-0.6666386127471924,0.47619047619047616
+docgap_eb12d3cd52bfdc9f,Utility method to extract the base item type from a [GAP] item type.,base,collection,-0.8257501721382141,0.03636363636363636
+docgap_ffecd5099ede6866,parse_timespan-Convert a [GAP] to seconds.,return,string timespan definition,-0.6884320974349976,0.04938271604938272
+docgap_3a40dd700da40175,Create [GAP] from a dictionary.,a dictionary,a new object,-0.6011332273483276,0.14035087719298245
+docgap_2ef31eb3b77fb86c,Collect the common metrics from [GAP] diffed reports and download them to the diff report resources directory,the,both the,-0.7016617059707642,0.3076923076923077
+docgap_016e8c1ce0b90214,Graphs a [GAP] and embeds it in a Jupyter notebook.,notebook,line plot,-0.5548753142356873,0.1388888888888889
+docgap_3425082a6fc2641b,A safe [GAP] potentially upcasts the result array.,way to,version of putmask that,-1.2553457021713257,0.06944444444444445
+docgap_139f306217a31257,Get [GAP] given idcode.,_descriptor_for_idcode(idcode),the descriptor for a,-0.056763000786304474,0.38518518518518513
+docgap_b445768491e04e3e,Parse an HTML tag at [GAP] the wikicode string.,the top of,the head of,-0.3241211473941803,0.3333333333333333
+docgap_f0c0a45760f38735,Merge outputs [GAP] sub-workflow.,: return out. Merge outputs: return out. Mer,for a,-0.5397849082946777,0.022727272727272728
+docgap_4b87b18186eb4dfc,Get a list of the indices for [GAP] joint.,"_joint(self, name): return [].",a specific,-0.26564082503318787,0.05714285714285715
+docgap_787712a69b619b56,Returns a generator [GAP] secrets and their versions,of all,that yields all the,-0.48434293270111084,0.16666666666666666
+docgap_9cb16c60b130d131,Parse the ouput resulted of a [GAP]. Or a saddle point.,saddle point,geometry optimization,-0.4252726137638092,0.09523809523809525
+docgap_6878bc499f939bf1,Train [GAP] model that contains frequent itemsets.,"(cls, data, minSupport=0.3,",an FP-Growth,-0.14087077975273132,0.0588235294117647
+docgap_b75a8152663ec1ed,Filter [GAP] mechanisms to include those that succeed with the provided properties and are secure enough.,"_mechanism_list(mechanisms, properties, allow",a list of,-0.19351017475128174,0.09523809523809525
+docgap_44e9bb81ab7e3a34,Set policy_name [GAP] monitor hidden SFP policy,"(self, **kwargs) to",of threshold,-0.40264275670051575,0.11538461538461539
+docgap_88ad971dcf016114,This method will index a [GAP] Solr.,Solr,file into,-0.6413068771362305,0.0816326530612245
+docgap_fc58bfc1f3122d86,Any steps [GAP] need to be taken after running the action.,that,that,-1.1795251369476318,1.0
+docgap_90a733a34b077e20,Prepares a [GAP] by executing the delete monarchy method.,. Prepares a. Prepares a. Prepare,given node for deletion,-0.6066213846206665,0.05228758169934641
+docgap_b5848aef99deca9b,Stop the event loop created when [GAP] is called.,the event loop,subscribe,-0.45734697580337524,0.018518518518518517
+docgap_f27b29b7c1734896,Returns the [GAP] metabolite.,self._metabolites[_id_to_metabolites[,stoichiometric coefficient of a,-0.18265797197818756,0.10582010582010583
+docgap_c922a2a1bdc5dbaf,Send a keyboard event to [GAP] the related objects.,all,all,-0.7120780944824219,1.0
+docgap_504cc12d4468a4b4,Update the log of the [GAP] sequence.,sequence to the,receiver link,-1.1735347509384155,0.10144927536231885
+docgap_61e0cb10e3ea0bf9,Return the current number of kernels that have been loaded by [GAP] interface.,the,the KEEPER,-0.5197405815124512,0.23529411764705882
+docgap_e75267d9ce20f640,Decorate a view [GAP]-based access controls.,_func,function to require permission,-0.47855085134506226,0.1111111111111111
+docgap_84b24d63469c4c39,r Returns the shape of an L1 norm weight array W as defined by the input array W and the [GAP] convolutional representation dimensions cri.,input array W. Returns the,given,-0.6714813709259033,0.03846153846153846
+docgap_22d8636439bb6651,Returns the size [GAP] cell + indexes,of the,of the array,-0.5405179262161255,0.5384615384615384
+docgap_c426a02a4b00d9c8,Yields all tokens [GAP] first_token through and including last_token.,including,in order from,-0.2959282100200653,0.0784313725490196
+docgap_c63b1df858371388,Stream the [GAP] a request.,"stream_download(self, data, callback, callback):",response body of,-0.2530517280101776,0.0847457627118644
+docgap_c7bcbcda512c9834,Updates the [GAP] in Server Density.,default,device information,-1.1601002216339111,0.09999999999999999
+docgap_03225947d1f9a7b1,Start a child process and return [GAP] url.,False,the zmp,-0.5774720311164856,0.047619047619047616
+docgap_644f9e56edd2d629,Create a [GAP] or update an existing application version in SAR.,new application,new application,-0.4974547028541565,1.0
+docgap_51dbb0a9b668791c,Copies the [GAP] the current clipboard.,copyFilepath( self ):. Copies,current filepath contents to,-0.42877641320228577,0.24358974358974358
+docgap_d28a65e208c7c267,Display a message with choices of [GAP] and Cancel.,Cancel,OK,-0.9115041494369507,0.0
+docgap_483d54e8d2b0536d,Converts data to the appropriate type using [GAP]. unpack method.,the,struct,-0.36586520075798035,0.07407407407407407
+docgap_db5ba67828592da0,Parse [GAP] a list of dict.,is,the sentence into,-0.858260452747345,0.044444444444444446
+docgap_6ddf4d1eb7ef1262,Add a [GAP] to Generic object.,Generic object,custom provider,-0.4472239315509796,0.11111111111111112
+docgap_8858f27b78756cda,Ensure the VPC with passed [GAP] absent.,is,properties is,-0.27288976311683655,0.0909090909090909
+docgap_caca07e0bbab0637,This function calculates the delta velocity to [GAP] an encounter with a Plummer-softened stream in the impulse approximation.,return,due,-0.8774105310440063,0.14814814814814814
+docgap_8330cc0b70ab8c4c,Load configuration [GAP] from the specified source.,:. Load configuration:. Load configuration:,values,-0.3770211935043335,0.015151515151515152
+docgap_0ac3f9f119435097,Get the size of [GAP] in the proper zone,the zone,the resource,-0.4093019962310791,0.26666666666666666
+docgap_6f42cfec07ed3fd1,Generate [GAP] context for the resource we are interested in,a,an instance,-0.526911199092865,0.038461538461538464
+docgap_4cbd9e9cba80be61,Matrix-rank-1 product [GAP] triangular matrix.,is a,for real,-1.1271114349365234,0.0930232558139535
+docgap_364be18bc91e9f7d,Filter out [GAP] barcodes not in the whitelist with optional cell barcode error correction,cell,cell,-0.43491286039352417,1.0
+docgap_1c439bf77e53af27,Removes the child [GAP] the specified position.,from,at,-0.3404225707054138,0.0
+docgap_42a79e16a86574c2,This example demonstrates how to [GAP] an analytic sequence.,create,generate pretty equations from,-0.46522924304008484,0.09677419354838708
+docgap_2c7f87836dd48742,Get the current draft version [GAP] layer.,. Get the current draft version of the layer.,of a,-0.736469030380249,0.052830188679245285
+docgap_2d03db809aa57793,Returns a set of all module-[GAP] in the Python standard library.,specific modules,names,-0.37451595067977905,0.08333333333333333
+docgap_1d1e75249935df0f,Receives and processes messages for flows stored [GAP] relational db.,in,in the,-0.35019803047180176,0.25
+docgap_f6600e1ca2797f16,Eliminate dead [GAP] bodies.,dead,code from except handler,-0.7659056186676025,0.07194244604316548
+docgap_31e86470dc1b04ef,This function will take a finite time-series [GAP] or flux time-series and an external parameter list and apply the sigma-clipping to those values.,", a fixed",and a magnitude,-0.8196905851364136,0.15789473684210525
+docgap_eba7d31cdc69cf0b,Returns a closure that pushed the given value onto a [GAP] s stack.,given value,Machine,-0.510168194770813,0.10256410256410257
+docgap_960bce8843383232,Return a new class: ` PseudoTable ` with pseudos in [GAP] rows.,self if p.element.row in,the given,-0.32456907629966736,0.08333333333333333
+docgap_f51825c1a924e190,Returns [GAP] all of the required scope sets in the list of assumed scopes are satisfied.,False. Returns False. Returns Fal,True if,-0.3701881766319275,0.03809523809523809
+docgap_e78f916c50b64ada,Removes a [GAP] directory and all empty intermediate ones.,target_directory,leaf fake,-0.4303737282752991,0.05
+docgap_64a0b87628a855f3,Inherit docstring [GAP] class and method.,"(name, bases, attrs): return type(name",from parent,-0.08728737384080887,0.07575757575757576
+docgap_1039651130d9f075,Adds a point to the current node or iteratively descends to one of its children. Returns the new [GAP] or iteratively.,node,node,-0.23180794715881348,1.0
+docgap_115ff9a4ed8e10d9,Pulls [GAP] them uniquely for this build.,the pulls and pulls,parent images and retag,-1.3118643760681152,0.22522522522522523
+docgap_0aa5f2e1b914f288,Ensures that every adjacent frequency band pair in [GAP] frequency bands meets the required overlap ratio.,the adjacent,the set of,-0.4549400210380554,0.23529411764705882
+docgap_3511c1f4beabd92d,Construct a certificate signing [GAP] certificate authority.,authority. Construct a,request for the specified,-0.5265734195709229,0.12698412698412698
+docgap_9c60be23a83ef22c,Get a filename from given name without [GAP] or incompatible characters.,incompatible characters,dangerous,-0.4731777608394623,0.08641975308641975
+docgap_d1fd26eed7dba657,Add a [GAP] the parent node,parent node to,new child node to,-0.6102419495582581,0.4487179487179487
+docgap_26fc30fc986e44cf,Ensures that the given context is [GAP] context.,the given,a pycairo,-0.5892221927642822,0.05128205128205128
+docgap_ff2ef02733bc3082,Delete [GAP] the Cloud BigQuery server.,"_model(client, model_id):. Remove_",a model from,-0.30866706371307373,0.1951219512195122
+docgap_870d6a9c71fdcd6e,Decodes and returns [GAP] region.,. Decodes and returns. Decodes and returns,the value in a,-0.5197768211364746,0.07189542483660132
+docgap_44dfb222a118649e,Return [GAP] of n master instances in different nodes.,target is a set,a list,-0.4966742992401123,0.14583333333333334
+docgap_b612c4afff4732a6,Prepare [GAP] shard of the model for the decoder.,a,one,-0.5991408824920654,0.0
+docgap_d07b18e74cfc168e,Sends new timing information. delta [GAP] milliseconds. rate is in milliseconds. tags is a dict of tags to add to the timing.,rate is in,is in,-0.12223795056343079,0.5
+docgap_51c7767d75b13897,Decorator that ensures multiprocessing logging uses ZeroMQ queues. [GAP] function that does not work with local logging.,Decorator that ensures multiprocessing logging uses ZeroMQ queue,This is a wrapper,-0.4017466902732849,0.07894736842105263
+docgap_bda2aafd4cfe48e9,Remove documents [GAP] mapping_type from the index.,from,of a specified,-0.4166676104068756,0.05063291139240506
+docgap_22afb7c69705db27,Write [GAP] content to the database.,the,the remaining,-0.32966893911361694,0.17391304347826084
+docgap_f69e29062937efa8,Continuously yield new files with [GAP] in filename.,new files,steps,-0.8339059948921204,0.07407407407407407
+docgap_67494baf507eb324,Run the CSS expression on this element and its children and return a list [GAP] results.,of,of the,-0.9149160385131836,0.25
+docgap_50cb97baa52cdb65,Print the list of all [GAP] extensions that can be parsed by this parser registry.,the,file,-0.2710687220096588,0.125
+docgap_1b78b798e65ac460,Registers a handler for a given URI with Responses so that it can be [GAP] to Stack-In-A-Box.,added,intercepted and handed,-0.7762335538864136,0.12121212121212123
+docgap_3a0bfd411a785900,Parses [GAP] in the UBCPI XBlock s content XML.,e_question_xml(root): return question_,the question XML element,-0.1520356386899948,0.28654970760233917
+docgap_3f36e5255d8dfe75,Find TEI XML dir of TEI text for the First 1 [GAP] Greek corpus.,st,k Years of,-0.2745199501514435,0.04166666666666667
+docgap_47e64b8bd4cf48b4,Handle a single message [GAP] the server.,to,from,-0.5282933712005615,0.15384615384615383
+docgap_2b2450e245bb094c,Context manager for deferring writes of [GAP] a context.,a context in,a given bucket within,-0.48654258251190186,0.15476190476190477
+docgap_f7f14abd3a6bab74,Show [GAP] a monitored twitter handle.,self as,the details of,-0.3350290358066559,0.125
+docgap_859caf2d23b42b53,This method returns the next arm in the order [GAP] make next.,you,that they should,-0.6083465814590454,0.09195402298850575
+docgap_6dd700a804c4bacc,Define the constrained portion of the consumption function [GAP] self. mLvlMinNow.,of,as cFuncNowCnst and,-0.4037039577960968,0.019607843137254905
+docgap_5e52e185fe8bda9d,Consume a [GAP] and send action in return,shopper,check return,-0.7457265257835388,0.07142857142857142
+docgap_7a71e66465f85be7,Writes the data encoding the GetAttributeList request [GAP] to the output_buffer.,", corresponding",payload,-1.3307602405548096,0.058823529411764705
+docgap_04c2ae56289e38d4,Start the instance [GAP] instance names.,name with the,with the given,-0.9040673971176147,0.5606060606060606
+docgap_739b0f8578423e02,Obtain a new [GAP] logging into MAAS.,ID by,API key by,-0.6547695398330688,0.23333333333333334
+docgap_fea74cb6c7dfae2c,Searches the stack for the return target and [GAP] if exists.,returns None. Searches the stack for the return target and returns,returns the index,-0.539509117603302,0.23504273504273504
+docgap_fd1c510d1b081349,Picks out the probabilities of the actions along [GAP]-steps.,the,batch and time,-1.1683082580566406,0.08
+docgap_7832b266fa9e455e,Returns [GAP] given index if such a node currently exists in the node list or None otherwise.,self._nodes.get(index). Returns,the node with the,-0.2004076987504959,0.12403100775193798
+docgap_3b279e66963cd8a0,Sets the affinity capability [GAP] neighbor.,of the,for the neighbor,-0.41939252614974976,0.23529411764705882
+docgap_8c65daf329adad05,Use an endpoint and [GAP] additional keyword arguments rather than one.,return Three(**kwargs) arguments to generate,any,-0.6241966485977173,0.01568627450980392
+docgap_d4d5aee4b8da305a,report the total progress for the current stack optionally [GAP] completed.,be,given the local fraction,-1.0732641220092773,0.01515151515151515
+docgap_64c6a094f8a08789,Rename tables [GAP] source to destination name.,from,from,-0.4779042899608612,1.0
+docgap_0b8f1655a3513349,Retrieves and [GAP] the required paths needed to run sphinx.,returns,creates,-0.8188798427581787,0.18518518518518517
+docgap_4e1d8cb0e1e20c29,Patches built-[GAP] logging if necessary.,in patch_logging: return other patch_logging(self): return,in Python,-0.45211800932884216,0.059139784946236555
+docgap_80852e1701c8f9ad,method finds a single [GAP] base on the given primary key and returns it to the caller,key,record,-1.0064165592193604,0.07407407407407407
+docgap_27657cda56da9d5a,Save this data port into an xml. [GAP] object.,com,dom. Element,-0.6955179572105408,0.09523809523809525
+docgap_0996101f0951e10a,call callback [GAP] data forever (until \ C-c is reached,to,for all,-1.4832578897476196,0.06666666666666667
+docgap_c7951b4c7666e7e7,Decorator that checks if the object of the function has [GAP] sel_axis members.,a number of,axis and,-0.9503713846206665,0.07142857142857142
+docgap_21d25bc4fc85226b,Creates a VTK actor [GAP] triangulated surface plots.,with,for rendering,-0.5119544863700867,0.0273972602739726
+docgap_eadb7877aebb5bf7,"Return cookies as a string of "" \ \ n ""-separated [GAP] headers.","""",Set-Cookie3,-0.47988271713256836,0.0
+docgap_b79172281e4a337e,Returns whether the field is [GAP] in a given mode,visible or not,visible,-0.644855260848999,0.5625
+docgap_b5adfd0a4a198183,Compile a template [GAP] the given data.,for,file with,-0.691745400428772,0.044444444444444446
+docgap_5a596e76ab339300,Sets the value of three-tuple-if mapped from YANG [GAP] one.,to,variable to a private,-0.3792431950569153,0.052631578947368425
+docgap_73b86e6da7799550,Returns a deep copy of an [GAP] crossed referenced lists or dicts,original copy of,object with no,-0.6877268552780151,0.09333333333333332
+docgap_5ebc2abdebc33f12,parse_frames-parse [GAP] yield a list of tuples each containing the n-th element of the list.,_frames(filename):.,a file and,-0.29609090089797974,0.18055555555555558
+docgap_a8fce177a86f2e97,Calculates the Singular Value Decomposition of the input data [GAP] function.,from the input data,using SciPy s svd,-0.7177517414093018,0.08602150537634409
+docgap_7eb6e0a87479c6ff,Returns the state of [GAP] working copy,the,the git,-0.5761495232582092,0.3636363636363636
+docgap_376444a350aef403,Get [GAP] CloudFront distribution with a given name.,"_distribution(name, region=None, key=",information about a,-0.04798576608300209,0.1503267973856209
+docgap_68cff8d09151bfbb,Return the [GAP] in the hierarchy.,n,number of nodes,-0.5375014543533325,0.02631578947368421
+docgap_2abd7be6e2c43c52,Forecast the given [GAP] time Series using the given forecasting function.,forecasting function in,decomposition of observed,-0.8242712020874023,0.18604651162790697
+docgap_508094459aae9592,r Returns the phase of [GAP] Fast Fourier Transform of a waveform.,a,the inverse,-0.30926644802093506,0.0
+docgap_a9cbb4a09d6e901f,Retrieve a list of CA certificates at either [GAP] TXAWS_CERTS_PATH environment variable.,the,the TXAWS_CERTS_PATH or the,-0.8038831949234009,0.07843137254901959
+docgap_686c53bf8650727d,Adds command line arguments to [GAP] group.,argument_group,an argument,-0.543796181678772,0.55
+docgap_f977c9aca9d3f63c,Writes the specified [GAP] to the console stdout.,name,message,-0.7296847701072693,0.21621621621621623
+docgap_05030d4e42ccf86f,Set a value at the [GAP] OrderedDict,end of the value.,front of an,-0.8773452639579773,0.18840579710144928
+docgap_59eee02a7d29d9dd,returns a [GAP] of credentials for bucket and admin,list,dictionary,-0.46115678548812866,0.07272727272727272
+docgap_f4d4b1e32fec013f,% prog install [GAP]. bed backbone. fasta alt. fasta,(args):,patchers,-0.212896928191185,0.09999999999999999
+docgap_8522171a7d95ffdf,Check [GAP] for crypto done and finalize the final transfer.,_for_crypto_done(self):. Check,queue,-0.09762527793645859,0.022222222222222223
+docgap_5eb87cdc54a7b346,Parses the [GAP] returns a dictionary with the flags placed in the appropriate entry in the appropriate entry.,dictionary and,set of flags and,-0.5353992581367493,0.1733333333333333
+docgap_298d9915b2690345,Split a string into a [GAP] of lists.,list,list,-0.44637027382850647,1.0
+docgap_a5643b4f00e4e852,Reload the [GAP] from saved schedule file.,schedule file,schedule,-0.6394959092140198,0.6875000000000001
+docgap_f048668c9bf3d2a5,Create a [GAP] BSP instance with the given rectangle.,new,new,-0.5452139973640442,1.0
+docgap_39105d3e2c3d0968,Checks if a [GAP] stream_id and tuple matches with the output schema.,"self,",given,-0.44878458976745605,0.06666666666666667
+docgap_53ae8e9fa0af8d98,Initiate a connection [GAP] device.,to your,to a specific,-0.6583175659179688,0.13333333333333333
+docgap_c9b8501a28166be7,Sends a [GAP] specified context.,message in the,new notification to the,-1.0159884691238403,0.17708333333333334
+docgap_ce74a1b9f9e2730b,Validates [GAP] a regular project-based workflow.,a regular project-based workflow. Validates,the JSON spec for,-0.5991727113723755,0.08484848484848485
+docgap_84b1298f8fed4abb,Undo the value compression [GAP] (n),value,performed by x = compress_amount,-0.4132356345653534,0.03125
+docgap_4af9d99d27a47bc7,Get switch ip [GAP] transaction.,s for,addresses from baremetal,-1.1529350280761719,0.1111111111111111
+docgap_c71ab2e07f6f4920,normalize the [GAP] to make sure needed values are there,flags,flags,-0.568247377872467,1.0
+docgap_3c3652c234bc73fb,Returns the value of the given variable or the given default [GAP] the variable is not defined.,. Returns the value of the given variable or the given default,value if,-0.3788745105266571,0.11794871794871793
+docgap_c861bb8afcf8a154,Create an HDF5 file [GAP] temporary file.,and create a,backed by a,-0.5755950808525085,0.16666666666666669
+docgap_c1690541fc971d79,Probes the volume group for [GAP] returns a list of LogicalVolume instances.,the volume group.,logical volumes and,-0.6184672713279724,0.32258064516129037
+docgap_51433cf7781926fe,Get the S and Z matrices using [GAP] parameters.,the S and Z,the current,-0.48096925020217896,0.21568627450980393
+docgap_ac638b487b43ac73,Log HTTP [GAP] headers etc.,"headers,",information including url,-0.4405905604362488,0.03571428571428571
+docgap_c3df4b5712f21a45,Infer an attribute [GAP] using getattr on the associated object,by,node by,-0.7340257167816162,0.19999999999999998
+docgap_fc9968361f9afb79,This function factorizes [GAP] specific entry in the internal state.,a,the RHS of a,-0.4590803384780884,0.034482758620689655
+docgap_b76953042cac558a,Get all keys with a [GAP] during the transaction.,key,given prefix of Key,-0.9945885539054871,0.05714285714285715
+docgap_4dc2fedcc8623533,Retrieve manta output variant file [GAP] on analysis.,based,depending,-0.7957193851470947,0.07407407407407407
+docgap_8576ec942d6a909f,Utility method that yields all directories on the [GAP] file systems.,self.,device s,-0.20624738931655884,0.08333333333333333
+docgap_1072f12c191da52d,set the base or default to [GAP] Docker Hub.,the,use,-0.7189174294471741,0.16666666666666666
+docgap_8c2222e453086ce9,r Save traced [GAP] a JSON file.,to,modules information to,-0.5825949907302856,0.05
+docgap_fda9aa3b19305d4d,constructs a dictionary that represents amphidromus relations between objects and a list of [GAP] between objects,amphidromus relations,amphidromus relations,-0.4237862825393677,1.0
+docgap_a7c952d4289e713e,Convert an [GAP] base36 string representation.,array of,integer into its,-0.8410742878913879,0.05263157894736842
+docgap_338a7b62e89c5c57,Apply options [GAP] configuration.,to,component options to this,-1.0483731031417847,0.04347826086956522
+docgap_45203fd770ed58cb,Retrieves a stat that was previously [GAP] by the current pipeline run.,generated,reported,-0.653427004814148,0.2222222222222222
+docgap_616b6fa4ad0b607c,Pad apply 3-[GAP] leaky relu.,D,D convolution and,-0.5831744074821472,0.022727272727272724
+docgap_df25c0f223103d1c,Initialize [GAP] object from a json dictionary.,an,a IdentifiedLanguages,-0.37183016538619995,0.052631578947368425
+docgap_1e3683be592fe4cb,Add the given plugin name to the list of [GAP] netnode plugin names in the current IDB.,the,registered,-0.5999306440353394,0.0784313725490196
+docgap_e1988776f698a947,Return the [GAP] previous unwrittable letter on a given row.,def,position of the,-0.2678646445274353,0.04938271604938272
+docgap_6d35cad5fe114b1a,Visit the If node and [GAP] result.,return the,return the,-0.4236188530921936,1.0
+docgap_c884f918556d5ae7,Sets the rule of the based on [GAP] rulenames.,the,the given list of,-0.5478060245513916,0.12903225806451613
+docgap_7d0466aaabd1de22,Computes the hitting probability of [GAP] target states.,hitting in,all states to the,-0.5691771507263184,0.06060606060606061
+docgap_aee382ae21204289,Returns a [GAP] access a federated server and a portal token security handler.,portal token security handler to,handler to,-0.4316178560256958,0.4054054054054054
+docgap_b602c8b7a890b165,Import zone based off [GAP] file.,zone,a BIND zone,-0.4304976463317871,0.3278688524590164
+docgap_b182b24eb2fa474c,This function takes a tuple of input filename and returns a tuple of the size of the file and the size of the file that is used to store the subportion of [GAP] this function.,input filename in,the BWT independently using,-0.7910287380218506,0.16239316239316243
+docgap_46fd1bc222066fa2,Return a function object suitable for the get side of a [GAP] descriptor.,function,list property,-0.317897230386734,0.0625
+docgap_3be0521c771c08f1,Returns the list of output [GAP] this rule.,_files(self) to,files from,-0.47344863414764404,0.3
+docgap_fe578b78749b02ef,Return the created [GAP] a dict.,dict as,workflow as,-0.5088633894920349,0.15384615384615383
+docgap_2b0a3fa0a541988b,Read the version [GAP]. version file that may exist alongside __init__. py.,file,from a,-0.5127267837524414,0.06451612903225806
+docgap_15cc17d6b2525688,Function to [GAP] a new configuration segment.,create,create,-0.5285746455192566,1.0
+docgap_e3e3aafbbb1e0b3f,Constructs a BlueDispatcher out of [GAP] object.,the,the current,-0.9091173410415649,0.21052631578947367
+docgap_e48f742723ba100f,Downloads the contents [GAP] link to a file.,of a,of a,-0.5081082582473755,1.0
+docgap_5929ae3df4e1e430,Same as unpack_from_dict but [GAP] dictionary.,in the,returns a,-1.269160509109497,0.13333333333333333
+docgap_420aa16c944af098,Processes the API data for a post and adds [GAP] Media objects related to that post.,the API data for the,or updates the,-0.4755883812904358,0.264367816091954
+docgap_5cdd20f022c814f7,Writes in an 64-bit [GAP] from the specified memory space and offset.,memory space,value,-0.47436320781707764,0.05555555555555556
+docgap_2aee0e867f384793,Returns a dict with fields detail from a [GAP] model schema,model schema. Returns a,marshmallow,-0.6995694637298584,0.11494252873563218
+docgap_51a679144b0dc8d5,A worker thread that communicates [GAP] the GUI,to,with,-0.8897542953491211,0.15384615384615383
+docgap_c8776db0671d95a8,Destroy this prefix running any [GAP] files inside it.,of the,cleanups and removing any,-0.5255931615829468,0.038461538461538464
+docgap_0aaf04723c8d3b9d,Return an iterator of tuples describing the identities [GAP] node.,of the,of the,-0.4796108603477478,1.0
+docgap_6b925a6921a3dfb0,Local [GAP] of experts that works well on TPU.,team,mixture,-0.49770915508270264,0.16216216216216217
+docgap_32fc9a9f13231860,This function encodes the diagnostic data [GAP] sensor,of the,of a,-0.7960925102233887,0.3870967741935483
+docgap_7368543db9b39808,Add [GAP] in issue_keys to the epic_id.,"_issues_to_epic(self, epic_id",the issues,-0.13477809727191925,0.23529411764705882
+docgap_dc05470db8eda5d8,Convert a style dictionary to an [GAP] format dict.,num_format_str=None,xlsxwriter,-0.4594881534576416,0.06944444444444445
+docgap_371466e27762fcb4,Notify about an AddChange at a [GAP] and length.,time of index,caertain index,-0.5334299802780151,0.3636363636363636
+docgap_f1f9c43a9c7cfd21,Returns a dictionary of all the [GAP] to include with DataFrame.,fields,fields,-0.3705001771450043,1.0
+docgap_92b037cc1774c79f,Parse a human [GAP] into a list of key combinations.,key,readable key sequence,-0.5135970711708069,0.10256410256410257
+docgap_d9cc5b07d167ff77,Internal method [GAP] special-casing patches on column data sources.,for,to handle,-0.8329865336418152,0.044444444444444446
+docgap_c8cd007c0b954866,Set [GAP] the x-axis tick labels.,"_xticklabels_position(self, row, column,",the position of,-0.09419269114732742,0.26
+docgap_d5c7d807bde93944,Create and attach volumes to [GAP] machine.,your,a virtual,-0.637843906879425,0.0816326530612245
+docgap_7034717e7fa95bb0,Used [GAP] asyncio. Protocol of incoming data.,by,to signal,-0.8056240081787109,0.0
+docgap_7cc64383be37e47b,Returns [GAP] trade datetime for the given asset and dt.,the,the last,-0.49362343549728394,0.3076923076923077
+docgap_8b10670320859665,Return a list of row col tuples that need [GAP] highlighted.,to be,to be,-0.470836341381073,1.0
+docgap_03c278615fc5300d,Scroll the object which has * [GAP] beginning horizontally.,"args,**selectors): return self.device",selectors * attributes to,-0.2610570192337036,0.28654970760233917
+docgap_f58ea16dddb563aa,Processes a request_token [GAP] the request token on success.,on success. Processes,request and returns,-0.6134766936302185,0.10476190476190476
+docgap_947c87229c0ed7fd,Given a GTIN or SSCC [GAP] check digit.,", return nearest_multiple_of_ten - total.",return its appropriate,-0.3171767294406891,0.22413793103448276
+docgap_6f93651453b5cc5b,r Estimates the multivariate ESS [GAP] a set of samples.,in,sigma matrix for,-1.3365963697433472,0.023809523809523808
+docgap_f657f32dc6b3a1a1,Get alphabet and label names [GAP] dirs.,(dirs): return alphabet and label names(dirs):,union across all,-0.25881484150886536,0.1111111111111111
+docgap_6c17ad931f52ce9a,Parse an address and return [GAP] object,an,an Address,-0.17515608668327332,0.125
+docgap_dffb00cd6b520ac6,Creates a random tuple [GAP] tree_depth,"(size,",of size and,-0.29393261671066284,0.2777777777777778
+docgap_4357f1a9cd15acef,Return the set of [GAP] that are referenced but not defined.,parameters,tokens,-0.586414098739624,0.09090909090909091
+docgap_cc1c48a370ae426d,Creates or updates a specific point shape. The arguments allows for [GAP] a specific point by shape part point of any shape type. The arguments allows for updating a specific point by shape part point of any shape type.,updating,updating,-0.3107692301273346,1.0
+docgap_2e7bc172d12fa16d,Return a dict [GAP] between two dicts.,",",with fields that differ,-1.0628106594085693,0.0
+docgap_65a69c2a59b0c931,Initialize what requires credentials [GAP] secret files.,for,and,-0.6199002265930176,0.0
+docgap_8b11bb15b174d506,Make sure every vCard in [GAP] unique filename.,the filename is a,the dictionary has a,-0.6671472787857056,0.22916666666666666
+docgap_d2a38ecb60acb21f,Loads lat-lon [GAP] a netCDF file.,in,coordinates from,-1.365036964416504,0.07142857142857142
+docgap_35b7b90baf823699,transliterate a string into a random [GAP] the current language,language in,base64-encoded version of,-0.8125508427619934,0.06451612903225806
+docgap_0e8d4799cfd929cf,Load [GAP] Plex XML response.,"Data(self, data, data, data:. Load",the attributes from the,-0.32062840461730957,0.08333333333333333
+docgap_98533c58188b0c90,Add an index [GAP] with the specified field and value pair for indexing.,ing index,to the object,-0.4187268912792206,0.0392156862745098
+docgap_060b3c7ba55469bc,Checks if the parent destination [GAP] for node.,is,is valid,-1.0814845561981201,0.16666666666666669
+docgap_c8c47ab5404a2151,Sets the color [GAP] edit to the inputed colorSet.,"Set( self, colorSet. Sets the colorSet to",set for this,-0.31470125913619995,0.13194444444444445
+docgap_bb57105eb6bf9597,check if the [GAP] something,module is,configuration files actually specify,-0.45332613587379456,0.06666666666666668
+docgap_57cf3e4ba660a9ff,r This function is used to partition the void space into pore regions using [GAP] watershed algorithm.,the,a marker-based,-0.5658882856369019,0.026666666666666665
+docgap_0d62a444a5f250c1,Create an instance of class [GAP] folder according to ResourceModelName of a resource,in the,named * ResourceModel from models,-1.2241142988204956,0.029411764705882356
+docgap_51d7e1c5d5dd1b34,Return OrderedDict of all [GAP] are not None,Returns,the keys that,-0.8617812395095825,0.06666666666666667
+docgap_3bf82cfdadba5829,Returns list of phone [GAP] punctuation.,number,numbers without,-0.5525899529457092,0.43750000000000006
+docgap_5ff0e12b1d5eb155,Retrieve the resources in a collection possibly filtered by a series of values to use in [GAP] search.,a,a where clause,-0.7329311966896057,0.02857142857142857
+docgap_879a91c04bed9468,Checks that the input [GAP] valid.,is,array is,-0.5619575381278992,0.16666666666666669
+docgap_979034ceebd06919,Restores TransientFile object with given name. Should be used when form is [GAP] and no file,not available,submitted with file name,-1.2911349534988403,0.10416666666666666
+docgap_7d7d0d8e11804da5,Returns the indentation level [GAP] specified line.,of the,of the,-0.5185749530792236,1.0
+docgap_8fe0c33019a5406d,Determine if loss has [GAP] should stop.,been stopped or,runaway and we,-0.8040906190872192,0.09722222222222224
+docgap_9e42f03510f5c9f5,Returns the ID of the [GAP] for a given location.,location,feature that is available,-0.4057711362838745,0.05952380952380952
+docgap_57f1bdfb3b79efa4,Convert reduced deflection [GAP] to physical deflection angle,angle,angle,-0.34015852212905884,1.0
+docgap_7904dfa6c69a88d1,This function is called by the sensorpod module when it [GAP] ready to be monitored by the user.,is,is,-0.3639990985393524,1.0
+docgap_ea8529f1d2a777ac,Yields each tuple for all columns in an object that [GAP] missing,is,are not,-0.6511198878288269,0.0
+docgap_fa704030539738e8,This function [GAP] Galactocentric coordinates to XYZ coordinates.,returns,transforms rectangular,-0.6986820101737976,0.125
+docgap_822fb2115ec17974,Returns [GAP] resource file exists otherwise False.,os.path.exists(real_path): return,True if the,-0.2550406754016876,0.07692307692307691
+docgap_d50c87f76daedd58,Used to change lines [GAP] SVG file.,in,in an,-0.6554022431373596,0.33333333333333337
+docgap_d748625d3cc16a48,Removes [GAP] the corresponding value.,the map.pop(key) from,specified key and return,-0.41243427991867065,0.11666666666666667
+docgap_e1494da9a50819bb,Equivalent to [GAP] method.,the,the python dict update,-0.9684359431266785,0.09756097560975609
+docgap_efb6dd58991860df,Add a condor command to the submit file that allows variable (macro) [GAP] to the executable.,to be added,arguments to be passed,-0.5603681206703186,0.2976190476190476
+docgap_0dcdcdf1cdebf4e8,Update or [GAP] keys from a query string in a URL,remove,remove,-0.5052475929260254,1.0
+docgap_3124ba926faf610e,Returns [GAP] of the spin of the secondary mass.,the spin,the x-component,-0.21306823194026947,0.2222222222222222
+docgap_d04a83d96b7f6948,Evaluates and accumulates [GAP] of the last forward computation.,the value,evaluation metric on outputs,-0.8075071573257446,0.14583333333333331
+docgap_0867682203bfd885,Fetch data with func return [GAP] by ID,",",dict indexed,-1.6738677024841309,0.0
+docgap_8528cbf1d055d9d6,Compute [GAP]-frequency evolution of an inspiral signal in the time-frequency plane.,time,the time,-0.3789759874343872,0.4651162790697675
+docgap_94ee75187a7f739e,Collect python files from the [GAP] example directories.,example directories and,gallery,-0.9961676001548767,0.06666666666666667
+docgap_7bd06955acabfc75,Split the source string into lines [GAP] to be extracted.,that need,that are needed,-1.559839129447937,0.5087719298245614
+docgap_da14b0bccd5ff10a,Executes the [GAP] issue reports.,issue reports. Executes the issue reports. Executes the issue,configured suite of,-0.3219033479690552,0.08
+docgap_a890cede59de0569,Reassigns one or [GAP] label numbers to a new label number.,more,more,-0.3078973591327667,1.0
+docgap_8143844c545dd6aa,Does this [GAP] match a sequence of nodes?,match,pattern exactly,-0.4632810652256012,0.08888888888888889
+docgap_4e30f6723e2f7685,Create a new Storable object with a kwarg-[GAP] exposes.,storable object that,style init and,-0.41121891140937805,0.14942528735632185
+docgap_915c2fa409562e68,Bridge [GAP] a worker under multiprocessing.,is,function to run,-0.5550400018692017,0.025641025641025644
+docgap_03a57f49769692b8,Join relative URLs to base URL like urllib. [GAP]. urljoin but support arbitrary URIs.,def,parse,-0.5293031930923462,0.09523809523809522
+docgap_5fbfb5c4f54732b6,Make [GAP] and return html path to image,_thumbnail(self): return html path to,thumbnail,-0.21979920566082,0.3170731707317073
+docgap_087b56c27c71c0f3,Check the missing [GAP] from the workitem copied workitem,workitem,parameters for rendering directly,-0.6448267698287964,0.07407407407407407
+docgap_0c925e2581cd14f6,Parse a resource file containing a [GAP] dicts,number of,list of,-0.729096531867981,0.18181818181818185
+docgap_fed81ebb8ee0f5e1,A decorator that ensures that an entityID passed as the entity is passed [GAP] the entity.,as,as,-0.5849182605743408,1.0
+docgap_f60151036584555c,Return all the [GAP] for a given user.,packages,available packages,-0.45365455746650696,0.5238095238095238
+docgap_fc5b148788c8bb7c,returns a [GAP] parameters that constrain this parameter,set of,list of,-0.6009567379951477,0.4583333333333333
+docgap_34367d7da469dc0c,Load config from YAML config_file and [GAP] or override it with the given additional_args.,reload it,extend,-0.5942579507827759,0.1
+docgap_78f722177c28cf68,Gets version of this code [GAP] commits,. Gets version of this code. Gets version of this,based on,-0.49668416380882263,0.05128205128205129
+docgap_e634c4c48bbdb90c,Callback executed [GAP] received from the server.,:. Callback,when a message is,-0.6140550374984741,0.043478260869565216
+docgap_a97b20268fe2d7b5,Run all field validators [GAP] of errors.,to avoid the detection,and return a dict,-0.9315871000289917,0.16666666666666669
+docgap_48dfae533aef59a2,Parse. xml file [GAP] object.,"(cls, xml_path): return the",and create a XmlParser,-0.24852131307125092,0.1287878787878788
+docgap_6b312b9d3b37c3a0,Get the [GAP] the physical server.,physical server to,RAID support on,-0.7697786688804626,0.09523809523809526
+docgap_d946380aff2e1901,This function calculates the delta [GAP] encounter with a Hernquist sphere in the impulse approximation.,v,velocity to due an,-0.18396249413490295,0.021276595744680854
+docgap_fac424393b629d86,Convert a spherical harmonic degree [GAP] instance.,to a,to a new class,-0.7199928164482117,0.25316455696202533
+docgap_c8a848c4b62a0101,Returns [GAP] keys in the cache.,def,a set of,-0.3659653067588806,0.10256410256410256
+docgap_a8ddcba41405bc55,Called just [GAP] this node has been visited.,a few days after,after,-0.9664240479469299,0.3125
+docgap_458c36f6f3a19b1a,Decorator that returns [GAP] that will parse the arguments of the view class with the given argmap.,decorator. Decorator,a function,-0.12069898098707199,0.06666666666666667
+docgap_d2d3c3e796638a6c,Returns the string [GAP] at the given index,of the index,name of the block,-0.826960563659668,0.4027777777777778
+docgap_b98403ed85c19103,Builds a flat message [GAP] message dictionary.,dictionary. Builds a flat,from a,-0.24500329792499542,0.07692307692307693
+docgap_56900b2d78fd4f99,function takes a str object containing the name of an existing performance task and issues a RESTFUL [GAP] IMC REST service to get the performance task information.,DATA,call to the,-1.3570951223373413,0.0
+docgap_0534e3c4c7a9e4eb,get nested dict as dict where key is tuple or delimited string [GAP] keys,. get,of all-1 nested,-0.5856752395629883,0.06666666666666667
+docgap_e1e6ead4144b4765,Extract slices [GAP] image as equal-sized blobs of column-format data.,of column-format,of an,-0.43979987502098083,0.16666666666666666
+docgap_bde5f6068f390b0b,Returns the collection [GAP] serialized object.,of the,of items as a,-0.6861032843589783,0.19047619047619047
+docgap_e3adc959878781a4,Make a [GAP] string based on configuration parameters.,string based on configuration parameters. Make a string based on configuration,prefix,-0.4916033148765564,0.02531645569620253
+docgap_47fb16f78ed8d6c9,Returns the [GAP] specified pathname.,name of the,comment group for a,-0.7607094049453735,0.13333333333333333
+docgap_fa9dcc72f83ca600,Constructs the spec for predefined fields that are to [GAP] master spec prior to schema load,be loaded into the,be included in the,-0.6284618973731995,0.4086021505376344
+docgap_5767de36c581513b,Read the exposure and the riskmodel and update the attributes of [GAP] the relevant attributes.,readinput.exposure and update,the object with,-0.35585084557533264,0.07692307692307693
+docgap_6fa81851945014bb,Gets the Bank Ids [GAP] AssessmentPart.,_by,mapped to an,-0.3342162072658539,0.0
+docgap_21ab4b81dff236c1,Name a chord. A [GAP] is a list of names.,chord,chord,-0.21911224722862244,1.0
+docgap_c523de8238348c29,Creates and adds duplicate analyses from the source [GAP] to the destination slot.,slot,slot,-0.6525461673736572,1.0
+docgap_1ae848400e0b4c8a,Sets [GAP] value for the cluster.,the,the TC1,-0.400555819272995,0.3636363636363636
+docgap_65b8bd65a74cab8c,Converts a given variant into a [GAP] the descriptors in the given object.,given variant with,list containing,-0.4875218868255615,0.14285714285714285
+docgap_ee542031e6d8c3c7,Parse the [GAP] a dictionary.,dictionary in,gdb mi output into,-0.9224063158035278,0.1282051282051282
+docgap_cd12c64445feb2d5,Remove a section [GAP] file. Returns the removed section as dictionary.,as dictionary,from an ini,-0.5056334137916565,0.12280701754385964
+docgap_9b9d797827348f00,Returns whether [GAP] attribute.,the skip is an attribute or an attribute. Returns an attribute or an,to skip the specified,-0.8738378882408142,0.1626984126984127
+docgap_00e3e1b25af4ce14,Default [GAP] for match error handling.,_match_error_handler(exc.new_url),error handler,-0.05750580132007599,0.34146341463414637
+docgap_89424e7202b737f5,Detects [GAP] something which is not an instance or a type.,something which is not,that a class inherits,-0.5688348412513733,0.15789473684210525
+docgap_5ac7a0d2808b25c1,Instantiates [GAP] the current object,the return of,the argparse parser for,-0.8775873184204102,0.17204301075268819
+docgap_42b4527c14fc0d44,Searchers [GAP] in this repo and returns a map of study id = = > study filepath,are able to search,for files,-1.2813987731933594,0.10606060606060606
+docgap_90343ec13d2065c5,Checks if [GAP] strategy is intraday and returns the result.,the,a particular,-0.5704094171524048,0.031746031746031744
+docgap_03b01facc418cf9b,Overrides the workflow actions menu displayed top right in the object s view. Returns the list of [GAP] be performed.,workflow actions to,actions that can,-0.5990971326828003,0.4444444444444445
+docgap_ed89be647eea708b,Run a Quil program on the [GAP] and return the values stored in the classical registers designated by the classical_addresses parameter.,Quil program,QVM multiple times,-0.43809205293655396,0.09333333333333335
+docgap_ea408d8bf7ce1dff,Assembler adds an immediate value to the [GAP] value and writes the result to the destination register.,destination register,PC,-0.6814647316932678,0.0
+docgap_5251210f8d586de2,Function waitPuppetCatalogToBeApplied Wait for puppet [GAP] applied to the given key,s,catalog to be,-1.1251230239868164,0.0
+docgap_339f5ee6335e5e22,Generic message when no [GAP] is found.,info,information,-0.10685562342405319,0.3278688524590164
+docgap_839f1fd4cbe98122,Checks a single object for [GAP] the manager.,the manager and,collisions with,-0.8083110451698303,0.06666666666666667
+docgap_5d61ba9eec402d2b,Remove all vertices in the current mesh which are not [GAP] a face.,visible on,referenced by,-0.5513381958007812,0.07407407407407406
+docgap_d4ebe5e92f3f8c59,Return a [GAP] representing this model.,model,json dictionary,-0.4262659549713135,0.044444444444444446
+docgap_aba64d318d1eac2d,Get super ctx method and super [GAP] with input name.,"_method(name, ctx): return result.",ctx where name matches,-0.15643838047981262,0.1895424836601307
+docgap_089fa4fbb83550dc,Returns a uids list of the objects this action must be [GAP] against to.,able to attack,performed,-0.9753644466400146,0.037037037037037035
+docgap_86cbc0c7716a942e,Disable automatic [GAP] a netCDF4. Variable.,_auto_decode_variable(var):. Dis,decoding on,-0.18190239369869232,0.15789473684210525
+docgap_c26fc1ed51f032e1,This [GAP] waits until the child exits. This will block forever if the child has unread output and has terminated.,will block if the child,method,-0.5341463088989258,0.08333333333333334
+docgap_83e6dc467ef63422,Populate meta data for [GAP] information.,meta,a sequence with quality,-0.5079835653305054,0.045112781954887216
+docgap_319e16f0467ea005,This is a convenience method that returns a Fedora object that [GAP] datastream.,returns _raw_,is a raw,-0.22492754459381104,0.18749999999999997
+docgap_99bc169d5bc9f0dd,Return a new monitor usable [GAP] different operation.,with a,for a,-0.503765344619751,0.16666666666666666
+docgap_ce28eb538c4e4ce9,Returns a new LSTM with recurrent dropout enabled for [GAP] and test LSTM.,train_lstm,training,-0.18851153552532196,0.3846153846153846
+docgap_814c4c33a094a047,r Return the natural neighbors of [GAP] triangle containing a point.,a,a given,-0.3420150876045227,0.07142857142857142
+docgap_c92afef15b4cb377,returns a composite array with the [GAP]-> rlz,rlz,associations eid,-0.7351109981536865,0.0
+docgap_8136e35250fa4d81,Function that adds a description [GAP] class.,to the,to a model,-0.4738816022872925,0.21212121212121213
+docgap_d460986df78dd46c,find examples not [GAP] and move them into examples,.,under lib dir,-1.0441081523895264,0.0
+docgap_f17aad4d1ec3d4c8,Internal method for [GAP] building Custom Indicator Class.,the,dynamically,-0.2793673276901245,0.0
+docgap_982128011438a628,Return [GAP]-readable string representation of this object.,"pretty_str(self, indent=0):",a human,-0.22178880870342255,0.022988505747126436
+docgap_08a99c1644ce7d60,Return QMED estimate based [GAP]-over-threshold (POT records.,on a -over,on peaks,-0.6794015169143677,0.20512820512820512
+docgap_f4135e4d46e62f51,Dump a deque into [GAP]-compatible dict.,a dump_deque,a JSON,-0.547433614730835,0.07692307692307693
+docgap_5c660c460efe2b42,Updates the upper and [GAP] depths based on the input edges,lower,lower,-0.6102046966552734,1.0
+docgap_c9d93f1d34216f69,Generator [GAP] a chunked-encoded HTTP response.,generates,for data coming from,-0.4610486626625061,0.08333333333333333
+docgap_66a25e425324c74a,Un-[GAP] updates.,schedule,schedules sending of initial,-0.4615243673324585,0.3548387096774193
+docgap_8dafab0bf46b6e7c,Provide GC annotated intervals for [GAP] during panels and denoising.,panels,error correction,-0.5821953415870667,0.039215686274509796
+docgap_283bad57529b0f22,Create [GAP] with the specified event.,"Create a def menu(self, event_button, event_",a menu,-0.418272465467453,0.12592592592592594
+docgap_80c37f9e02a2ac60,Return a datetime instance from a string [GAP] now_field.,def parse_now_field(s): return,generated by,-0.2332298308610916,0.08108108108108109
+docgap_a71440a04e3a7566,Returns a list of SSH keys [GAP] user.,to the,for the current,-0.8568123579025269,0.25
+docgap_a073acc92d9a3967,returns a list of [GAP] user selection,user selection: return get_contacts(. returns a list,contacts by,-0.47873833775520325,0.20114942528735633
+docgap_9b00bc7f33859b6b,Returns [GAP] steps that contain downbeats.,downbeat_steps. Returns downbeat_steps,the indices of time,-0.3043748736381531,0.07692307692307693
+docgap_de680a99f4e0842c,Generates a [GAP] with the same transitions.,state,new POP state,-0.4487561583518982,0.3846153846153846
+docgap_b5182e31ed00f732,Initialize application and KVSession. This will replace the session management of the [GAP] with the session management of the application with Flask-KVSession s.,application,application,-0.08413412421941757,1.0
+docgap_99cd8e64474e718e,Return [GAP] normalized for duscan usage: no trailing slash.,pathname. Return pathname is,path,-0.35269710421562195,0.1226993865030675
+docgap_6e17bd636f80f288,Convert samples to mono if [GAP] are not mono already.,samples,they,-0.9214605689048767,0.05405405405405406
+docgap_a27d375b98a0b58c,Given a state [GAP] indices to slice partial FDMT solution and sump to a given DM,"of FDMT, we used",return,-0.9090853929519653,0.039215686274509796
+docgap_9f1ecd2ef29848a0,Draw each visible mesh in the scene from the perspective of the scene s camera and lit [GAP] light.,by,by its,-0.9550739526748657,0.25
+docgap_46f2b86d1b989b0c,Remove [GAP] header from the file text.,the,the coding,-0.3830718696117401,0.23529411764705882
+docgap_c7520a20b9e1ec51,Publish an [GAP] a list of values returned by its subscribers.,index with,event and return,-0.7493071556091309,0.09523809523809523
+docgap_4657c921488e92f3,Load a constraint satisfaction [GAP] from a. cnf file.,. Remove a constraint satisfaction,problem,-1.0887116193771362,0.04629629629629629
+docgap_48e72227ee8a881e,Get the archiver metrics for [GAP] key.,"pg_stat_archiver,",the given,-0.5487921237945557,0.14285714285714288
+docgap_e2b8add59f637d3d,Read lines of [GAP]. _filename convert them to read alignments and yield them.,"readAlignments(self, read):",JSON from self,-0.3708178997039795,0.12037037037037038
+docgap_d891704757334f35,Calculates average dictinary from list of [GAP] give label,values to,dictionary for,-1.3330183029174805,0.07407407407407407
+docgap_f0bbbd7836158bc4,Execute the [GAP] return the result of the command.,command and,command and,-0.6805721521377563,1.0
+docgap_e9e473ffba509756,Setup recovery [GAP] for the current node.,: return True,metadata,-0.4414049983024597,0.0625
+docgap_ec8d114eec964b6d,Return frame from the buffer together [GAP] next frame,with,with the,-0.6612957119941711,0.4651162790697675
+docgap_2aae8293a1ea003c,Log exception [GAP]. Compatible with logging. exception signature.,signature:,event,-0.48762115836143494,0.1
+docgap_dec0ca021e9a9085,Return an iterator over [GAP] in the current window.,the window,the data,-0.5638532638549805,0.28205128205128205
+docgap_2a7767d2369a9f69,Write rows to table with key and return a generator of [GAP] entries.,the,the new,-1.0538135766983032,0.3636363636363636
+docgap_9650a1c4b73faa85,Set [GAP] the item at the given index to the given value.,the value of,the data of,-0.2759608030319214,0.3148148148148148
+docgap_5cdd4bc9baad5a4d,Compute multiplicative self attention for [GAP] with batch dimension.,a batch dimension,time series of vectors,-1.044244647026062,0.12745098039215688
+docgap_b881e106dfd09b88,Uploads a [GAP] the dataset with the given source and destination paths.,dataset to,file to,-0.7083737850189209,0.19444444444444445
+docgap_db9f27612ebce227,Return a string representation of the tasks [GAP] statuses and parameters in a dependency tree format,",",their,-0.6401066184043884,0.0
+docgap_3d3630d2dc22a872,Reset the timing values [GAP] resource.,of the,for the specified,-0.6085092425346375,0.2222222222222222
+docgap_7c637d88de4b0dc6,instantiate the classes that [GAP] source and destination crash storage systems.,are used to create,implement the,-1.2726213932037354,0.08974358974358974
+docgap_19b0155d29f3f1b1,Transform each item [GAP] a callback.,into,in the collection using,-0.6058838367462158,0.07518796992481203
+docgap_ef270467dd494e88,Adds a [GAP] log for missing exceptions.,missing,message to the,-0.40200674533843994,0.10416666666666667
+docgap_8c16fe60e8abd506,Move file pointer back to [GAP] recorded starting position.,the,its,-0.45950546860694885,0.16666666666666666
+docgap_00cbbb007f7da8b6,The local dir for staging files for [GAP] particular task.,a,that,-0.4296340346336365,0.18181818181818182
+docgap_44129e3791ab7589,Convenience function to [GAP] configure any level of logging to a file.,configure or,quickly,-0.39207297563552856,0.07142857142857142
+docgap_c2490efbf48baa39,Get the [GAP] needed by child to unpickle process object,data,basic data,-1.390302300453186,0.3636363636363636
+docgap_96f68d30a6c5eed2,Parses the [GAP]-list.,group_list,value into a group,-0.6047812700271606,0.26086956521739135
+docgap_c4363ba6681f2083,Returns [GAP] of all field names that should be created when instantiating this serializer class.,the name,the list,-0.5968871712684631,0.30303030303030304
+docgap_cc20b2c11805fd56,Switches on logging [GAP] level.,to logging,at a given,-1.0244874954223633,0.13333333333333333
+docgap_20b4e6fa82241aec,Convert 2 [GAP] file to MagIC file,"g_bin(dir_path=""."", mag_file='",G binary format,-0.28173476457595825,0.12500000000000003
+docgap_36d5075365c496ae,Serializes the object [GAP] a JWE token.,with,into,-0.4757445454597473,0.20000000000000004
+docgap_53ac973a1bd65660,This method calculates [GAP] two images.,the number of,the squared differences between,-0.6216272115707397,0.1623931623931624
+docgap_4af941d62181cc94,Get the path [GAP] on the minion where CIBs are saved,cibpath,to the directory,-0.6748725771903992,0.09259259259259259
+docgap_15e01bd3ddd9e302,Retrieve running configuration [GAP] device state information.,s from,and,-1.033191442489624,0.0
+docgap_ebcef5a3febf7a57,returns a single milestone with [GAP] number,a single,the given,-0.317465215921402,0.1388888888888889
