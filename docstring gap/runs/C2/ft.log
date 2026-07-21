@@ -1,0 +1,39 @@
+=== FT SWEEP START Tue Jul 21 06:52:47 UTC 2026 ===
+
+#### RUN tag=main lr=0.0003 mode=plain budget=1500s bs=24 ####
+train pool=100000 (buckets2-19)  eval=1500 (bucket0)
+  t=0 (zero-shot) chrF=0.1653
+  t=  5.0min seen=3504 sps=11.6 loss=2.515 chrF=0.1967
+  t= 10.0min seen=6768 sps=11.2 loss=2.413 chrF=0.2162
+  t= 15.0min seen=9408 sps=10.5 loss=2.371 chrF=0.2227
+  t= 20.0min seen=12288 sps=10.2 loss=2.347 chrF=0.2245
+  t= 25.0min seen=15648 sps=10.4 loss=2.319 chrF=0.2314
+  DONE main: 652 steps, 15648 samples, 10.4 samples/s train-only
+  curve -> runs/C2/curve_main.csv
+  ckpt -> runs/C2/ft_main
+
+wall 1882s
+=== main done Tue Jul 21 07:24:16 UTC 2026 ===
+
+#### RUN tag=hint lr=0.0003 mode=doc_first budget=900s bs=24 ####
+train pool=100000 (buckets2-19)  eval=1500 (bucket0)
+  t=0 (zero-shot) chrF=0.1986
+  t=  5.0min seen=1512 sps=5.0 loss=2.354 chrF=0.2772
+  t= 10.1min seen=3144 sps=5.2 loss=2.190 chrF=0.3018
+  t= 15.1min seen=4608 sps=5.1 loss=2.119 chrF=0.3129
+  DONE hint: 192 steps, 4608 samples, 5.1 samples/s train-only
+  curve -> runs/C2/curve_hint.csv
+
+wall 1361s
+=== hint done Tue Jul 21 07:47:03 UTC 2026 ===
+
+#### RUN tag=lr1e4 lr=0.0001 mode=plain budget=600s bs=24 ####
+train pool=100000 (buckets2-19)  eval=1500 (bucket0)
+  t=0 (zero-shot) chrF=0.1653
+  t=  5.0min seen=3720 sps=12.4 loss=2.643 chrF=0.2014
+  t= 10.1min seen=7536 sps=12.5 loss=2.495 chrF=0.2090
+  DONE lr1e4: 314 steps, 7536 samples, 12.5 samples/s train-only
+  curve -> runs/C2/curve_lr1e4.csv
+
+wall 763s
+=== ALL_FT_DONE Tue Jul 21 07:59:53 UTC 2026 ===

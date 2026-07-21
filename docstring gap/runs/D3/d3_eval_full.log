@@ -1,0 +1,85 @@
+[data] train_fit(2-19)=209022 val0=11462 val1=11489 threads=14 model=Salesforce/codet5-small zeroshot=True
+[fits even] n=104493 25s
+[fits odd] n=104529 26s
+[train phase tag0] X(1339054, 78) 130s
+[train phase tag1] X(1344392, 78) 133s
+[fits full] n=209022 51s
+[c1-base] Xtr(2683446, 78) Xv(773503, 78) Xv1(777124, 78) all-fork-done @ 9.9min
+Training until validation scores don't improve for 40 rounds
+Early stopping, best iteration is:
+[289]	valid_0's ndcg@1: 0.446624
+[P0 c1-only] bucket-0 chrF=0.3189  pool_oracle=0.6285
+[t5] zero-shot base weights loaded (Salesforce/codet5-small, no FT)
+[t5] int8 dynamic quantization ready
+[t5-gen] 1536/11462
+[t5-gen] 3008/11462
+[t5-gen] 4544/11462
+[t5-gen] 6016/11462
+[t5-gen] 7552/11462
+[t5-gen] 9024/11462
+[t5-gen] 10560/11462
+[t5-gen] 1536/11489
+[t5-gen] 3008/11489
+[t5-gen] 4544/11489
+[t5-gen] 6016/11489
+[t5-gen] 7552/11489
+[t5-gen] 9024/11489
+[t5-gen] 10560/11489
+[codet5-gen] val0+val1 done @ 23.4min (620s)
+[t5-gen] 1536/16000
+[t5-gen] 3008/16000
+[t5-gen] 4544/16000
+[t5-gen] 6016/16000
+[t5-gen] 7552/16000
+[t5-gen] 9024/16000
+[t5-gen] 10560/16000
+[t5-gen] 12032/16000
+[t5-gen] 13504/16000
+[t5-gen] 15040/16000
+[codet5-train] gated=16000 done @ 30.6min
+[P1 codet5-standalone] bucket-0 chrF=0.4089 exact=0.1806 empty=0.0000
+[augment] rows=40000 t5_new_cand=9901 t5_hit_pool=6099 X(2693347, 83)
+Training until validation scores don't improve for 40 rounds
+Early stopping, best iteration is:
+[193]	valid_0's ndcg@1: 0.500606
+[hybrid reranker] iters 193 top12 [('lm_total_pw', 118944), ('t5_len', 108388), ('centrality8', 91694), ('b2src_code', 91539), ('lm_first_logp', 37433), ('char_len', 30346), ('lm_rank', 27233), ('t5_is_cand', 25432), ('len_minus_typ', 21677), ('masked_len', 21335), ('lm_mean_logp', 19585), ('src_code', 19331)]
+[augment] rows=11462 t5_new_cand=6917 t5_hit_pool=4545 X(780420, 83)
+[P2 learned-hybrid argmax] bucket-0 chrF=0.4380  (+0.1191 vs C1, +0.0291 vs codet5)  oracle=0.6696
+[decode] confident-T5 overrides applied: 405
+[P3 hybrid+override thr=-0.35] chrF=0.4323
+[decode] confident-T5 overrides applied: 715
+[P3 hybrid+override thr=-0.5] chrF=0.4277
+[decode] confident-T5 overrides applied: 1253
+[P3 hybrid+override thr=-0.7] chrF=0.4205
+[P4 codet5-primary + logp rescue -> C1]
+    thr=-1.50  chrF=0.4092  c1_used=0.001
+    thr=-1.20  chrF=0.4102  c1_used=0.012
+    thr=-1.00  chrF=0.4124  c1_used=0.045
+    thr=-0.85  chrF=0.4143  c1_used=0.103
+    thr=-0.70  chrF=0.4170  c1_used=0.211
+    thr=-0.55  chrF=0.4146  c1_used=0.369
+    thr=-0.40  chrF=0.3977  c1_used=0.567
+[P5 codet5-primary + (logp AND anchor>=1) rescue -> C1]
+    thr=-1.20  chrF=0.4092  c1_used=0.004
+    thr=-1.00  chrF=0.4096  c1_used=0.015
+    thr=-0.85  chrF=0.4096  c1_used=0.040
+    thr=-0.70  chrF=0.4107  c1_used=0.089
+    thr=-0.55  chrF=0.4079  c1_used=0.162
+    thr=-0.40  chrF=0.3975  c1_used=0.260
+    thr=-0.25  chrF=0.3777  c1_used=0.381
+[ORA two-way max(C1,codet5)] 0.4918
+[tiers] tier  n     C1      codet5  (codet5-C1)
+    l2r2    981  0.3927  0.5019  (+0.1092)
+    l1r1   4728  0.3175  0.4351  (+0.1176)
+    none   5753  0.3074  0.3715  (+0.0641)
+[augment] rows=11489 t5_new_cand=7058 t5_hit_pool=4431 X(784182, 83)
+[save] runs/D3/d3_val0_rows.csv (11462) + _val1_rows.csv (11489)
+
+#### SUMMARY @ 33.7min ####
+  P0 C1-only            0.3189
+  P1 codet5-standalone  0.4089
+  P2 learned-hybrid     0.4380
+  P4 codet5+logp-rescue 0.4170 (thr=-0.7)
+  P5 codet5+anchor-resc 0.4107 (thr=-0.7)
+  ORA max(C1,codet5)    0.4918
+[done] total 33.7min
