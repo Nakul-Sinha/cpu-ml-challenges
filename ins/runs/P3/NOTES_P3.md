@@ -89,7 +89,7 @@ IT re-scorer, NP gate) fit at runtime.  The embedded modules' reranker / load_tr
 / main() are dead code (never on the ship path — proven: the isolated smoke test has no
 solution/folds.csv and still matches exactly).
 
-## artifacts (box: ~/insled/runs/P3/, mirror: G:/Datacurve/cpu-challenges/ins/runs/P3/)
+## artifacts (box: ~/insled/runs/P3/, mirror: G:/ml/cpu-challenges/ins/runs/P3/)
     solution.py            self-contained ship (SHIP = de@0.31)
     submission_final.csv   shipped (de@0.31 robust)      submission_cvopt.csv  alt (de@0.19)
     pipeline_v4.py         honest ladder + ship-fixed scan (import-based, reproduces above)

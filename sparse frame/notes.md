@@ -54,13 +54,13 @@
 ## Env
 - Remote sweep box: EC2 i-0c0784a14ee583064, 34.227.176.167, 16 vCPU / 124GB, Amazon Linux 2023.
 - venv ~/venv (py3.9) has numpy/pandas/scipy/sklearn; installing pillow/opencv/torch(cpu).
-- Working disk /mnt/work (278GB). Dataset -> /mnt/work/eris/dataset/public/.
+- Working disk /mnt/work (278GB). Dataset -> /mnt/work/data/dataset/public/.
 - MUST keep final solution within grader budget: 10 cores, 62GB, 1.5h.
 
 ---
 
 # QUEUED NEXT: ParseRift (parser attachment disagreement)
-- Dataset: G:\Datacurve\cpu-challenges\parser attatchment disagreement\dataset
+- Dataset: G:\ml\cpu-challenges\parser attatchment disagreement\dataset
 - Task: token-level binary classification. For each token in an English sentence, predict whether 25 independent dependency parsers disagree on its head (contested=1) beyond a 15% margin.
 - Data: train.parquet 20,624 tokens (grouped into sentences), test.parquet 4,145 (contested withheld). Columns: token_id, sentence_id, position, token, contested. token_id/sentence_id/position are OPAQUE (carry no signal -> using them scores 0).
 - Metric: MCC (Matthews Correlation Coefficient), clip to [0,1]. ~23% contested (imbalanced). Constant/random/id-only all score 0.

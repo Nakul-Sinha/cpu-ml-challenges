@@ -7,7 +7,7 @@ from PIL import Image
 import cv2
 from scipy.ndimage import gaussian_filter
 
-ROOT = sys.argv[1] if len(sys.argv) > 1 else "/mnt/work/eris/dataset/public"
+ROOT = sys.argv[1] if len(sys.argv) > 1 else "/mnt/work/data/dataset/public"
 NSAMP = int(sys.argv[2]) if len(sys.argv) > 2 else 250
 TRAIN_IMG = os.path.join(ROOT, "images", "train")
 rng = np.random.default_rng(0)

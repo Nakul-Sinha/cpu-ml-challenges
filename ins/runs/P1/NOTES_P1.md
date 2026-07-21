@@ -75,7 +75,7 @@ de edited-row ratio should stay <= N3's; still VERIFY the submission de edited-r
 [0.45,1.80] before shipping (as N3 did; a robust de thr can be nudged up if over-predicting).
 Runtime: GRU full-train = 5 seeds x ~4s = ~20s; fits the 60-min CPU grader easily.
 
-## Files (box: ~/insled/runs/P1/, mirror: G:/Datacurve/cpu-challenges/ins/runs/P1/)
+## Files (box: ~/insled/runs/P1/, mirror: G:/ml/cpu-challenges/ins/runs/P1/)
     p1_base.py      fold fit + N3 reproduction (nested 0.5503 exact)
     p1_lever1.py    it re-scorer (rescorer_oof) + full Lever-1 ablation
     p1_lever2.py    BiGRU tagger (gru_oof, n_seeds) + full Lever-2 ablation

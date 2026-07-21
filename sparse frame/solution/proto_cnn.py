@@ -12,7 +12,7 @@ def parse_args():
     ap.add_argument("root")
     ap.add_argument("--epochs", type=int, default=70)
     ap.add_argument("--res", default="320x180")
-    ap.add_argument("--cache", default="/mnt/work/eris/cache")
+    ap.add_argument("--cache", default="/mnt/work/data/cache")
     ap.add_argument("--bs", type=int, default=32)
     ap.add_argument("--lr", type=float, default=2e-3)
     ap.add_argument("--seed", type=int, default=0)
@@ -175,7 +175,7 @@ def main():
                   f"valMCFS={macro:.4f} best={best:.4f} | IoU>=.5={hit:.3f} mIoU={mIoU:.3f} clsAcc={clsacc:.3f} "
                   f"({time.time()-t0:.0f}s/ep)", flush=True)
     print(f"BEST valMCFS={best:.4f}")
-    if best_state: torch.save(best_state, "/mnt/work/eris/proto_best.pt")
+    if best_state: torch.save(best_state, "/mnt/work/data/proto_best.pt")
 
 @torch.no_grad()
 def evaluate(net, X, cen, siz, cls, va, outW, outH, blend=0.5):

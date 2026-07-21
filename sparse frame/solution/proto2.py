@@ -14,12 +14,12 @@ def parse_args():
     ap.add_argument("root")
     ap.add_argument("--epochs", type=int, default=60)
     ap.add_argument("--res", default="320x180")
-    ap.add_argument("--cache", default="/mnt/work/eris/cache")
+    ap.add_argument("--cache", default="/mnt/work/data/cache")
     ap.add_argument("--bs", type=int, default=32)
     ap.add_argument("--lr", type=float, default=3e-3)
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--threads", type=int, default=10)
-    ap.add_argument("--out", default="/mnt/work/eris/proto2_best.pt")
+    ap.add_argument("--out", default="/mnt/work/data/proto2_best.pt")
     return ap.parse_args()
 
 def build_cache(root, outW, outH, cache_dir):

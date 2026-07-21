@@ -18,7 +18,7 @@ from sklearn.metrics import accuracy_score
 
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("root"); ap.add_argument("ckpts", nargs="+")
-    ap.add_argument("--res", default="256x144"); ap.add_argument("--cache", default="/mnt/work/eris/cache")
+    ap.add_argument("--res", default="256x144"); ap.add_argument("--cache", default="/mnt/work/data/cache")
     ap.add_argument("--tta", action="store_true")
     args = ap.parse_args()
     outW, outH = map(int, args.res.split("x")); gh, gw = outH//4, outW//4; nf = 4

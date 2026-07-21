@@ -4,7 +4,7 @@ import sys, os, csv, collections, time
 import numpy as np
 from PIL import Image
 
-ROOT = sys.argv[1] if len(sys.argv) > 1 else "/mnt/work/eris/dataset/public"
+ROOT = sys.argv[1] if len(sys.argv) > 1 else "/mnt/work/data/dataset/public"
 TRAIN_IMG = os.path.join(ROOT, "images", "train")
 np.random.seed(0)
 

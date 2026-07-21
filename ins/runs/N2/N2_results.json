@@ -61,6 +61,6 @@
   "compliance": "all learning from train.csv at runtime; per-fold leak-free stores; no literal encoded content strings (only punctuation/mark literals); real LGBM detector unchanged; test used only for inference-time edited-row-rate diagnostic (sanctioned); nested threshold selection; both nested+nonnested reported",
   "artifacts": {
     "box": "~/insled/runs/N2/{n2_ext.py, n2_measure.py, n2_eda.py, n2_endiag.py, N2_results.json}",
-    "local": "G:/Datacurve/cpu-challenges/ins/runs/N2/ (same files)"
+    "local": "G:/ml/cpu-challenges/ins/runs/N2/ (same files)"
   }
 }

@@ -12,10 +12,10 @@ from common import (CATS, CAT2I, FRAME_W, FRAME_H, read_train_csv, load_clip_inp
 def parse_args():
     ap = argparse.ArgumentParser()
     ap.add_argument("root"); ap.add_argument("--epochs", type=int, default=60)
-    ap.add_argument("--res", default="256x144"); ap.add_argument("--cache", default="/mnt/work/eris/cache")
+    ap.add_argument("--res", default="256x144"); ap.add_argument("--cache", default="/mnt/work/data/cache")
     ap.add_argument("--bs", type=int, default=48); ap.add_argument("--lr", type=float, default=4e-3)
     ap.add_argument("--seed", type=int, default=0); ap.add_argument("--threads", type=int, default=10)
-    ap.add_argument("--warmup", type=int, default=3); ap.add_argument("--out", default="/mnt/work/eris/proto3_best.pt")
+    ap.add_argument("--warmup", type=int, default=3); ap.add_argument("--out", default="/mnt/work/data/proto3_best.pt")
     ap.add_argument("--balance", type=int, default=1)  # class-balanced sampling (macro metric weights cats equally)
     return ap.parse_args()
 

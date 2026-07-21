@@ -1,20 +1,20 @@
 ---
-name: project-eris
-description: Plan, implement, validate, and manage Shipd.ai Project Eris ML challenge solves and challenge-creation packages. Use when working on Eris/Shipd challenge pages, datasets under dataset/public, solution.ipynb notebooks, submission.csv validators, leaderboard/credit strategy, or creating Eris datasets, prepare.py, grade.py, rubrics, and reference solutions.
+name: cpu-only-ml-solutions
+description: Plan, implement, validate, and manage ML challenge solutions and challenge-creation packages. Use when working on challenge pages, datasets under dataset/public, solution.ipynb notebooks, submission.csv validators, leaderboard/credit strategy, or creating datasets, prepare.py, grade.py, rubrics, and reference solutions.
 ---
 
-# Project Eris
+# Competition workflow
 
-Operate as a Project Eris competition engineer: produce valid, compliant, competitive ML submissions quickly, with git-backed project isolation and strict quality checks.
+Operate as a competition engineer: produce valid, compliant, competitive ML submissions quickly, with git-backed project isolation and strict quality checks.
 
 ## Project Rules
 
-- Use git for every Eris project. Keep work in a private GitHub repository unless the user explicitly says otherwise.
+- Use git for every project. Keep work in a private GitHub repository unless the user explicitly says otherwise.
 - Give each challenge its own directory at the repository root, e.g. natural-product-evidence-matching/.
 - Use one Codex thread per challenge project. Stay inside the assigned challenge directory unless reading shared repo tooling or the user asks to coordinate across projects.
 - Treat official solver notebooks as Kaggle-style submissions: read from ./dataset/public/, write final output to ./working/submission.csv, and run end-to-end without manual intervention.
 - Use only libraries available in the expected Kaggle Docker/runtime environment for official solution.py or solution.ipynb submissions unless the challenge explicitly permits installing or packaging extras.
-- For Shipd upload handoffs, match the platform field names exactly: provide solution.py or solution.ipynb plus submission.csv. If also creating a local folder, mirror the runtime-generated output as working/submission.csv. Do not present solution.csv as the final upload file.
+- For upload handoffs, match the platform's field names exactly: provide solution.py or solution.ipynb plus submission.csv. If also creating a local folder, mirror the runtime-generated output as working/submission.csv. Do not present solution.csv as the final upload file.
 - Keep final code and final CSV consistent. If a post-processing change creates a new submission.csv (thresholding, calibration, blending, quantiles, clipping, etc.), update solution.py/solution.ipynb to reproduce that same decision rule before handing files to the user.
 - Never make official solution.py or solution.ipynb read, discover, validate, reorder, copy, mirror, or fall back to an uploaded/root/sibling submission.csv, previous working/submission.csv, or other precomputed test prediction file. The official script must generate ./working/submission.csv from ./dataset/public/ through the declared modeling pipeline when run in isolation.
 - Never ship a decoy or fallback pipeline that produces different predictions from the submitted CSV. If a neural ensemble, blend, calibration, or postprocessing path produced the upload, the official code must execute that same path or the submission is not review-safe.
@@ -51,7 +51,7 @@ Never generate or recommend solutions that:
 - Copy, mirror, reorder, or validate an uploaded submission.csv as the official output instead of computing predictions in the official runtime.
 - Include a visible ML pipeline that is bypassed whenever a precomputed submission file is present.
 - Use private, role-gated, paid, obscure, inaccessible, API-backed, or non-reproducible pretrained models, weights, embeddings, or endpoints.
-- Upload magic weights or externally trained artifacts that bypass the platform runtime/training limits or cannot be fairly reproduced in the expected environment.
+- Upload magic weights or externally trained artifacts that bypass the runtime/training limits or cannot be fairly reproduced in the expected environment.
 - Ignore challenge-specific method rules, such as open-weight LLM requirements or bans on metadata/source IDs.
 - Submit invalid files: missing rows, duplicate IDs, wrong columns/order, invalid labels, NaN/Inf, out-of-range values, or nondeterministic outputs.
 
@@ -75,7 +75,7 @@ If the user asks for a violating path, redirect to a compliant modeling or valid
 6. Improve in clear increments: features, stronger model, calibration, thresholding, ensembling, or compact neural training.
 7. Run a strict final validator before any official submission.
 8. Track each credit: credit number, public score, local score, change made, and next action.
-9. Write approach.md with submission-form-ready text covering time spent, model architecture, preprocessing, key design decisions, what worked, what did not work, local validation, and compliance notes. Store the numeric time value separately when helpful, e.g. time_spent.txt. In any paste-ready submission text (the short reviewer paragraph / simple-approach.md, and the approach text pasted into the Eris form), avoid typographic AI tells: no em or en dashes, no two words joined by a hyphen into a compound (write "multiscale" not "multi-scale", "per image" not "per-image"; proper model names such as Faster R-CNN and U-Net keep their real spelling), and write small whole numbers as digits (4 not four).
+9. Write approach.md with submission-form-ready text covering time spent, model architecture, preprocessing, key design decisions, what worked, what did not work, local validation, and compliance notes. Store the numeric time value separately when helpful, e.g. time_spent.txt. In any paste-ready submission text (the short reviewer paragraph / simple-approach.md, and the approach text pasted into the the platform form), avoid typographic AI tells: no em or en dashes, no two words joined by a hyphen into a compound (write "multiscale" not "multi-scale", "per image" not "per-image"; proper model names such as Faster R-CNN and U-Net keep their real spelling), and write small whole numbers as digits (4 not four).
 10. Commit meaningful milestones. Push to the private GitHub repo when work is stable or the user asks.
 
 For detailed solver workflow, read references/solve-workflow.md.
@@ -102,7 +102,7 @@ For solving:
 - validate_submission.py for strict local schema/value checks when useful.
 - run_experiment.py or research/ scripts for H100-only experiments, clearly separated from official notebooks.
 - notes.md for challenge facts, local CV, public submissions, and next actions.
-- approach.md with concise text the user can paste into the Eris "Your Approach" submission field, plus a recommended time-spent value.
+- approach.md with concise text the user can paste into the the platform "Your Approach" submission field, plus a recommended time-spent value.
 - Final upload handoff files named exactly solution.py/solution.ipynb and submission.csv; optional working/submission.csv should be an exact mirror of the final CSV.
 
 For challenge creation:

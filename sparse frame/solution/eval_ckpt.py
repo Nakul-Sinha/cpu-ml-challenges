@@ -14,7 +14,7 @@ from cls_appearance import appearance
 def parse():
     ap = argparse.ArgumentParser()
     ap.add_argument("root"); ap.add_argument("ckpts", nargs="+")
-    ap.add_argument("--res", default="256x144"); ap.add_argument("--cache", default="/mnt/work/eris/cache")
+    ap.add_argument("--res", default="256x144"); ap.add_argument("--cache", default="/mnt/work/data/cache")
     ap.add_argument("--tta", action="store_true")
     return ap.parse_args()
 

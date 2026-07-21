@@ -32,7 +32,7 @@ def brier_macro(probs, y, cats):
 
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("root"); ap.add_argument("ckpt")
-    ap.add_argument("--res", default="256x144"); ap.add_argument("--cache", default="/mnt/work/eris/cache")
+    ap.add_argument("--res", default="256x144"); ap.add_argument("--cache", default="/mnt/work/data/cache")
     args = ap.parse_args()
     outW, outH = map(int, args.res.split("x")); gh, gw = outH//4, outW//4; nf = 4
     clips, X, cen, siz, cls, cat = proto3.build_cache(args.root, outW, outH, args.cache)
