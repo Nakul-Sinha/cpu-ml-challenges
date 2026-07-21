@@ -1,0 +1,14 @@
+[load] train 231973 test 50000 threads 7 nproc 7 ntrain 58000  5s
+[fits even] n=115955 34s
+[fits odd] n=116018 34s
+[train phase even->odd] X(1950530, 78) 291s
+[train phase odd->even] X(1948151, 78) 293s
+[train matrix] X(3898681, 78) groups 58000  584s
+Training until validation scores don't improve for 40 rounds
+Early stopping, best iteration is:
+[345]	valid_0's ndcg@1: 0.440616
+[reranker] iters 345 top10 [('lm_total_pw', 131487), ('centrality8', 130701), ('b2src_code', 126751), ('lm_rank', 65821), ('lm_first_logp', 65643), ('len_minus_typ', 42773), ('char_len', 39044), ('masked_len', 36713), ('lm_mean_logp', 35235), ('glob_freq_log', 31333)]
+[fits full] n=231973 64s
+
+[TIMINGS] parity_fits=68s  train_candgen_feat=584s  train=157s  full_fits=64s  test_candgen_feat_decode=776s  TOTAL=1655s
+[done] wrote runs/C1/submission_v2.csv (50000 rows)  mean_len 12.0

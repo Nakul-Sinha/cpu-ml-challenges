@@ -1,0 +1,22 @@
+[load] train 231973 fold 220511 val 11462 4s
+[fits even] n=104493 29s (b1_idx+lm, b2_fit 14s, lm_tri 681153)
+[fits odd] n=116018 33s (b1_idx+lm, b2_fit 15s, lm_tri 743463)
+[union] n=27554 b2 99s lm 87s merge 2s mean_pool 67.1
+[train phase even->odd] X(1848251, 78) 279s
+[union] n=30446 b2 98s lm 114s merge 2s mean_pool 67.1
+[train phase odd->even] X(2042596, 78) 327s
+[train matrix] X(3890847, 78) groups 58000 607s
+Training until validation scores don't improve for 40 rounds
+Early stopping, best iteration is:
+[177]	valid_0's ndcg@1: 0.431724
+[reranker] iters 177 top15 [('b2src_code', 130273), ('centrality8', 123815), ('lm_total_pw', 122383), ('lm_rank', 59346), ('lm_first_logp', 59124), ('char_len', 45964), ('masked_len', 33459), ('lm_mean_logp', 33328), ('lm_leave', 32858), ('word_len', 31392), ('src_code', 29946), ('glob_freq_log', 24989), ('len_minus_typ', 21190), ('ovl_frac', 15661), ('b2_anchor_strength', 14783)]
+[fits full] n=220511 64s (b1_idx+lm, b2_fit 30s, lm_tri 1251097)
+[union] n=11462 b2 82s lm 42s merge 1s mean_pool 67.5
+[val pool] mean 67.5 oracle 0.6302 exact 0.311
+[argmax] chrF 0.3210  realized/oracle 0.509
+[mbr T=0.4] chrF 0.3226
+[mbr T=0.6] chrF 0.3204
+[mbr T=0.8] chrF 0.3165
+
+[TIMINGS] parity_fits=62s  train_candgen_feat=607s  train=99s  full_fits=64s  val_candgen_feat=150s  total=1443s
+HEADLINE bkt0 chrF: argmax 0.3210 | best_mbr 0.3226 (T=0.4) | keep_mbr False | FINAL 0.3210 | oracle 0.6302 | realized 0.509

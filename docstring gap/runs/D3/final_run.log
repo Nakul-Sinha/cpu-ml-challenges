@@ -1,0 +1,71 @@
+[load] train 231973 test 50000 threads 10 nproc 10 ntrain 40000 coverage 1.0 skip_t5 False  4s
+[fits even] n=115955 28s
+[fits odd] n=116018 29s
+[train phase tag0] X(1348254, 78) 150s
+[train phase tag1] X(1340404, 78) 149s
+[train matrix] X(2688658, 78) groups 40000  299s
+[fits full] n=231973 58s
+[test matrix] X(3375384, 78) groups 50000  all-fork-stages-done @ 14.9min
+[t5] zero-shot load (coverage 1.0) @ 14.9min
+[t5] zero-shot base weights loaded (Salesforce/codet5-small, no FT)
+/home/ec2-user/docgap/runs/D1/solution_v3.py:1065: DeprecationWarning: torch.ao.quantization is deprecated and will be removed in 2.10. 
+For migrations of users: 
+1. Eager mode quantization (torch.ao.quantization.quantize, torch.ao.quantization.quantize_dynamic), please migrate to use torchao eager mode quantize_ API instead 
+2. FX graph mode quantization (torch.ao.quantization.quantize_fx.prepare_fx,torch.ao.quantization.quantize_fx.convert_fx, please migrate to use torchao pt2e quantization API instead (prepare_pt2e, convert_pt2e) 
+3. pt2e quantization has been migrated to torchao (https://github.com/pytorch/ao/tree/main/torchao/quantization/pt2e) 
+see https://github.com/pytorch/ao/issues/2259 for more details
+  self.qmodel = torch.quantization.quantize_dynamic(
+[t5] int8 dynamic quantization ready
+[t5] gate thr=-1000000000000000000.0000 train-cov(parity)=1.000 test-cov(full)=1.000 (50000/50000)
+[t5-gen] 1504/50000
+[t5-gen] 3008/50000
+[t5-gen] 4512/50000
+[t5-gen] 6016/50000
+[t5-gen] 7520/50000
+[t5-gen] 9024/50000
+[t5-gen] 10528/50000
+[t5-gen] 12000/50000
+[t5-gen] 13504/50000
+[t5-gen] 15008/50000
+[t5-gen] 16512/50000
+[t5-gen] 18016/50000
+[t5-gen] 19520/50000
+[t5-gen] 21024/50000
+[t5-gen] 22528/50000
+[t5-gen] 24000/50000
+[t5-gen] 25504/50000
+[t5-gen] 27008/50000
+[t5-gen] 28512/50000
+[t5-gen] 30016/50000
+[t5-gen] 31520/50000
+[t5-gen] 33024/50000
+[t5-gen] 34528/50000
+[t5-gen] 36000/50000
+[t5-gen] 37504/50000
+[t5-gen] 39008/50000
+[t5-gen] 40512/50000
+[t5-gen] 42016/50000
+[t5-gen] 43520/50000
+[t5-gen] 45024/50000
+[t5-gen] 46528/50000
+[t5-gen] 48000/50000
+[t5-gen] 49504/50000
+[t5-gen] 1504/16000
+[t5-gen] 3008/16000
+[t5-gen] 4512/16000
+[t5-gen] 6016/16000
+[t5-gen] 7520/16000
+[t5-gen] 9024/16000
+[t5-gen] 10528/16000
+[t5-gen] 12000/16000
+[t5-gen] 13504/16000
+[t5-gen] 15008/16000
+[augment] rows=40000 t5_new_cand=9861 t5_hit_pool=6139 X(2698519, 83)
+[augment] rows=50000 t5_new_cand=30044 t5_hit_pool=19956 X(3405428, 83)
+Training until validation scores don't improve for 40 rounds
+Early stopping, best iteration is:
+[317]	valid_0's ndcg@1: 0.499674
+[reranker+t5] iters 317 top12 [('lm_total_pw', 118831), ('t5_len', 109246), ('centrality8', 90900), ('b2src_code', 86057), ('lm_first_logp', 38452), ('t5_is_cand', 33784), ('lm_rank', 32359), ('char_len', 31780), ('masked_len', 24264), ('lm_mean_logp', 22678), ('len_minus_typ', 20172), ('word_len', 19594)]
+
+[TIMINGS] parity_fits=57s  train_candgen_feat=299s  full_fits=58s  test_candgen_feat=476s  t5_load=6s  t5_infer_test=1575s  t5_infer_train=514s  reranker_train=67s  TOTAL=3145s (52.4min)  mode=full t5_ok=True
+[done] wrote runs/D3/submission_v3.csv (50000 rows) mean_len 11.69

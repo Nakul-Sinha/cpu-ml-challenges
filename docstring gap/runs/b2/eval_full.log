@@ -1,0 +1,23 @@
+trn 220511 val 11462 (bucket0 total 11462) load 4.0s
+FIT 27.7s (anchor 7.3 global 0.1 fuzz 20.2)
+
+TIMING on 11462 rows: anchored+code+global 1.4s | +fuzz(gated 100%) 166.6s
+  -> extrap 50k rows single-thread: anc+code+glob 6s | fuzz 727s | TOTAL 733s
+
+=== HEADLINE (cap 80) ===
+pool oracle chrF: 0.5866   exact-hit: 0.228   mean pool 68.6 (max 80)
+
+=== PER-SOURCE MARGINAL (oracle drop if removed) ===
+  drop anchor(all)   : oracle 0.4608   marginal +0.1257
+  drop fuzz(full)    : oracle 0.5534   marginal +0.0332
+  drop fuzz(window)  : oracle 0.5793   marginal +0.0073
+  drop fuzz(both)    : oracle 0.5406   marginal +0.0460
+  drop code          : oracle 0.5113   marginal +0.0753
+  drop global        : oracle 0.5778   marginal +0.0088
+  drop  l2r2         : oracle 0.5816   marginal +0.0049
+  drop  l1r1         : oracle 0.5642   marginal +0.0224
+  drop  skipR/L      : oracle 0.5613   marginal +0.0253
+  drop  r1           : oracle 0.5665   marginal +0.0201
+  drop  l1           : oracle 0.5644   marginal +0.0222
+
+=== STANDALONE (this source only, capped) ===

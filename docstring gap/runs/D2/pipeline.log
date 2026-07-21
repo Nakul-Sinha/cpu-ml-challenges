@@ -1,0 +1,97 @@
+===== D2 PIPELINE START Tue Jul 21 08:40:50 UTC 2026 =====
+>>> [08:40:50] STAGE 1 zeroshot
+=== ZERO-SHOT FORMAT SWEEP (codet5-small) ===
+eval rows: 1500 (bucket-0 sample, seed=1 == C2)
+  plain        chrF=0.2365  50.1s  29.9 rows/s
+  code_first   chrF=0.3559  65.3s  23.0 rows/s
+  doc_first    chrF=0.4151  54.7s  27.4 rows/s
+zeroshot json saved
+
+total 175.6s
+>>> [08:43:52] STAGE 2 speed
+=== INFERENCE SPEED (codet5-small, greedy, threads=7) ===
+  fp32 bs= 16:   20.4 rows/s    111.7 tok/s  50k-> 40.9 min
+  fp32 bs= 32:   24.4 rows/s    133.7 tok/s  50k-> 34.2 min
+  fp32 bs= 64:   23.6 rows/s    129.2 tok/s  50k-> 35.3 min
+  fp32 chrF (zero-shot code_first, 1024 rows): 0.3604
+
+  --- dynamic int8 quantization ---
+/home/ec2-user/docgap/runs/D2/codet5_probe.py:101: DeprecationWarning: torch.ao.quantization is deprecated and will be removed in 2.10. 
+For migrations of users: 
+1. Eager mode quantization (torch.ao.quantization.quantize, torch.ao.quantization.quantize_dynamic), please migrate to use torchao eager mode quantize_ API instead 
+2. FX graph mode quantization (torch.ao.quantization.quantize_fx.prepare_fx,torch.ao.quantization.quantize_fx.convert_fx, please migrate to use torchao pt2e quantization API instead (prepare_pt2e, convert_pt2e) 
+3. pt2e quantization has been migrated to torchao (https://github.com/pytorch/ao/tree/main/torchao/quantization/pt2e) 
+see https://github.com/pytorch/ao/issues/2259 for more details
+  qmodel = torch.quantization.quantize_dynamic(model, {torch.nn.Linear}, dtype=torch.qint8).eval()
+  int8 bs= 16:   36.0 rows/s    199.2 tok/s  50k-> 23.1 min
+  int8 bs= 32:   37.9 rows/s    208.5 tok/s  50k-> 22.0 min
+  int8 bs= 64:   33.0 rows/s    182.6 tok/s  50k-> 25.2 min
+  int8 chrF (same subset): 0.3559  (delta -0.0045)
+
+total 229.3s
+>>> [08:47:48] STAGE 3 FT lr3e-4 doc_first 900s + ckpt
+
+#### RUN tag=main lr=0.0003 mode=doc_first budget=900s bs=24 model=Salesforce/codet5-small ####
+train pool=100000 (buckets2-19)  eval=1500 (bucket0)
+  t=0 (zero-shot) chrF=0.4151
+  t=  5.0min seen=2640 sps=8.8 loss=1.590 chrF=0.3685
+  t= 10.1min seen=4632 sps=7.7 loss=1.527 chrF=0.3855
+  t= 15.0min seen=6432 sps=7.1 loss=1.506 chrF=0.3825
+  DONE main: 268 steps, 6432 samples, 7.1 samples/s train-only
+  curve -> runs/D2/curve_main.csv
+  ckpt -> runs/D2/ft_main
+
+wall 1202s
+>>> [09:07:57] STAGE 4 dump 500 (ft_main)
+=== INTEGRATION DUMP (500 rows, mode=doc_first, ckpt=runs/D2/ft_main) ===
+  chrF on dump: 0.3735
+  seq_logprob vs f corr: 0.489
+  saved runs/D2/ct5_dump_ft_500.csv
+
+total 23.9s
+>>> [09:08:27] STAGE 5 union oracle
+CodeT5 FT dump rows: 500
+
+=== MEANS over 500 rows (bucket-0 sample, seed=7) ===
+  retrieval PICK  (B1)         : 0.2669
+  C1 reranker PICK             : 0.3395
+  CodeT5 FT standalone         : 0.3735
+  retrieval ORACLE (B2 pool)   : 0.5671
+  UNION oracle (B2 pool U CT5) : 0.6110  (lift over pool +0.0439)
+  TWO-WAY oracle max(C1pick,CT5): 0.4746  (headroom over C1 pick +0.1351)
+  CodeT5 pred already in B2 pool: 198/500 (39.6%)
+  CodeT5 pred == C1 pick exactly: 62/500 (12.4%)
+
+=== AGREEMENT (vs C1 pick) ===
+  C1 pick good (f>0.8): 75 rows -> mean CT5 f = 0.5692
+  C1 pick bad  (f<0.3): 301 rows -> CT5 rescues (f>0.5): 48/301  mean CT5 f = 0.2631
+  CodeT5 f > retrieval ORACLE  : 87/500 rows (adds coverage the pool lacks)
+  corr(C1 pick f, CodeT5 f)    = 0.395
+  corr(CodeT5 seq_logprob, f)  = 0.489
+
+=== seq_logprob GATE (what CT5 realizes over C1 pick if we accept CT5 when conf>=thr) ===
+  thr=-0.15: coverage=21.4%  blended chrF=0.3865  (realized +0.0470)
+  thr=-0.25: coverage=34.2%  blended chrF=0.3877  (realized +0.0481)
+  thr=-0.35: coverage=50.4%  blended chrF=0.3935  (realized +0.0540)
+  thr=-0.50: coverage=73.8%  blended chrF=0.3934  (realized +0.0538)
+
+=== HEAD-TO-HEAD codet5 vs t5 (FT, 500 common rows) ===
+  t5-small FT standalone   : 0.3133
+  codet5   FT standalone   : 0.3735
+  per-row: codet5 wins 217, t5 wins 160, tie 123
+  oracle max(t5,codet5)    : 0.4270  (both-generators ceiling)
+  UNION(pool,t5,codet5)    : 0.6260  (vs pool-only 0.5671)
+>>> [09:08:35] STAGE 6 FT lr1e-4 doc_first 300s quick check
+
+#### RUN tag=lr1e4 lr=0.0001 mode=doc_first budget=300s bs=24 model=Salesforce/codet5-small ####
+train pool=100000 (buckets2-19)  eval=1500 (bucket0)
+  t=0 (zero-shot) chrF=0.4151
+  t=  2.5min seen=1128 sps=7.5 loss=1.681 chrF=0.4162
+  t=  5.1min seen=2016 sps=6.7 loss=1.543 chrF=0.4075
+  DONE lr1e4: 84 steps, 2016 samples, 6.7 samples/s train-only
+  curve -> runs/D2/curve_lr1e4.csv
+
+wall 561s
+>>> [09:18:04] ALL DONE
+CKPT CLEANED Tue Jul 21 09:18:17 UTC 2026
+/dev/nvme1n1p1  8.0G  5.1G  2.9G  65% /
