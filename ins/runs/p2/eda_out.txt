@@ -1,0 +1,127 @@
+=== EDIT CATEGORY COUNTS (lang, type) ===
+  de deletion       9
+  de multi_mark     109
+  de multi_plain    134
+  de single_mark    193
+  de single_plain   107
+  en multi_mark     11
+  en multi_plain    14
+  en single_mark    13
+  en single_plain   50
+  it deletion       38
+  it multi_mark     48
+  it multi_plain    241
+  it single_mark    10
+  it single_plain   388
+
+=== src_ntok -> rep_ntok distribution (multi) ===
+  de multi_mark: {(2, 1): 6, (2, 2): 6, (2, 5): 35, (2, 6): 37, (3, 1): 6, (3, 2): 3, (3, 4): 2, (3, 7): 2, (3, 8): 4, (4, 1): 2, (4, 2): 2, (4, 10): 4}
+  de multi_plain: {(2, 1): 9, (2, 2): 18, (2, 3): 1, (2, 5): 1, (3, 1): 81, (3, 2): 1, (3, 3): 1, (4, 1): 10, (4, 2): 2, (4, 3): 1, (4, 4): 1, (4, 5): 2, (5, 1): 2, (5, 2): 2, (6, 2): 1, (7, 7): 1}
+  en multi_mark: {(2, 2): 2, (3, 1): 9}
+  en multi_plain: {(3, 1): 11, (3, 6): 1, (5, 1): 2}
+  it multi_mark: {(2, 1): 2, (2, 2): 9, (2, 3): 3, (2, 4): 6, (2, 5): 5, (2, 6): 2, (3, 1): 4, (3, 2): 1, (3, 3): 1, (3, 4): 4, (3, 6): 1, (4, 1): 2, (4, 3): 2, (4, 6): 1, (5, 2): 1, (5, 3): 1, (5, 9): 1, (6, 7): 1, (7, 2): 1}
+  it multi_plain: {(2, 1): 27, (2, 2): 106, (2, 3): 16, (2, 4): 8, (2, 5): 8, (3, 1): 2, (3, 2): 10, (3, 3): 25, (3, 4): 2, (3, 5): 1, (4, 1): 4, (4, 2): 4, (4, 4): 4, (4, 6): 1, (5, 2): 5, (5, 3): 2, (5, 4): 6, (5, 5): 3, (5, 6): 3, (6, 2): 3, (8, 2): 1}
+
+=== it multi_plain EXAMPLES (src -> rep) [nsrc,nrep] ===
+  [3,4] 'lh ﬁkèjg èugayg'
+        -> 'lhhl ﬁkèjl ﬁykxgal èugayl'
+  [2,2] 'uyh ﬁkyxqlqgky'
+        -> 'uyh/uyhhl ﬁkyxqlqgky/-qkèty'
+  [3,2] 'è Èkgdyxxgkè xyhyéègalqè'
+        -> 'Èkgdyxxgkè/Èkgdyxxgkyxxy xyhyéègalqè/y'
+  [2,1] 'uyh kyqqgky'
+        -> 'kyqqgklhy'
+  [2,2] 'uèkyqqg èaqyxqlqlkèg'
+        -> 'uèkyqqg/l èaqyxqlqlkèg/l'
+  [2,2] 'lè tlauèulqè'
+        -> 'lè/lhhy tlauèulqè/y'
+  [2,4] 'dgkjlqgkè yxqykaè;'
+        -> 'yxqykay uyﬁﬀqlqy lhhl dgkjléègay;'
+  [2,1] 'hg xqﬀuyaqy'
+        -> 'tghgkg'
+  [2,1] 'è ùﬀlhè'
+        -> 'tìy'
+  [2,3] 'uyè Èkgdyxxgkè'
+        -> 'uyh tgkﬁg ugtyaqy'
+  [2,1] 'è ùﬀlhè'
+        -> 'tìy'
+  [2,2] 'uyﬃhè lqhyqè'
+        -> 'uyﬃhè/-hhy lqhyqè/y'
+
+=== it multi_mark EXAMPLES (src -> rep) [nsrc,nrep] ===
+  [2,4] 'uyè/uyhhy hlzgklqgkè/hlzgklqkètè.'
+        -> 'uè hlzgklqgkè y hlzgklqkètè.'
+  [2,2] 'ulhhl/ulh ﬁkgﬁkèg'
+        -> 'ulh/ulhhl ﬁkgﬁkèg/l'
+  [5,9] 'èh/hl tlauèulqg/l ò xqlqg/l qﬀqgky/qﬀqkèty;'
+        -> 'tìè xè tlauèul ìl xzghqg hl dﬀaéègay uè qﬀqgk;'
+  [4,1] 'uyhhl/uyh qèqghlky uè lxxyﬃag'
+        -> "uyhh'lxxyﬃaèxql"
+  [2,2] 'lh/hl Rèkyqqgky/Rèkyqqkèty'
+        -> 'lhhl Rèkyéègay'
+  [2,2] 'lh/hl Rèkyqqgky/Rèkyqqkèty'
+        -> 'lhhl Rèkyéègay'
+  [5,3] 'Ml/Uh qèqghlky uyhh’lxxyﬃag ò èjﬁyﬃalql/g'
+        -> "M'lxxyﬃaèxql uyzy èjﬁyﬃalkxè"
+  [3,1] 'xgag èazèqlqy/è l'
+        -> 'ﬁgxxgag'
+  [4,6] 'U/My tèqqluèaè/y xqklaèykè/y ybqkltgjﬀaèqlkè/y:'
+        -> 'Jghgkg tìy ìlaag ﬀal tèqqluèalaél ybqkltgjﬀaèqlkèl:'
+  [2,2] 'hl/èh ﬁkgﬁkèg'
+        -> 'èh/hl ﬁkgﬁkèg/l'
+  [2,6] 'uyh/uyhhl tlauèulqg/l'
+        -> 'uè tìè ìl ﬁkyxyaqlqg hl tlauèulqﬀkl,'
+  [3,4] 'uyh/uyhhl tlauèulqg/l xyhyéègalqg/l'
+        -> 'uyh xgﬃﬃyqqg tlauèulqg xyhyéègalqg'
+
+=== de multi_plain EXAMPLES (src -> rep) [nsrc,nrep] ===
+  [3,1] 'Gkäwéàkxààéà äàw Gkäwéàkéà,'
+        -> 'Gkäwxéuéàwé,'
+  [4,5] 'üxuw éxàé dtkxbé Cxkdueéxk'
+        -> 'vpyy wxé àéäé Öupsévväu dtkxb'
+  [2,1] 'wéu Üéuvxßˮéuké'
+        -> 'wéu/wxéÜéuvxßˮéuké'
+  [3,1] 'Géàxpuâupsévvpuxààéà äàw Géàxpuâupsévvpuéà'
+        -> 'Géàxpuâupsévväuéà'
+  [5,2] 'Vdvkâupsévvpuxààéà, Vdvkâupsévvpuéà, Vdvkwpféàkxààéà äàw Vdvkwpféàkéà,'
+        -> 'Vdvkâupsévväuéà, Vdvkwpfxéuéàwé,'
+  [4,1] 'Öupsévvpuxà pwéu eéuäséàéu Öupsévvpu'
+        -> 'Öupsévväu'
+  [3,1] 'Gkäwéàkxààéà äàw Gkäwéàkéà'
+        -> 'Gkäwxéuéàwéà'
+  [3,1] 'Gkäwéàkxààéà äàw Gkäwéàkéà'
+        -> 'Gkäwxéuéàwéà'
+  [3,1] 'Gkäwéàkxààéà äàw Gkäwéàkéà'
+        -> 'Gkäwxéuéàwéà'
+  [3,1] 'Gkäwéàkxààéà äàw Gkäwéàkéà'
+        -> 'Gkäwxéuéàwéà'
+  [5,1] 'Öupsévvpuxà pwéu éxàév eédﬂkékéà Öupsévvpuv'
+        -> 'Öupsévväu'
+  [3,1] 'Öupsévvpuxààéà äàw Öupsévvpuéà'
+        -> 'Öupsévväuéà'
+
+=== de multi_mark EXAMPLES (src -> rep) [nsrc,nrep] ===
+  [2,6] 'Métkpu:xà Öuèvxwéàk:xà'
+        -> 'Métkpu pwéu Métkpuxà Öuèvxwéàk pwéu Öuèvxwéàkxà'
+  [2,6] 'Öupaétkyéxkéu:xà Üéuüdykäàzvwxuétkpu:xà'
+        -> 'Öupaétkyéxkéu pwéu Öupaétkyéxkéuxà Üéuüdykäàzvwxuétkpu pwéu Üéuüdykäàzvwxuétkpuxà'
+  [4,2] 'wxé Gkäwéàkxà/ wéu Gkäwéàk,'
+        -> 'dyyé Gkäwxéuéàwéà,'
+  [3,1] 'Eékuéäéuxà/ wéu Eékuéäéu'
+        -> 'Eékuéääàzvâéuvpà'
+  [3,2] 'éxàé Öupbéàxéàfspuvßˮéuxà/éxàéà Öupbéàxéàfspuvßˮéu'
+        -> 'éxàé/à Öupbéàxéàfspuvßˮéu/xà'
+  [2,5] 'wéu/wxé Dxuétkpu/xà.'
+        -> 'wéu Dxuétkpu pwéu wxé Dxuétkpuxà.'
+  [2,5] 'féxßˮàäàzveéuéßˮkxzké:u Qäàtkxpàvkuèzéu:xà'
+        -> 'féxßˮàäàzveéuéßˮkxzkéu Qäàtkxpàvkuèzéu pwéu féxßˮàäàzveéuéßˮkxzké Qäàtkxpàvkuèzéuxà'
+  [4,10] 'féxßˮàäàzveéuéßˮkxzké:u Qäàtkxpàvkuèzéu:xà Xéxßˮàäàzveéuéßˮkxzké:u Qäàtkxpàvkuèzéu:xà'
+        -> 'féxßˮàäàzveéuéßˮkxzkéu Qäàtkxpàvkuèzéu pwéu féxßˮàäàzveéuéßˮkxzké Qäàtkxpàvkuèzéuxà Xéxßˮàäàzveéuéßˮkxzkéu Qäàtkxpàvkuèzéu pwéu féxßˮàäàzveéuéßˮkxzké Qäàtkxpàvkuèzéuxà'
+  [2,6] 'Cpwäybéudàküpukyxßˮé*u: Gkäwxéàzdàzveédäskudzké*u'
+        -> 'Cpwäybéudàküpukyxßˮé pwéu -béudàküpukyxßˮéu: Gkäwxéàzdàzveédäskudzké pwéu -eédäskudzkéu'
+  [2,6] 'Iàvkxkäkvyéxkéu*xà \nPéxkéu*xà'
+        -> 'Iàvkxkäkvyéxkéu pwéu Iàvkxkäkvyéxkéuxà Péxkéu pwéu Péxkéuxà'
+  [2,6] 'Qdßˮbéukuékéuv/Qdßˮbéukuékéuxà.\nDéu/Dxé'
+        -> 'Qdßˮbéukuékéuv pwéu wéu fävkèàwxzéà Qdßˮbéukuékéuxà. Déu'
+  [2,5] 'éxàév*u Dpféàk*xà'
+        -> 'éxàéu Dpféàkxà pwéu éxàév Dpféàkéà'

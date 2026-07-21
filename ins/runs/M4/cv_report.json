@@ -1,0 +1,86 @@
+{
+  "ship_config": "M1 detector + A2 transducer + M2(de gen/collapse) + M3(it/en feats+hooks) + group-vote[de,en]",
+  "nested_elru": 0.5423,
+  "nonnested_elru": 0.5517,
+  "canonical_oof_check": 0.5517,
+  "nonnested_thr": {
+    "de": 0.07,
+    "en": 0.39,
+    "it": 0.45
+  },
+  "nested_detail": {
+    "de": {
+      "edited_mean": 0.3421,
+      "unchanged_mean": 0.6111,
+      "n_edited": 295,
+      "n_unchanged": 216,
+      "lang_score": 0.4094
+    },
+    "en": {
+      "edited_mean": 0.747,
+      "unchanged_mean": 0.9859,
+      "n_edited": 63,
+      "n_unchanged": 71,
+      "lang_score": 0.8067
+    },
+    "it": {
+      "edited_mean": 0.3171,
+      "unchanged_mean": 0.6923,
+      "n_edited": 432,
+      "n_unchanged": 182,
+      "lang_score": 0.4109
+    }
+  },
+  "nonnested_detail": {
+    "de": {
+      "edited_mean": 0.345,
+      "unchanged_mean": 0.6296,
+      "n_edited": 295,
+      "n_unchanged": 216,
+      "lang_score": 0.4161
+    },
+    "en": {
+      "edited_mean": 0.7722,
+      "unchanged_mean": 0.9859,
+      "n_edited": 63,
+      "n_unchanged": 71,
+      "lang_score": 0.8256
+    },
+    "it": {
+      "edited_mean": 0.3203,
+      "unchanged_mean": 0.6923,
+      "n_edited": 432,
+      "n_unchanged": 182,
+      "lang_score": 0.4133
+    }
+  },
+  "unchanged_fp": {
+    "de": [
+      80,
+      216
+    ],
+    "en": [
+      1,
+      71
+    ],
+    "it": [
+      56,
+      182
+    ]
+  },
+  "submission_edit_rate": {
+    "de": 0.829,
+    "en": 0.291,
+    "it": 0.759
+  },
+  "train_edit_rate": {
+    "de": 0.577,
+    "en": 0.47,
+    "it": 0.704
+  },
+  "edit_rate_flags": [],
+  "submission_rows": 445,
+  "submission_edited": 292,
+  "ai_baseline": 0.56,
+  "beats_ai_baseline": false
+}
