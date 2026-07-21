@@ -42,3 +42,21 @@ Box 1 (EPYC 124GB, ~/docgap) — 232k-row indexes/features need RAM; final parit
   - Ship files staged: solution.py (md5 80df5a02...), submission.csv, working/submission.csv, approach.md.
   - 0.53 score-to-beat: honestly UNREACHED — established across 3 iterations that retrieval+rerank caps ~0.35 realization-bound, t5-small caps ~0.34 hybrid, and any generator big enough (codet5-base) blows the 90-min CPU budget on inference alone. Expected grader ~0.44.
   - Future levers (unbuilt): multi-candidate codet5 beam injection (raises oracle + realization), gentle-lr FT screen (3e-5), closing the 0.05 selection headroom.
+
+## SHIP REVERSAL (2026-07-21): grader has NO internet — codet5 hybrid HUNG
+- Submitted codet5 hybrid (solution_v3) HUNG on the grader and never wrote a submission.
+- Root cause: grader has no internet. `_load_t5_base` tried offline (cache-miss, model not present)
+  then online (HF_HUB_OFFLINE=0) -> the ~240MB download BLOCKS forever on the unreachable host.
+  A blocked network call never raises, so the try/except degradation + wall-clock stage-skip timers
+  never fire -> whole 1.5h budget consumed -> no submission (scores 0 / dead-last).
+- The ~0.44 was only ever reachable because OUR box had codet5 cached; on a no-internet grader it was
+  never loadable, cached-or-downloaded. Compliance reviewer had also soft-flagged the online fallback.
+- FIX: shipped the pure-retrieval + LightGBM reranker chassis (runs/C1/solution_v2.py) as solution.py.
+  Zero torch/transformers/HF/network code -> cannot hang; try/except -> best-constant fallback always
+  writes a valid submission. Verified isolated on Box 1 (clean dir, only dataset+solution.py):
+  TOTAL 1273s (21 min), valid 50000-row submission, mean_len 12.0. Compliance-clean (no idf/tfidf/bm25
+  — HashingVectorizer alternate_sign=False norm l2; all models fit in-script; no test fitting).
+  Expected score ~0.32 (bucket-0 0.3210), the honest achievable score on a no-internet grader.
+- Hung codet5 version archived at runs/D3/solution_v3_codet5_hung.py.
+- RECOVERY LEVER (no pretrained model, fully compliant): retrieval-only pool oracle is 0.5866 and the
+  reranker realizes only 55% (0.3210); a reranker/pool iteration can target ~0.36-0.40.
