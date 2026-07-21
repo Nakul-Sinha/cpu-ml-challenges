@@ -42,4 +42,23 @@ Box 2 (Xeon SPR 61GB, ~/insled) — small data, fast iteration; grader-parity ru
   - Risks: en test slash-shift materializing (test en edit-rate ratio 0.62 vs train); de overprediction (ratio 1.44 @ thr .07).
 - [x] iter3 (wf_c2ce44d2): N1 it NP-gate generator (+.0096 it nested; diagnosed multi_plain regression = detection collapse; doc-prior/ending-gate/reranker all measured negative — all it groups edit-active, TP/FP lexically identical). N2 de markrun generator (multi_marked .138→.394) + masc_only collapse fallback (chrF .699 vs identity .474) + de robustness curve (thr .10 ≈ free, ratio 1.29) + EN SHIFT PROVEN RESOLVED (zeroing all slash features changes 0/2208 en tokens — en is plain-lexicon driven). N3 integrated: **nested 0.5503 CV-opt / 0.5534 ROBUST (de@0.11)**; non-nested 0.5617; zero added FPs; robust variant BOTH safer and nested-higher → upload candidate. Honest nested still < 0.56.
 - [ ] iter4 (wf_dbd3a965): P1 it-only re-scorer + BiGRU sequence-tagger ensemble ∥ P2 multi-token transform decomposition learning + it agreement composer + duplicate-adjacency deletion re-check → P3 final compose + self-contained solution.py + isolated smoke test
-- [ ] final deliverables (approach.md, submission handoff)
+- [x] final deliverables (approach.md, submission handoff) — PR #29 merged 2026-07-21
+
+## Compliance fix (2026-07-21, post-rejection)
+Platform rejected the shipped solution.py: "Prompt Compliance" and "Held-out Answer Ingestion" both
+failed with "source that cannot be safely inspected". Root cause: the productionizer had packaged
+9 historical dev modules (elru/transducer/pipeline/m2_ext/m3_ext/m4_ext/n2_ext/run_m4/run_n1) as raw
+triple-quoted string literals in a `_MODS` dict and dynamically `exec(compile(...))`'d them into
+synthetic `sys.modules` entries at import time so their cross-imports resolved. Behaviorally correct
+(verified byte-identical at the time) but automated scanners correctly refuse dynamic exec-of-embedded-
+strings as inspectable, and the ~2700 lines of embedded dead research code (old argparse dispatchers,
+diagnostic mains, an unused folds.csv reader) looked evasive besides.
+
+Fix: rewrote solution.py as genuinely flat code — no exec/compile/eval/__import__/marshal/pickle/
+ModuleType/sys.modules trick anywhere, only the ship-path-reachable functions kept (86 top-level
+defs, single `if __name__` guard), 4028 -> 2351 lines. Verified independently: isolated run on Box 2
+(clean dir, only train.csv+test.csv+solution.py, no runs/ or solution/ folder) produced output
+BYTE-IDENTICAL (diff -q) to the previously-shipped runs/P3/submission_final.csv; 82s wall clock;
+edit-rate ratios unchanged (de 0.86/en 0.62/it 1.10); submission re-validated (445 rows, 0 invalid).
+Nested CV score unchanged at 0.5707 (pure structural refactor, zero behavior change). Old flagged
+version preserved at runs/P3/solution_flagged_v4.py for reference. Re-shipped via a follow-up PR.
