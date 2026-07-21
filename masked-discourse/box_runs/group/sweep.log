@@ -1,0 +1,9 @@
+gbm31 OOF v=51.9547 p=51.4617 (50s)
+nn5 available
+reblend {'g': 0.0, 'g2': 0.0, 't': 0.5, 'n': 0.25, 'n5': 0.25} viterbi -> 54.8414 (81s)
+alpha=0.5: v=54.8893 p=54.3513
+alpha=2.0: v=54.8216 p=54.4209
+alpha=4.0: v=54.7059 p=54.3778
+mult[global]: nested A->B +0.000 B->A -0.331 | in-sample 54.8414 (base 54.8414)
+mult[anchor]: nested A->B -0.984 B->A -0.015 | in-sample 55.0302 (base 54.8414)
+SWEEP DONE 90s
