@@ -1,0 +1,19 @@
+{
+  "config": "N3 CV-optimal + IT-only P2-enhanced transducer (multi-token append compose)",
+  "headline_nested": 0.5504,
+  "nonnested": 0.5619,
+  "canonical_oof_check": 0.5504,
+  "robust_nested": 0.5535,
+  "nested_lang": {
+    "de": 0.4237,
+    "en": 0.8067,
+    "it": 0.4209
+  },
+  "baseline_nested": 0.5503,
+  "delta_nested": 0.0001,
+  "submission_edit_frac": {
+    "de": 0.829,
+    "en": 0.291,
+    "it": 0.759
+  }
+}

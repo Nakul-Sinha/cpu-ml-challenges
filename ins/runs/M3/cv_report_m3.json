@@ -1,0 +1,65 @@
+{
+  "nonnested_elru": 0.5175,
+  "nested_elru": 0.5066,
+  "nonnested_thr": {
+    "de": 0.07,
+    "en": 0.39,
+    "it": 0.45
+  },
+  "nested_thr_by_fold": {
+    "0": {
+      "de": 0.05,
+      "en": 0.05,
+      "it": 0.45
+    },
+    "1": {
+      "de": 0.05,
+      "en": 0.39,
+      "it": 0.45
+    },
+    "2": {
+      "de": 0.07,
+      "en": 0.39,
+      "it": 0.45
+    },
+    "3": {
+      "de": 0.07,
+      "en": 0.39,
+      "it": 0.47
+    },
+    "4": {
+      "de": 0.07,
+      "en": 0.75,
+      "it": 0.45
+    }
+  },
+  "nonnested_detail": {
+    "de": {
+      "edited_mean": 0.2726,
+      "unchanged_mean": 0.6528,
+      "n_edited": 295,
+      "n_unchanged": 216,
+      "lang_score": 0.3676
+    },
+    "en": {
+      "edited_mean": 0.7001,
+      "unchanged_mean": 0.9859,
+      "n_edited": 63,
+      "n_unchanged": 71,
+      "lang_score": 0.7715
+    },
+    "it": {
+      "edited_mean": 0.3203,
+      "unchanged_mean": 0.6923,
+      "n_edited": 432,
+      "n_unchanged": 182,
+      "lang_score": 0.4133
+    }
+  },
+  "del_diag": {
+    "n_true_del": 47,
+    "del_pred": 4,
+    "del_hit": 0
+  },
+  "whitespace_checks": 12
+}

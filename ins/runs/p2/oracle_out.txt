@@ -1,0 +1,121 @@
+
+===== BASELINE transducer.py =====
+  lang/type                 n  mean_chrf
+  de multi_mark           109     0.6203
+  de multi_plain          134     0.4952
+  de single_mark          193     0.6329
+  de single_plain         107     0.6452
+  en multi_mark            11     0.8517
+  en multi_plain           14     0.6322
+  en single_mark           13     0.6093
+  en single_plain          50     0.8563
+  it multi_mark            48     0.4793
+  it multi_plain          241     0.6121
+  it single_mark           10     0.7470
+  it single_plain         388     0.6808
+  -- per-lang mean over all non-empty edit spans --
+    de: n=543 mean_chrf=0.5988
+    en: n=88 mean_chrf=0.7836
+    it: n=687 mean_chrf=0.6436
+
+===== +decomp only (no append) =====
+  lang/type                 n  mean_chrf
+  de multi_mark           109     0.6315
+  de multi_plain          134     0.5431
+  de single_mark          193     0.6381
+  de single_plain         107     0.6415
+  en multi_mark            11     0.8517
+  en multi_plain           14     0.6322
+  en single_mark           13     0.6093
+  en single_plain          50     0.8563
+  it multi_mark            48     0.4769
+  it multi_plain          241     0.6096
+  it single_mark           10     0.7665
+  it single_plain         388     0.6742
+  -- per-lang mean over all non-empty edit spans --
+    de: n=543 mean_chrf=0.6140
+    en: n=88 mean_chrf=0.7836
+    it: n=687 mean_chrf=0.6391
+
+===== +append only (no decomp) =====
+  lang/type                 n  mean_chrf
+  de multi_mark           109     0.6181
+  de multi_plain          134     0.4827
+  de single_mark          193     0.6298
+  de single_plain         107     0.6305
+  en multi_mark            11     0.8517
+  en multi_plain           14     0.6322
+  en single_mark           13     0.6093
+  en single_plain          50     0.8563
+  it multi_mark            48     0.4774
+  it multi_plain          241     0.6173
+  it single_mark           10     0.7470
+  it single_plain         388     0.6891
+  -- per-lang mean over all non-empty edit spans --
+    de: n=543 mean_chrf=0.5913
+    en: n=88 mean_chrf=0.7836
+    it: n=687 mean_chrf=0.6500
+
+===== +decomp+append (suffix-first) =====
+  lang/type                 n  mean_chrf
+  de multi_mark           109     0.6182
+  de multi_plain          134     0.5370
+  de single_mark          193     0.6313
+  de single_plain         107     0.6461
+  en multi_mark            11     0.8517
+  en multi_plain           14     0.6322
+  en single_mark           13     0.6093
+  en single_plain          50     0.8563
+  it multi_mark            48     0.4761
+  it multi_plain          241     0.6191
+  it single_mark           10     0.7866
+  it single_plain         388     0.6891
+  -- per-lang mean over all non-empty edit spans --
+    de: n=543 mean_chrf=0.6083
+    en: n=88 mean_chrf=0.7836
+    it: n=687 mean_chrf=0.6511
+
+===== +decomp+append (append-first) =====
+  lang/type                 n  mean_chrf
+  de multi_mark           109     0.6159
+  de multi_plain          134     0.5001
+  de single_mark          193     0.6315
+  de single_plain         107     0.6463
+  en multi_mark            11     0.8517
+  en multi_plain           14     0.6322
+  en single_mark           13     0.6093
+  en single_plain          50     0.8563
+  it multi_mark            48     0.4721
+  it multi_plain          241     0.6341
+  it single_mark           10     0.7866
+  it single_plain         388     0.7058
+  -- per-lang mean over all non-empty edit spans --
+    de: n=543 mean_chrf=0.5989
+    en: n=88 mean_chrf=0.7836
+    it: n=687 mean_chrf=0.6655
+
+===== FULL (it agree on) =====
+  lang/type                 n  mean_chrf
+  de multi_mark           109     0.6182
+  de multi_plain          134     0.5370
+  de single_mark          193     0.6313
+  de single_plain         107     0.6461
+  en multi_mark            11     0.8517
+  en multi_plain           14     0.6322
+  en single_mark           13     0.6093
+  en single_plain          50     0.8563
+  it multi_mark            48     0.4761
+  it multi_plain          241     0.6191
+  it single_mark           10     0.7866
+  it single_plain         388     0.6891
+  -- per-lang mean over all non-empty edit spans --
+    de: n=543 mean_chrf=0.6083
+    en: n=88 mean_chrf=0.7836
+    it: n=687 mean_chrf=0.6511
+
+===== DELTAS vs baseline (chrf) =====
+  +decomp only (no append): {'it_multi_plain': -0.0025, 'it_single_plain': -0.0065, 'de_multi_plain': 0.0479, 'de_allspans': 0.0152, 'it_allspans': -0.0044, 'en_allspans': 0.0}
+  +append only (no decomp): {'it_multi_plain': 0.0052, 'it_single_plain': 0.0083, 'de_multi_plain': -0.0125, 'de_allspans': -0.0075, 'it_allspans': 0.0064, 'en_allspans': 0.0}
+  +decomp+append (suffix-first): {'it_multi_plain': 0.007, 'it_single_plain': 0.0083, 'de_multi_plain': 0.0418, 'de_allspans': 0.0095, 'it_allspans': 0.0075, 'en_allspans': 0.0}
+  +decomp+append (append-first): {'it_multi_plain': 0.0221, 'it_single_plain': 0.0251, 'de_multi_plain': 0.0049, 'de_allspans': 0.0001, 'it_allspans': 0.022, 'en_allspans': 0.0}
+  FULL (it agree on): {'it_multi_plain': 0.007, 'it_single_plain': 0.0083, 'de_multi_plain': 0.0418, 'de_allspans': 0.0095, 'it_allspans': 0.0075, 'en_allspans': 0.0}
