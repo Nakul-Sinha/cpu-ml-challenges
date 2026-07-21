@@ -1,0 +1,7 @@
+gbm per-fold done 32s
+textlin per-fold done 77s
+nnseq reuse (fold-mean test) 78s
+C1 written
+C2_metatext_bag written (174s)
+C3_metanotext_bag written (176s)
+DONE

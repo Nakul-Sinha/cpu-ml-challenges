@@ -1,0 +1,26 @@
+group-fold row counts: [250, 250, 250, 250, 250]
+  fold 0 anchor dist: {'agreement': 59, 'answer': 55, 'appreciation': 43, 'elaboration': 51, 'question': 42}
+  fold 1 anchor dist: {'agreement': 59, 'answer': 45, 'appreciation': 46, 'elaboration': 43, 'question': 57}
+  fold 2 anchor dist: {'agreement': 40, 'answer': 54, 'appreciation': 57, 'elaboration': 45, 'question': 54}
+  fold 3 anchor dist: {'agreement': 52, 'answer': 37, 'appreciation': 59, 'elaboration': 52, 'question': 50}
+  fold 4 anchor dist: {'agreement': 40, 'answer': 58, 'appreciation': 46, 'elaboration': 58, 'question': 48}
+gbm[bal] group-OOF 51.9912
+gbm[blend07] group-OOF 52.2415
+gbm[blend08] group-OOF 52.0886
+gbm winner blend07 52.2415 (32s)
+textlin group-OOF 53.5545 (44s)
+[  105.3s] nnseq fold 0 done (6 models)
+[  133.2s] nnseq fold 1 done (6 models)
+[  164.7s] nnseq fold 2 done (6 models)
+[  202.2s] nnseq fold 3 done (6 models)
+[  240.9s] nnseq fold 4 done (6 models)
+nnseq (30 models) group-OOF 53.8151 (163s)
+blend (0.0, 0.5, 0.5) viterbi group-OOF 54.4967
+title+forum-ONLY LR group-OOF: 35.2861
+meta group text=False C=1.5: vit 53.7218 post 54.0210 (2s)
+meta group text=False C=4.0: vit 53.7344 post 54.2227 (2s)
+meta group text=True C=1.5: vit 60.3538 post 60.8942 (76s)
+meta group text=True C=4.0: vit 62.1893 post 62.0903 (93s)
+multiplier nested (group halves): A->B +0.136  B->A -1.011
+multiplier in-sample tuned blend: 55.3612 (base 54.4967)
+TOTAL 447s DONE

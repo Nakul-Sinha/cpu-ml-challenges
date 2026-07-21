@@ -1,5 +1,13 @@
 # Masked Discourse Sequence Recovery — notes
 
+## FINAL OUTCOME (challenge closed 2026-07-21)
+- Shipped submission (meta-stacker, OOF 64.63): presubmission 52.69, public LB 52.51; top ~56.
+- Post-mortem: the meta's text-block gain (+8-11 OOF under BOTH row and forum-group CV) did not
+  exist on test; honest blend OOF (54.5 group-CV) tracked the LB. Candidates C1-C4 (incl. bagged
+  stacking + best honest blend 54.89) were built and validated but the challenge closed before
+  presubmission verdicts. Full lesson recorded in memory (eris-stacking-recipe).
+- Box 1 cleaned; scripts/logs/folds archived under box_runs/group/; candidate CSVs under working/.
+
 Challenge: recover masked (type, parent) route through reply-graph neighborhoods.
 Metric: 100 * (0.45 TypeMacroF1 + 0.25 AnchorMacroF1 + 0.10 TypeScore + 0.15 OrderedScore + 0.05 ParentScore).
 Published: constant 13.46 / topo-parent 22.82 / local-window 38.96 / public-ensemble 41.57. Target: 54+.

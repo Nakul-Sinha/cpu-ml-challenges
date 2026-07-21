@@ -1,0 +1,6 @@
+[   45.5s] nnseq fold 0 done (10 models)
+[   90.0s] nnseq fold 1 done (10 models)
+[  137.6s] nnseq fold 2 done (10 models)
+[  193.9s] nnseq fold 3 done (10 models)
+[  251.3s] nnseq fold 4 done (10 models)
+nn5 done 50 models 251s
