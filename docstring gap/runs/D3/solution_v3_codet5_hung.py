@@ -1,43 +1,57 @@
-"""Docstring Gap Restoration -- self-contained end-to-end solution (Agent C1, v2).
+"""Docstring Gap Restoration -- self-contained HYBRID solution (Agents D1->D3, v3).
 
-Integrates three trained components into a single-file, CPU-only pipeline:
+C1 retrieval chassis (union candgen + LightGBM LambdaRank reranker) AUGMENTED with a
+ZERO-SHOT code-pretrained generator (Salesforce/codet5-small), injected as a per-row
+union-pool candidate and described by 5 extra reranker features. The in-script-trained
+LambdaRank reranker SELECTS, per row, between the retrieval pool and the codet5 candidate.
+Single-file, CPU-only, grader-safe.
 
-  CANDIDATES  = B2 PoolBuilder (anchored multi-key indexes + gated fuzzy char n-gram
-                KNN + learned code-prior candidates + global spans; gate_fuzz, cap 80)
-                UNION  B3 LMBridge top-12 word-trigram stupid-backoff bridge spans.
-                (A neural span-classifier pool was measured and EXCLUDED: it lifted
-                union oracle by only +0.007 on a 3k probe, < the +0.01 bar.)
-  RERANKER    = LightGBM LambdaRank over ~78 features: B1's 53 (anchored
-                prob/rank/present, global freq, lexical overlap, word-trigram
-                fill-fluency LM) + B2 provenance (source one-hots, tier, score,
-                fuzzy cosine, learned code target-prior, anchor strength) + B3 LM
-                metadata (entering/leaving logp, per-word, rank, in-pool, consensus)
-                + centrality (mean pooled-chrF of a candidate vs the top-8-by-tier).
-                Label = min(int(10 * f_pooled(candidate, true_span)), 10).
-  DECODE      = argmax of the reranker score (MBR over the softmax posterior was
-                swept on the bucket-0 holdout and did not clear +0.003 -- the
-                centrality feature already captures the MBR signal -- so argmax).
+  GENERATOR   = Salesforce/codet5-small (60.5M, same T5 arch as t5-small but pretrained on
+                code+docstrings), used ZERO-SHOT (base pretrained weights, NO fine-tune).
+                D2/D3 measured zero-shot doc_first chrF = 0.4135 on held-out bucket-0 vs
+                t5-small fine-tuned ~0.31 and vs the C1 retrieval chassis 0.319 (+0.095).
+                Fine-tuning REGRESSES codet5 (0.4135 -> 0.3735), so we do NOT fine-tune.
+                doc_first prompt: masked sentence with [GAP]->'<extra_id_0>' + " . " +
+                compact code hint (def-line + last return); output span parsed from
+                '<extra_id_0> ... '. int8-dynamic-quant, greedy, bs 64. Loaded and run in
+                the MAIN process only, AFTER every fork-pool stage (torch + fork do not mix).
+  CANDIDATES  = B2 PoolBuilder (gated-fuzz, cap 80)  UNION  B3 LMBridge top-12
+                UNION  {codet5 doc_first greedy pred}. Coverage 1.0 = codet5 injected for
+                EVERY row (codet5 beats retrieval on all anchor tiers, most on strong ones:
+                l2r2 +0.23, l1r1 +0.14, none +0.08), so it is NOT weakness-gated. The gate
+                machinery is retained ONLY as a graceful time-pressure degradation.
+  RERANKER    = LightGBM LambdaRank over 78 retrieval feats + 5 codet5 feats (has_t5,
+                t5_is_cand, t5_seq_logprob, t5_len, t5_in_pool). Label = min(int(10*
+                f_pooled(candidate, true_span)), 10). t5_len / t5_is_cand / t5_seq_logprob
+                rank in the reranker's top gain features -> the codet5 candidate is used.
+  DECODE      = pure argmax of the reranker score. (A confident-codet5 override was measured
+                to HURT at every threshold -- the reranker already exploits t5_seq_logprob --
+                so it is retained ONLY for the test-only degradation path where no learned
+                codet5 reranker exists.)
 
-Leakage hygiene: the reranker's TRAINING candidates/features use parity half-fits
-of every module -- an even-bucket training row draws from the ODD half and vice
-versa (twins share masked_docstring -> same bucket -> same parity), so no row sees
-itself or its twins. TEST rows are absent from the train fit, so they use the full
--train fit directly. Nothing is ever fit on the test set.
+Leakage hygiene (unchanged from C1): reranker TRAINING rows draw candidates/features from
+parity half-fits (even-bucket row -> ODD half fit and vice versa; twins share
+masked_docstring -> same bucket -> same parity). TEST rows are absent from every train
+fit. Nothing is ever fit on the test set. codet5 is used zero-shot, so it is trained on
+NOTHING (no train/test exposure at all).
 
-Compliance: every statistic is a raw term-frequency count or a count-derived
-conditional probability / cosine over hashed raw term frequencies. NO idf / tf-idf
-/ bm25 anywhere. HashingVectorizer uses alternate_sign=False, norm='l2'. All models
-(LightGBM reranker, the count LMs, the fuzzy index, the learned priors) are trained
-inside this script from the provided training data only; no synthetic data.
+Robustness: cumulative wall-clock stage-skip rules degrade gracefully
+(skip train-side codet5 -> test-only override; shrink coverage; skip codet5 -> pure C1;
+any torch/weights failure -> pure C1; any pipeline failure -> best-constant). HF loads
+offline-first (HF_HUB_OFFLINE) then online.
+
+Compliance: every retrieval statistic is a raw term-frequency count or a count-derived
+probability / cosine over hashed raw term frequencies. NO idf / tf-idf / bm25. The
+generator uses BASE pretrained weights ZERO-SHOT; NO own checkpoint is ever loaded as the
+model source; NO fine-tuning; NO synthetic data. The LambdaRank reranker is the in-script
+trained model, fit only on provided training rows. Reads CSVs with keep_default_na=False.
 
 Usage:  python3 solution.py <public_dir> <submission_out>
-        (<public_dir> holds train.csv + test.csv; falls back to auto-detection.)
-Reads CSVs with keep_default_na=False (spans like 'nan'/'null' are real text).
 """
 import os
 for _v in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "NUMEXPR_NUM_THREADS"):
     os.environ.setdefault(_v, "1")
-import sys, re, time, math, hashlib, collections, glob as _glob, multiprocessing
+import sys, re, time, math, hashlib, collections, glob as _glob, random, multiprocessing
 from collections import defaultdict, Counter
 import numpy as np
 import pandas as pd
@@ -49,13 +63,41 @@ from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
 GAP = "[GAP]"
 NUM_THREADS = int(os.environ.get("SOLN_THREADS", str(min(multiprocessing.cpu_count(), 10))))
 NPROC = int(os.environ.get("SOLN_NPROC", str(NUM_THREADS)))
-NTRAIN = int(os.environ.get("SOLN_NTRAIN", "58000"))
+NTRAIN = int(os.environ.get("SOLN_NTRAIN", "40000"))
 _TESTN = int(os.environ.get("SOLN_TESTN", "0"))   # >0 truncates test (smoke only)
 WB = 1.0            # LMBridge word_bonus
 LM_TOPN = 12
 BEAM = 16
 LM_FLOOR = -40.0
 CAP = 80
+
+# ---------------- T5 hybrid config ----------------
+# Generator = Salesforce/codet5-small (code+docstring pretrained; same 60.5M T5 arch as
+# t5-small). D2/D3 measured codet5 ZERO-SHOT doc_first = 0.4135 bucket-0 vs t5-small FT
+# 0.31 and vs the C1 retrieval chassis 0.319: +0.095. Fine-tuning REGRESSES codet5
+# (0.4135 -> 0.3735), so we use base pretrained weights ZERO-SHOT (no FT). The in-script
+# LightGBM LambdaRank reranker still learns to SELECT between codet5 and retrieval per row.
+T5_MODEL_NAME = os.environ.get("SOLN_T5_MODEL", "Salesforce/codet5-small")
+T5_ZEROSHOT = os.environ.get("SOLN_T5_ZEROSHOT", "1") != "0"   # codet5 wants zero-shot
+T5_MODE = "doc_first"
+T5_LR = 3e-4
+T5_BS = 24
+T5_FT_MAX_S = int(os.environ.get("SOLN_FT_S", str(16 * 60)))   # time-boxed fine-tune (unused when zero-shot)
+T5_FT_POOL = int(os.environ.get("SOLN_FT_POOL", "30000"))
+T5_COVERAGE = float(os.environ.get("SOLN_COVERAGE", "1.00"))   # inject codet5 for ALL rows (strong everywhere)
+T5_OVERRIDE_THR = float(os.environ.get("SOLN_T5_OVR", "-0.35")) # confident-T5 override
+T5_INFER_BS = int(os.environ.get("SOLN_T5_BS", "32"))   # D2: codet5 int8 bs32 (37.9 rps) > bs64 (33 rps)
+T5_MAXNEW = 16
+T5_USE_QUANT = os.environ.get("SOLN_T5_QUANT", "1") != "0"
+TRAIN_T5_CAP = int(os.environ.get("SOLN_TRAIN_T5_CAP", "16000"))
+FT_MIN_S = int(os.environ.get("SOLN_FT_MIN", "240"))          # below this FT budget -> skip T5
+SKIP_T5 = os.environ.get("SOLN_SKIP_T5", "0") == "1"           # force pure-C1
+T5_INFER_RPS_EST = 28.0   # codet5-small int8 greedy bs32, ~10 cores (D2/D3 measured 30-38)
+# cumulative wall-clock stage-skip thresholds (minutes since start)
+SKIP_TRAIN_T5_MIN = 42.0
+COVERAGE30_MIN = 60.0
+SKIP_T5_MIN = 72.0
+SAFE_END_MIN = 86.0
 
 
 # ============================ scorer (char n-gram F, pooled) ============================
@@ -194,10 +236,6 @@ def lm_features(lm, lw, rw, cand):
             first = lp
         n += 1
     return (total / n if n else 0.0), first
-
-
-def make_stat_cache():
-    return {}
 
 
 def level_stats(idx, level, key, cache):
@@ -624,6 +662,11 @@ EXT_NAMES = [
 ]
 FEAT_NAMES = list(B1_FEAT_NAMES) + EXT_NAMES
 N_FEAT = len(FEAT_NAMES)
+# T5 hybrid features (appended after the 78 retrieval features)
+T5_FEAT_NAMES = ["has_t5", "t5_is_cand", "t5_seq_logprob", "t5_len", "t5_in_pool"]
+FEAT_NAMES3 = FEAT_NAMES + T5_FEAT_NAMES
+N_FEAT3 = len(FEAT_NAMES3)
+N_T5_FEAT = len(T5_FEAT_NAMES)
 _SRC1H = {"l2r2": 6, "l1r1": 7, "skipR": 8, "skipL": 8, "r1": 9, "l1": 10,
           "codeP": 11, "code": 12, "fuzz": 13, "fuzzw": 14, "global": 15}
 
@@ -780,9 +823,7 @@ def _feat_chunk(payloads):
     idx, glob, gtop, lm, pb = _G["idx"], _G["glob"], _G["gtop"], _G["lm"], _G["pb"]
     gtop_set = set(gtop)
     Xs, ys, ncands, texts = [], [], [], []
-    global _FCACHE
-    if _FCACHE is None:
-        _FCACHE = {}
+    fcache = {}
     for (masked, code, pool, astr, tgt) in payloads:
         cands = [p[0] for p in pool]
         rc = row_ctx(masked)
@@ -796,7 +837,7 @@ def _feat_chunk(payloads):
             if t in gtop_set:
                 s.add("global")
             src[t] = s
-        Xb1 = b1_featurize(cands, src, rc, idx, glob, _FCACHE, code, idents, lm)
+        Xb1 = b1_featurize(cands, src, rc, idx, glob, fcache, code, idents, lm)
         Xext = _ext_features(pool, astr, pb)
         Xs.append(np.hstack([Xb1, Xext]))
         ncands.append(len(cands)); texts.append(cands)
@@ -808,9 +849,8 @@ def _feat_chunk(payloads):
 
 
 def featurize_rows(df, fits, astr, unions, n_proc, want_labels):
-    global _G, _FCACHE
+    global _G
     _G = {"idx": fits.idx, "glob": fits.glob, "gtop": fits.gtop, "lm": fits.lm, "pb": fits.pb}
-    _FCACHE = {}
     tgts = df.target_span.astype(str).values if want_labels else [None] * len(df)
     masked = df.masked_docstring.values
     codes = df.code_context.values
@@ -836,30 +876,327 @@ def featurize_rows(df, fits, astr, unions, n_proc, want_labels):
     return X, y, groups, texts
 
 
-def build_training(train_sample, fits_even, fits_odd, n_proc):
-    ev = train_sample[train_sample._bkt % 2 == 0]
-    od = train_sample[train_sample._bkt % 2 == 1]
-    parts = []
-    for sub, fits, tag in ((ev, fits_odd, "even->odd"), (od, fits_even, "odd->even")):
+def build_training_base(samp, fits_even, fits_odd, n_proc):
+    """C1 parity training matrix, additionally returning per-row context for T5 augment.
+    Row order: even-bucket rows (fit on ODD) first, then odd-bucket rows (fit on EVEN)."""
+    ev = samp[samp._bkt % 2 == 0]
+    od = samp[samp._bkt % 2 == 1]
+    Xs, ys, groups, texts = [], [], [], []
+    masked_all, code_all, unions_all, astr_all, tag_all, tgt_all = [], [], [], [], [], []
+    for sub, fits, tag in ((ev, fits_odd, 0), (od, fits_even, 1)):
         if len(sub) == 0:
             continue
         t0 = time.time()
         astr, unions = build_union(sub, fits, n_proc)
-        X, y, groups, _ = featurize_rows(sub, fits, astr, unions, n_proc, want_labels=True)
-        print(f"[train phase {tag}] X{X.shape} {time.time()-t0:.0f}s", flush=True)
-        parts.append((X, y, groups))
-    X = np.vstack([p[0] for p in parts])
-    y = np.concatenate([p[1] for p in parts])
-    groups = sum((p[2] for p in parts), [])
-    return X, y, groups
+        X, y, g, tx = featurize_rows(sub, fits, astr, unions, n_proc, want_labels=True)
+        print(f"[train phase tag{tag}] X{X.shape} {time.time()-t0:.0f}s", flush=True)
+        Xs.append(X); ys.append(y); groups.extend(g); texts.extend(tx)
+        masked_all.extend(sub.masked_docstring.values.tolist())
+        code_all.extend(sub.code_context.values.tolist())
+        unions_all.extend(unions); astr_all.extend(astr); tag_all.extend([tag] * len(sub))
+        tgt_all.extend(sub.target_span.astype(str).values.tolist())
+    X = np.vstack(Xs); y = np.concatenate(ys)
+    return X, y, groups, texts, masked_all, code_all, unions_all, astr_all, tag_all, tgt_all
 
 
-def train_reranker(X, y, groups, n_threads, es_frac=0.08, seed=7):
+# ================================= T5 gate =================================
+def t5_weakness_score(masked, pb):
+    """Precomputable retrieval-weakness: higher = weaker retrieval (prioritized for T5).
+    Tiers by strongest exact anchor PRESENT in the index (l2r2 > l1r1 > none), refined
+    continuously by anchor support so a target coverage maps to a smooth threshold.
+    Uses only anchor indexes (no target information) -> identical rule train/test, leak-free."""
+    a = anchors(masked)
+    l2 = pb.idx["l2r2"].get(a["l2r2"])
+    if l2:
+        return -2.0 - min(sum(c for _, c in l2), 40) / 50.0    # strongest: [-2.8, -2.0]
+    l1 = pb.idx["l1r1"].get(a["l1r1"])
+    if l1:
+        return -1.0 - min(sum(c for _, c in l1), 40) / 50.0    # medium:   [-1.8, -1.0]
+    # weak tier (no exact 2-side anchor): refine by single-anchor (l1 / r1) support
+    s1 = 0
+    la = pb.idx["l1"].get(a["l1"]); ra = pb.idx["r1"].get(a["r1"])
+    if la:
+        s1 += sum(c for _, c in la)
+    if ra:
+        s1 += sum(c for _, c in ra)
+    return 1.0 - min(s1, 200) / 400.0                          # weak:     [0.5, 1.0]
+
+
+def calibrate_gate(masked_sample, pb, coverage):
+    if coverage >= 0.999:
+        return -1e18
+    sc = np.array([t5_weakness_score(m, pb) for m in masked_sample], dtype=np.float64)
+    return float(np.quantile(sc, 1.0 - coverage))
+
+
+def gate_mask(masked_list, pb, thr):
+    return np.array([t5_weakness_score(m, pb) >= thr for m in masked_list], dtype=bool)
+
+
+# ================================= T5 generator (main process only) =================================
+def code_hint(code):
+    """def line + last return line, compact (matches C2 t5_probe)."""
+    lines = code.split("\n")
+    def_line, ret_line = "", ""
+    for ln in lines:
+        s = ln.strip()
+        if not def_line and s.startswith("def "):
+            def_line = s
+        if s.startswith("return ") or s == "return" or s.startswith("return("):
+            ret_line = s
+    if not def_line:
+        for ln in lines:
+            if ln.strip():
+                def_line = ln.strip()
+                break
+    parts = [p for p in [def_line, ret_line] if p]
+    return " ".join(parts)
+
+
+def build_t5_input(masked, code, tok, mode):
+    sent = masked.replace(GAP, "<extra_id_0>")
+    if mode == "plain":
+        return sent
+    hint = code_hint(code)
+    hid = tok(hint, add_special_tokens=False, truncation=True, max_length=64).input_ids
+    hint = tok.decode(hid)
+    if mode == "code_first":
+        return hint + " . " + sent
+    return sent + " . " + hint  # doc_first
+
+
+_T5_EXTRACT = re.compile(r"<extra_id_0>(.*?)(?:<extra_id_1>|<extra_id_\d|</s>|<pad>|$)", re.DOTALL)
+
+
+def t5_extract(text):
+    m = _T5_EXTRACT.search(text)
+    if m:
+        return m.group(1).strip()
+    t = re.sub(r"</?s>|<pad>|<extra_id_\d+>", " ", text)
+    return re.sub(r"\s+", " ", t).strip()
+
+
+def _load_t5_base(threads):
+    """Offline-first (HF_HUB_OFFLINE) then online. Returns (torch, tok, model).
+    Model = T5_MODEL_NAME (Salesforce/codet5-small). AutoTokenizer resolves codet5's
+    RobertaTokenizerFast; AutoModelForSeq2SeqLM resolves its T5ForConditionalGeneration.
+    The <extra_id_0>/<extra_id_1> sentinels + t5_extract() are identical across both."""
+    import torch
+    torch.set_num_threads(threads)
+    from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
+    name = T5_MODEL_NAME
+    last = None
+    for offline in ("1", "0"):
+        os.environ["HF_HUB_OFFLINE"] = offline
+        os.environ["TRANSFORMERS_OFFLINE"] = offline
+        try:
+            tok = AutoTokenizer.from_pretrained(name)
+            model = AutoModelForSeq2SeqLM.from_pretrained(name)
+            return torch, tok, model
+        except Exception as e:
+            last = e
+            print(f"[t5] load offline={offline} failed: {e!r}", flush=True)
+    raise last
+
+
+class T5Gen:
+    def __init__(self, threads, mode=T5_MODE, lr=T5_LR, bs=T5_BS):
+        self.threads = threads; self.mode = mode; self.lr = lr; self.bs = bs
+        self.model = None; self.tok = None; self.qmodel = None
+        self.seen = 0; self.sps = 0.0; self.ft_min = 0.0
+
+    def finetune(self, train_df, budget_s, n_pool=T5_FT_POOL, seed=42, heartbeat=45):
+        import torch
+        from torch.optim import AdamW
+        _, tok, model = _load_t5_base(self.threads)
+        opt = AdamW(model.parameters(), lr=self.lr)
+        pool = train_df.sample(min(n_pool, len(train_df)), random_state=seed).reset_index(drop=True)
+        inputs = [build_t5_input(r.masked_docstring, r.code_context, tok, self.mode) for r in pool.itertuples()]
+        targets = [f"<extra_id_0> {str(r.target_span)} <extra_id_1>" for r in pool.itertuples()]
+        idx = list(range(len(inputs)))
+        random.seed(0); random.shuffle(idx)
+        model.train()
+        elapsed = 0.0; last = time.time(); ptr = step = seen = 0; hb = heartbeat; lastloss = 0.0
+        while elapsed < budget_s:
+            bi = [idx[(ptr + k) % len(idx)] for k in range(self.bs)]; ptr += self.bs
+            bt = [inputs[j] for j in bi]; tg = [targets[j] for j in bi]
+            enc = tok(bt, return_tensors="pt", padding=True, truncation=True, max_length=128)
+            lab = tok(tg, return_tensors="pt", padding=True, truncation=True, max_length=24).input_ids
+            lab[lab == tok.pad_token_id] = -100
+            out = model(**enc, labels=lab)
+            out.loss.backward()
+            torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+            opt.step(); opt.zero_grad()
+            step += 1; seen += self.bs; lastloss = float(out.loss.item())
+            now = time.time(); elapsed += now - last; last = now
+            if elapsed >= hb:
+                print(f"[t5-ft] {elapsed/60:5.1f}min step={step} seen={seen} "
+                      f"sps={seen/elapsed:.1f} loss={lastloss:.3f}", flush=True)
+                hb += heartbeat
+        model.eval()
+        self.tok = tok; self.model = model; self.seen = seen
+        self.sps = seen / max(elapsed, 1e-6); self.ft_min = elapsed / 60
+        print(f"[t5-ft] DONE {elapsed/60:.1f}min steps={step} seen={seen} sps={self.sps:.1f}", flush=True)
+        return self
+
+    def load_zeroshot(self):
+        """Load base pretrained weights, NO fine-tuning. codet5-small is used zero-shot
+        because fine-tuning measurably regresses it (D2: 0.4135 zs -> 0.3735 FT). This is
+        the shipped generator path: base pretrained weights only, no checkpoint, no FT."""
+        _, tok, model = _load_t5_base(self.threads)
+        model.eval()
+        self.tok = tok; self.model = model
+        self.seen = 0; self.sps = 0.0; self.ft_min = 0.0
+        print(f"[t5] zero-shot base weights loaded ({T5_MODEL_NAME}, no FT)", flush=True)
+        return self
+
+    def load_checkpoint(self, ckpt, threads=None):
+        """DEV/EVAL ONLY: load a previously fine-tuned checkpoint (never used by the grader)."""
+        import torch
+        from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
+        torch.set_num_threads(threads or self.threads)
+        self.tok = AutoTokenizer.from_pretrained(ckpt)
+        self.model = AutoModelForSeq2SeqLM.from_pretrained(ckpt).eval()
+        return self
+
+    def quantize(self):
+        try:
+            import torch
+            self.qmodel = torch.quantization.quantize_dynamic(
+                self.model, {torch.nn.Linear}, dtype=torch.qint8).eval()
+            print("[t5] int8 dynamic quantization ready", flush=True)
+        except Exception as e:
+            print(f"[t5] quantize failed ({e!r}); using fp32", flush=True)
+            self.qmodel = None
+        return self
+
+    def generate(self, masked_list, code_list, bs=T5_INFER_BS, max_new=T5_MAXNEW,
+                 use_quant=True, heartbeat_rows=1500):
+        import torch
+        m = self.qmodel if (use_quant and self.qmodel is not None) else self.model
+        tok = self.tok
+        n = len(masked_list)
+        texts = [build_t5_input(masked_list[i], code_list[i], tok, self.mode) for i in range(n)]
+        preds, logps = [], []
+        done = 0; nexthb = heartbeat_rows
+        for i in range(0, n, bs):
+            chunk = texts[i:i + bs]
+            enc = tok(chunk, return_tensors="pt", padding=True, truncation=True, max_length=128)
+            with torch.no_grad():
+                out = m.generate(**enc, max_new_tokens=max_new, num_beams=1, do_sample=False,
+                                 output_scores=True, return_dict_in_generate=True)
+            dec = tok.batch_decode(out.sequences, skip_special_tokens=False)
+            preds.extend([t5_extract(x) for x in dec])
+            try:
+                ts = m.compute_transition_scores(out.sequences, out.scores, normalize_logits=True)
+                gen = out.sequences[:, 1:]
+                mask = (gen != tok.pad_token_id)
+                lp = (ts * mask).sum(dim=1)
+                ln = mask.sum(dim=1).clamp(min=1)
+                logps.extend((lp / ln).tolist())
+            except Exception:
+                logps.extend([-1.0] * len(chunk))
+            done += len(chunk)
+            if done >= nexthb:
+                print(f"[t5-gen] {done}/{n}", flush=True)
+                nexthb += heartbeat_rows
+        return preds, logps
+
+
+# ---- single-candidate featurization (for injected T5 candidate; main process, no fork) ----
+def featurize_one(text, rc, code, idents, cc_set, gtop_set, fits, astr, top8_grams):
+    src = set()
+    if text in cc_set:
+        src.add("code")
+    if text in gtop_set:
+        src.add("global")
+    # local cache: a train row's parity fits differ per-row, so a shared (level,key) cache
+    # would cross-contaminate; a single-candidate call gets no reuse benefit anyway.
+    cache = {}
+    Xb1 = b1_featurize([text], {text: src}, rc, fits.idx, fits.glob, cache, code, idents, fits.lm)[0]
+    E = np.zeros(len(EXT_NAMES), dtype=np.float32)
+    E[4] = math.log1p(fits.pb.target_prior.get(text, 0))
+    E[5] = astr
+    E[17] = LM_FLOOR; E[18] = LM_FLOOR; E[19] = LM_FLOOR; E[20] = LM_FLOOR
+    E[21] = LM_TOPN; E[22] = 0
+    cg, tp = _grams(text)
+    if tp and top8_grams:
+        tot = 0.0
+        for rg, tr in top8_grams:
+            if tr == 0:
+                continue
+            mo = _overlap(cg, rg)
+            if mo:
+                p = mo / tp; r = mo / tr
+                tot += 2 * p * r / (p + r)
+        E[24] = tot / len(top8_grams)
+    return np.hstack([Xb1, E])
+
+
+def augment_with_t5(Xbase, groups, texts, unions, masked, codes, astr, gated,
+                    t5_pred, t5_logp, fits_list, ybase=None, tgts=None):
+    """Append 5 T5 columns; inject the T5 candidate into gated rows' pools.
+    fits_list[gi] = the Fits object whose index the row was featurized against
+    (parity fits for train rows; full fits for test rows). Returns
+    X_aug, groups_aug, texts_aug, y_aug, row_t5 (per-group (pred,logp) or None)."""
+    blocks, g_aug, tx_aug, y_blocks, row_t5 = [], [], [], [], []
+    start = 0
+    n_inject_new = n_inject_hit = 0
+    for gi in range(len(groups)):
+        g = groups[gi]
+        blk = Xbase[start:start + g]
+        yg = ybase[start:start + g] if ybase is not None else None
+        start += g
+        txt = list(texts[gi])
+        t5c = np.zeros((g, N_T5_FEAT), dtype=np.float32)
+        if gated[gi] and t5_pred[gi] is not None and str(t5_pred[gi]) != "":
+            t5c[:, 0] = 1.0  # has_t5 (row-level)
+            pred = str(t5_pred[gi]); lp = float(t5_logp[gi])
+            if pred in txt:
+                j = txt.index(pred)
+                t5c[j, 1] = 1.0; t5c[j, 2] = lp; t5c[j, 3] = float(len(pred)); t5c[j, 4] = 1.0
+                blk_aug = np.hstack([blk, t5c])
+                yg_aug = yg
+                n_inject_hit += 1
+            else:
+                fits = fits_list[gi]
+                rc = row_ctx(masked[gi]); cc, idents = code_features(codes[gi]); cc_set = set(cc)
+                pool = unions[gi]
+                top8 = sorted(pool, key=lambda x: (x[4], x[3]), reverse=True)[:8]
+                top8g = [_grams(t[0]) for t in top8]
+                fv = featurize_one(pred, rc, codes[gi], idents, cc_set, set(fits.gtop),
+                                   fits, astr[gi], top8g)
+                newt5 = np.array([1.0, 1.0, lp, float(len(pred)), 0.0], dtype=np.float32)
+                blk_aug = np.vstack([np.hstack([blk, t5c]),
+                                     np.hstack([fv[None, :], newt5[None, :]])])
+                txt.append(pred)
+                if yg is not None:
+                    yg_aug = np.concatenate([yg, np.array([f_pooled(pred, tgts[gi])], np.float32)])
+                else:
+                    yg_aug = None
+                n_inject_new += 1
+            row_t5.append((pred, lp))
+        else:
+            blk_aug = np.hstack([blk, t5c])
+            yg_aug = yg
+            row_t5.append(None)
+        blocks.append(blk_aug); g_aug.append(len(txt)); tx_aug.append(txt)
+        if yg_aug is not None:
+            y_blocks.append(yg_aug)
+    X_aug = np.vstack(blocks) if blocks else np.zeros((0, N_FEAT3), np.float32)
+    y_aug = np.concatenate(y_blocks) if (ybase is not None and y_blocks) else None
+    print(f"[augment] rows={len(groups)} t5_new_cand={n_inject_new} t5_hit_pool={n_inject_hit} "
+          f"X{X_aug.shape}", flush=True)
+    return X_aug, g_aug, tx_aug, y_aug, row_t5
+
+
+# ================================= reranker + decode =================================
+def train_reranker(X, y, groups, n_threads, feat_names, es_frac=0.08, seed=7):
     n = len(groups)
     n_es = max(1, int(n * es_frac))
     perm = np.random.RandomState(seed).permutation(n)
     es_g = set(perm[:n_es].tolist())
-    starts = np.cumsum([0] + groups)
+    starts = np.cumsum([0] + list(groups))
     es_rows, fit_rows, g_es, g_fit = [], [], [], []
     for gi in range(n):
         rows = range(starts[gi], starts[gi + 1])
@@ -876,34 +1213,31 @@ def train_reranker(X, y, groups, n_threads, es_frac=0.08, seed=7):
                   learning_rate=0.05, num_leaves=63, min_data_in_leaf=200,
                   feature_fraction=0.85, bagging_fraction=0.8, bagging_freq=1,
                   num_threads=n_threads, max_bin=255, verbose=-1)
-    dtr = lgb.Dataset(Xf, lab_f, group=g_fit, feature_name=FEAT_NAMES)
+    dtr = lgb.Dataset(Xf, lab_f, group=g_fit, feature_name=feat_names)
     dva = lgb.Dataset(Xe, lab_e, group=g_es, reference=dtr)
     booster = lgb.train(params, dtr, num_boost_round=700, valid_sets=[dva],
                         callbacks=[lgb.early_stopping(40), lgb.log_evaluation(0)])
     return booster
 
 
-def decode(booster, X, groups, texts, mbr_temp=0.0, mbr_m=12, fallback="value of the"):
-    starts = np.cumsum([0] + groups)
+def decode(booster, X, groups, texts, row_t5=None, override_thr=None, fallback="value of the"):
+    starts = np.cumsum([0] + list(groups))
     scores = booster.predict(X) if len(X) else np.zeros(0)
     preds = []
+    n_ovr = 0
     for gi in range(len(groups)):
         cs = texts[gi]
         if not cs:
             preds.append(fallback); continue
         s = scores[starts[gi]:starts[gi + 1]]
-        if mbr_temp <= 0 or len(cs) == 1:
-            preds.append(cs[int(np.argmax(s))]); continue
-        sel = list(np.argsort(-s)[:mbr_m])
-        sub = [cs[j] for j in sel]; k = len(sub)
-        K = np.empty((k, k), np.float32)
-        for a in range(k):
-            K[a, a] = 1.0
-            for b in range(a + 1, k):
-                v = f_pooled(sub[a], sub[b]); K[a, b] = v; K[b, a] = v
-        w = np.asarray(s[sel], np.float64) / mbr_temp
-        w = np.exp(w - w.max()); w /= w.sum()
-        preds.append(sub[int(np.argmax(K @ w))])
+        pick = cs[int(np.argmax(s))]
+        if override_thr is not None and row_t5 is not None and row_t5[gi] is not None:
+            pred, lp = row_t5[gi]
+            if lp >= override_thr and pred and str(pred) != "" and pred != pick:
+                pick = pred; n_ovr += 1
+        preds.append(pick)
+    if override_thr is not None:
+        print(f"[decode] confident-T5 overrides applied: {n_ovr}", flush=True)
     return preds
 
 
@@ -911,7 +1245,8 @@ def decode(booster, X, groups, texts, mbr_temp=0.0, mbr_m=12, fallback="value of
 def find_data_dir():
     here = os.path.dirname(os.path.abspath(__file__))
     for d in [".", "dataset", "../dataset", os.path.join(here, "dataset"),
-              os.path.join(here, "..", "dataset"), here, os.path.join(here, "..")]:
+              os.path.join(here, "..", "dataset"), os.path.join(here, "..", "..", "dataset"),
+              here, os.path.join(here, "..")]:
         if os.path.exists(os.path.join(d, "train.csv")) and os.path.exists(os.path.join(d, "test.csv")):
             return d
     hits = _glob.glob(os.path.join(here, "**", "train.csv"), recursive=True)
@@ -935,6 +1270,15 @@ def _resolve_paths():
     return public_dir, out_path
 
 
+def _write_submission(ids, preds, out_path, best_const):
+    preds = [p if (p is not None and str(p) != "") else best_const for p in preds]
+    assert len(preds) == len(ids), f"row count {len(preds)} != {len(ids)}"
+    df = pd.DataFrame({"id": np.asarray(ids), "prediction": preds})
+    assert (df["prediction"].astype(str).str.len() > 0).all(), "empty prediction present"
+    df.to_csv(out_path, index=False)
+    return df
+
+
 def _fallback_submission(test, out_path, const="value of the"):
     pd.DataFrame({"id": test.id.values, "prediction": [const] * len(test)}).to_csv(out_path, index=False)
 
@@ -942,6 +1286,10 @@ def _fallback_submission(test, out_path, const="value of the"):
 def main():
     t0 = time.time()
     T = {}
+
+    def el():
+        return (time.time() - t0) / 60.0
+
     dd, out_path = _resolve_paths()
     train = pd.read_csv(os.path.join(dd, "train.csv"), keep_default_na=False)
     test = pd.read_csv(os.path.join(dd, "test.csv"), keep_default_na=False)
@@ -949,11 +1297,11 @@ def main():
         test = test.head(_TESTN)
     train["_bkt"] = train.masked_docstring.map(bucket)
     print(f"[load] train {len(train)} test {len(test)} threads {NUM_THREADS} nproc {NPROC} "
-          f"ntrain {NTRAIN}  {time.time()-t0:.0f}s", flush=True)
-    # best-constant fallback ready in case anything downstream fails
+          f"ntrain {NTRAIN} coverage {T5_COVERAGE} skip_t5 {SKIP_T5}  {time.time()-t0:.0f}s", flush=True)
     best_const = train.target_span.astype(str).value_counts().idxmax()
 
     try:
+        # ---------- C1 base: ALL fork-pool stages first (torch loads only after these) ----------
         even = train[train._bkt % 2 == 0]; odd = train[train._bkt % 2 == 1]
         tf = time.time()
         fits_even = build_fits(even, NUM_THREADS, "even")
@@ -962,34 +1310,172 @@ def main():
 
         samp = train.sample(n=min(NTRAIN, len(train)), random_state=7).reset_index(drop=True)
         tt = time.time()
-        Xtr, ytr, gtr = build_training(samp, fits_even, fits_odd, NPROC)
+        (Xtr_b, ytr_b, gtr, txtr, masked_tr, code_tr,
+         unions_tr, astr_tr, tag_tr, tgt_tr) = build_training_base(samp, fits_even, fits_odd, NPROC)
         T["train_candgen_feat"] = time.time() - tt
-        print(f"[train matrix] X{Xtr.shape} groups {len(gtr)}  {T['train_candgen_feat']:.0f}s", flush=True)
-
-        tr = time.time()
-        booster = train_reranker(Xtr, ytr, gtr, NUM_THREADS)
-        T["train"] = time.time() - tr
-        imp = sorted(zip(FEAT_NAMES, booster.feature_importance("gain")), key=lambda x: -x[1])
-        print(f"[reranker] iters {booster.best_iteration} top10 {[(n,int(g)) for n,g in imp[:10]]}", flush=True)
-        del fits_even, fits_odd, Xtr, ytr
+        print(f"[train matrix] X{Xtr_b.shape} groups {len(gtr)}  {T['train_candgen_feat']:.0f}s", flush=True)
 
         tff = time.time()
         fits_full = build_fits(train, NUM_THREADS, "full")
         T["full_fits"] = time.time() - tff
 
         te = time.time()
-        astr, unions = build_union(test, fits_full, NPROC)
-        Xte, _, gte, texts = featurize_rows(test, fits_full, astr, unions, NPROC, want_labels=False)
-        preds = decode(booster, Xte, gte, texts, mbr_temp=0.0, fallback=best_const)
-        T["test_candgen_feat_decode"] = time.time() - te
+        astr_te, unions_te = build_union(test, fits_full, NPROC)
+        Xte_b, _, gte, txte = featurize_rows(test, fits_full, astr_te, unions_te, NPROC, want_labels=False)
+        T["test_candgen_feat"] = time.time() - te
+        masked_te = test.masked_docstring.values.tolist()
+        code_te = test.code_context.values.tolist()
+        print(f"[test matrix] X{Xte_b.shape} groups {len(gte)}  all-fork-stages-done @ {el():.1f}min", flush=True)
 
-        # guard: no empty predictions
-        preds = [p if (p is not None and str(p) != "") else best_const for p in preds]
-        pd.DataFrame({"id": test.id.values, "prediction": preds}).to_csv(out_path, index=False)
+        # ---------- T5 hybrid stage (MAIN process only, torch loaded here) ----------
+        mode = "full"                # full | test_only | skip
+        t5_ok = False
+        t5gen = None
+        row_t5_tr = row_t5_te = None
+        Xtr_a, gtr_a, txtr_a, ytr_a = None, None, None, None
+        Xte_a, gte_a, txte_a = None, None, None
+        gated_te = None
+
+        if SKIP_T5 or el() > SKIP_T5_MIN:
+            mode = "skip"
+            print(f"[t5] SKIP (skip_flag={SKIP_T5} elapsed={el():.1f}min)", flush=True)
+
+        if mode != "skip":
+            try:
+                # dynamic budget: never overrun; leave room for inference + rerank + write
+                cov = T5_COVERAGE
+                if el() > COVERAGE30_MIN:
+                    cov = min(cov, 0.30)
+                est_test_inf = (cov * len(test)) / T5_INFER_RPS_EST / 60.0
+                if T5_ZEROSHOT:
+                    # codet5 zero-shot: NO fine-tune (FT regresses codet5). Ensure the test-side
+                    # inference (+ rerank + write) fits the remaining wall-clock; if not, halve
+                    # coverage until it does, else degrade to pure C1.
+                    while cov > 0.06 and (el() + est_test_inf + 4.0) > SAFE_END_MIN:
+                        cov *= 0.5
+                        est_test_inf = (cov * len(test)) / T5_INFER_RPS_EST / 60.0
+                        print(f"[t5] tight budget -> coverage {cov:.3f}", flush=True)
+                    if (el() + est_test_inf + 4.0) > SAFE_END_MIN:
+                        raise RuntimeError(f"insufficient time for T5 inference @ {el():.1f}min -> pure C1")
+                    tft = time.time()
+                    print(f"[t5] zero-shot load (coverage {cov}) @ {el():.1f}min", flush=True)
+                    t5gen = T5Gen(NUM_THREADS).load_zeroshot()
+                    if T5_USE_QUANT:
+                        t5gen.quantize()
+                    T["t5_load"] = time.time() - tft
+                else:
+                    reserve = est_test_inf + 3.0 + 1.0    # rerank + write
+                    ft_budget = min(T5_FT_MAX_S, max(0.0, (SAFE_END_MIN - el() - reserve) * 60.0))
+                    if ft_budget < FT_MIN_S:
+                        raise RuntimeError(f"insufficient FT budget ({ft_budget:.0f}s < {FT_MIN_S}) -> pure C1")
+                    tft = time.time()
+                    print(f"[t5] fine-tune budget {ft_budget/60:.1f}min (coverage {cov}) @ {el():.1f}min", flush=True)
+                    t5gen = T5Gen(NUM_THREADS).finetune(train, ft_budget)
+                    if T5_USE_QUANT:
+                        t5gen.quantize()
+                    T["t5_finetune"] = time.time() - tft
+
+                if el() > SKIP_TRAIN_T5_MIN:
+                    mode = "test_only"
+                    print(f"[t5] elapsed {el():.1f}min > {SKIP_TRAIN_T5_MIN} -> TEST-ONLY (skip train-side T5)", flush=True)
+
+                # Gate threshold calibrated on the reranker-train rows' PARITY weakness: a train
+                # row scored against its opposite-parity fit does NOT see itself, mirroring the
+                # unseen condition of test rows (which are absent from the full fit). Calibrating
+                # on full-fit train would be self-leaked (train rows always find their own anchors)
+                # and over-gate test. Same frozen threshold gates train (parity) and test (full).
+                tw = np.array([t5_weakness_score(masked_tr[i],
+                               (fits_odd.pb if tag_tr[i] == 0 else fits_even.pb))
+                               for i in range(len(masked_tr))])
+                thr = float(np.quantile(tw, 1.0 - cov)) if cov < 0.999 else -1e18
+                gated_te = gate_mask(masked_te, fits_full.pb, thr)
+                print(f"[t5] gate thr={thr:.4f} train-cov(parity)={ (tw>=thr).mean():.3f} "
+                      f"test-cov(full)={gated_te.mean():.3f} ({int(gated_te.sum())}/{len(gated_te)})", flush=True)
+
+                # ----- test-side T5 inference -----
+                tti = time.time()
+                gt_idx = np.where(gated_te)[0]
+                t5p_te = [None] * len(test); t5l_te = [0.0] * len(test)
+                if len(gt_idx) > 0:
+                    ml = [masked_te[i] for i in gt_idx]; cl = [code_te[i] for i in gt_idx]
+                    preds, logps = t5gen.generate(ml, cl, use_quant=T5_USE_QUANT)
+                    for k, i in enumerate(gt_idx):
+                        t5p_te[i] = preds[k]; t5l_te[i] = logps[k]
+                T["t5_infer_test"] = time.time() - tti
+
+                if mode == "full":
+                    # ----- train-side T5 (leak-free: parity-fit weakness + parity-fit features) -----
+                    gated_tr = tw >= thr
+                    g_idx = np.where(gated_tr)[0]
+                    if len(g_idx) > TRAIN_T5_CAP:
+                        rng = np.random.RandomState(5)
+                        g_idx = np.sort(rng.choice(g_idx, TRAIN_T5_CAP, replace=False))
+                    keep = np.zeros(len(masked_tr), dtype=bool); keep[g_idx] = True
+                    gated_tr = keep
+                    tti2 = time.time()
+                    t5p_tr = [None] * len(masked_tr); t5l_tr = [0.0] * len(masked_tr)
+                    if len(g_idx) > 0:
+                        ml = [masked_tr[i] for i in g_idx]; cl = [code_tr[i] for i in g_idx]
+                        preds, logps = t5gen.generate(ml, cl, use_quant=T5_USE_QUANT)
+                        for k, i in enumerate(g_idx):
+                            t5p_tr[i] = preds[k]; t5l_tr[i] = logps[k]
+                    T["t5_infer_train"] = time.time() - tti2
+
+                    fits_list_tr = [(fits_odd if tag_tr[i] == 0 else fits_even) for i in range(len(masked_tr))]
+                    Xtr_a, gtr_a, txtr_a, ytr_a, row_t5_tr = augment_with_t5(
+                        Xtr_b, gtr, txtr, unions_tr, masked_tr, code_tr, astr_tr, gated_tr,
+                        t5p_tr, t5l_tr, fits_list_tr, ybase=ytr_b, tgts=tgt_tr)
+                    fits_list_te = [fits_full] * len(test)
+                    Xte_a, gte_a, txte_a, _, row_t5_te = augment_with_t5(
+                        Xte_b, gte, txte, unions_te, masked_te, code_te, astr_te, gated_te,
+                        t5p_te, t5l_te, fits_list_te)
+                    assert Xtr_a.shape[1] == Xte_a.shape[1] == N_FEAT3, \
+                        f"schema mismatch {Xtr_a.shape[1]} vs {Xte_a.shape[1]} vs {N_FEAT3}"
+                else:
+                    # test_only: keep row_t5_te for override; no matrix augmentation
+                    row_t5_te = [((t5p_te[i], t5l_te[i]) if gated_te[i] and t5p_te[i] else None)
+                                 for i in range(len(test))]
+                t5_ok = True
+            except Exception as e:
+                import traceback
+                traceback.print_exc()
+                print(f"[t5] FAILED ({e!r}) -> degrade to pure C1", flush=True)
+                mode = "skip"; t5_ok = False
+
+        # free parity fits before reranker train / decode
+        try:
+            del fits_even, fits_odd
+        except Exception:
+            pass
+
+        # ---------- reranker + decode ----------
+        tr = time.time()
+        if mode == "full" and t5_ok:
+            booster = train_reranker(Xtr_a, ytr_a, gtr_a, NUM_THREADS, FEAT_NAMES3)
+            T["reranker_train"] = time.time() - tr
+            imp = sorted(zip(FEAT_NAMES3, booster.feature_importance("gain")), key=lambda x: -x[1])
+            print(f"[reranker+t5] iters {booster.best_iteration} top12 {[(n,int(g)) for n,g in imp[:12]]}", flush=True)
+            # Ship pure argmax: the reranker has t5_seq_logprob as a feature and subsumes the
+            # confident-T5 override, which was measured on bucket-0 to HURT (-0.002..-0.004) at
+            # every coverage. The override is retained ONLY for the test-only fallback below,
+            # where no learned T5 reranker exists.
+            preds = decode(booster, Xte_a, gte_a, txte_a, fallback=best_const)
+        else:
+            booster = train_reranker(Xtr_b, ytr_b, gtr, NUM_THREADS, FEAT_NAMES)
+            T["reranker_train"] = time.time() - tr
+            if t5_ok and mode == "test_only":
+                preds = decode(booster, Xte_b, gte, txte, row_t5=row_t5_te,
+                               override_thr=T5_OVERRIDE_THR, fallback=best_const)
+                print("[decode] pure-C1 reranker + confident-T5 override (test-only mode)", flush=True)
+            else:
+                preds = decode(booster, Xte_b, gte, txte, fallback=best_const)
+                print("[decode] pure-C1 argmax", flush=True)
+
+        df = _write_submission(test.id.values, preds, out_path, best_const)
         print(f"\n[TIMINGS] " + "  ".join(f"{k}={v:.0f}s" for k, v in T.items()) +
-              f"  TOTAL={time.time()-t0:.0f}s", flush=True)
-        print(f"[done] wrote {out_path} ({len(preds)} rows)  "
-              f"mean_len {np.mean([len(str(p)) for p in preds]):.1f}", flush=True)
+              f"  TOTAL={time.time()-t0:.0f}s ({el():.1f}min)  mode={mode} t5_ok={t5_ok}", flush=True)
+        print(f"[done] wrote {out_path} ({len(df)} rows) mean_len "
+              f"{df.prediction.astype(str).str.len().mean():.2f}", flush=True)
     except Exception as e:
         import traceback
         traceback.print_exc()
