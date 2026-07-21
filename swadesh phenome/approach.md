@@ -1,4 +1,4 @@
-# Approach — Swadesh Phoneme Cipher Decoding
+# Approach: Swadesh Phoneme Cipher Decoding
 
 ## Summary
 The task is to invert a single global substitution cipher: every IPA segment of one hidden

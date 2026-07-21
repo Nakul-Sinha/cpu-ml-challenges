@@ -75,7 +75,7 @@ If the user asks for a violating path, redirect to a compliant modeling or valid
 6. Improve in clear increments: features, stronger model, calibration, thresholding, ensembling, or compact neural training.
 7. Run a strict final validator before any official submission.
 8. Track each credit: credit number, public score, local score, change made, and next action.
-9. Write approach.md with submission-form-ready text covering time spent, model architecture, preprocessing, key design decisions, what worked, what did not work, local validation, and compliance notes. Store the numeric time value separately when helpful, e.g. time_spent.txt. In any paste-ready submission text (the short reviewer paragraph / simple-approach.md, and the approach text pasted into the the platform form), avoid typographic AI tells: no em or en dashes, no two words joined by a hyphen into a compound (write "multiscale" not "multi-scale", "per image" not "per-image"; proper model names such as Faster R-CNN and U-Net keep their real spelling), and write small whole numbers as digits (4 not four).
+9. Write approach.md with submission-form-ready text covering time spent, model architecture, preprocessing, key design decisions, what worked, what did not work, local validation, and compliance notes. Store the numeric time value separately when helpful, e.g. time_spent.txt. In any paste-ready submission text (the short reviewer paragraph / simple-approach.md, and the approach text pasted into the platform's form), avoid typographic AI tells: no em or en dashes, no two words joined by a hyphen into a compound (write "multiscale" not "multi-scale", "per image" not "per-image"; proper model names such as Faster R-CNN and U-Net keep their real spelling), and write small whole numbers as digits (4 not four).
 10. Commit meaningful milestones. Push to the private GitHub repo when work is stable or the user asks.
 
 For detailed solver workflow, read references/solve-workflow.md.
@@ -92,7 +92,7 @@ For detailed solver workflow, read references/solve-workflow.md.
 - Reasoning is explained at each major step through comments when allowed, or through notebook markdown/approach.md when project instructions ban code comments.
 - Multiple submissions show clear progression from baseline to optimized and record exact changes.
 - The method solves the intended ML problem in good faith rather than relying on loopholes, metadata, hidden artifacts, hardcoded rows, or leaderboard exploitation.
-- The official script has been verified to fit the runtime GPU memory (~A10G/24 GB), not just the H100 — by capping the research-GPU memory fraction or testing on a <=24 GB device — and to finish within the runtime wall-clock budget.
+- The official script has been verified to fit the runtime GPU memory (~A10G/24 GB), not just the H100, by capping the research-GPU memory fraction or testing on a <=24 GB device, and to finish within the runtime wall-clock budget.
 
 ## Outputs To Prefer
 
@@ -102,7 +102,7 @@ For solving:
 - validate_submission.py for strict local schema/value checks when useful.
 - run_experiment.py or research/ scripts for H100-only experiments, clearly separated from official notebooks.
 - notes.md for challenge facts, local CV, public submissions, and next actions.
-- approach.md with concise text the user can paste into the the platform "Your Approach" submission field, plus a recommended time-spent value.
+- approach.md with concise text the user can paste into the platform's "Your Approach" submission field, plus a recommended time-spent value.
 - Final upload handoff files named exactly solution.py/solution.ipynb and submission.csv; optional working/submission.csv should be an exact mirror of the final CSV.
 
 For challenge creation:

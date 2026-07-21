@@ -1,4 +1,4 @@
-# Sparse-Frame Object Forecasting — notes
+# Sparse-Frame Object Forecasting: notes
 
 ## Challenge facts
 - Task: given 4 sparse-motion history frames (t0-t3) following one moving object, forecast its bounding box AND category at withheld frame t4.

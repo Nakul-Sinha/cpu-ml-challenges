@@ -1,4 +1,4 @@
-# ParseRift (parser attachment disagreement) — notes
+# ParseRift (parser attachment disagreement): notes
 
 ## Task
 Token-level binary classification: for each token predict whether 25 independent dependency parsers

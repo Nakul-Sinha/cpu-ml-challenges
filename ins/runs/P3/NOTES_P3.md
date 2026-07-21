@@ -1,4 +1,4 @@
-# P3 — FINAL COMPOSER + PRODUCTIONIZER (Institutional Edit Ledger Recovery, iter 4)
+# P3: FINAL COMPOSER + PRODUCTIONIZER (Institutional Edit Ledger Recovery, iter 4)
 
 ## Headline (honest nested CV, canonical elru, leak-free per fold, group-vote de+en)
 
@@ -14,35 +14,35 @@ baseline 0.56.**  Reproduces exactly on re-run (deterministic).
 
 ## What each component contributed (and whether it survived)
 
-* **P1 Lever 2 — de BiGRU ensemble (the decisive lever).**  Per-token prob
+* **P1 Lever 2, de BiGRU ensemble (the decisive lever).**  Per-token prob
   `(1-a)*shared_LGBM + a*BiGRU`, a=0.6.  de token PR-AUC .194->.280; de nested
   lang .4237->.4808 (+0.057); de unchanged-row FP 80/216->57/216 (more precise AND
   higher recall).  KEPT.
-* **P1 Lever 1 — IT-only LGBM re-scorer (small honest it lever).**  Additive boost
+* **P1 Lever 1, IT-only LGBM re-scorer (small honest it lever).**  Additive boost
   `clip(shared + w*clip(p_it-.3,0,None),0,1)`, w=0.6, into the fixed NP-gate spine.
   it token PR-AUC .293->.317; it nested .4205->.4243.  KEPT.
-* **en — FROZEN (measure-and-drop).**  BiGRU raises en PR-AUC .829->.897 but the
+* **en, FROZEN (measure-and-drop).**  BiGRU raises en PR-AUC .829->.897 but the
   selector picks a=0 downstream (en is replacement/budget-bound).  en byte-identical
   to N3.  Confirmed again in v4.
-* **P2 — IT-only enhanced transducer (marginal, non-regressing).**  Multi-token
+* **P2, IT-only enhanced transducer (marginal, non-regressing).**  Multi-token
   decomposition + append (slash-doubling agreement) rules; ENHANCE_LANGS=(it,) so
   de/en are BYTE-IDENTICAL.  Joint it nested .4243->.4246 (+0.0003), overall
   0.5706->0.5707 (+0.0001).  Within noise but strictly non-regressing and adds a real
   multi-token it agreement capability -> **KEPT** (zero downside).
 
-## SHIP decision: CV-optimal vs robust — the iter-3 finding does NOT transfer
+## SHIP decision: CV-optimal vs robust: the iter-3 finding does NOT transfer
 
 The iter-3 rule "robust = higher de threshold, safer AND nested-higher" was compensating
 de OVER-prediction on the shared prob.  With the BiGRU the de prob is peakier and de FP
 dropped 80->57, so **de now UNDER-predicts** (submission edited-ratio 0.79-0.95 across all
 thresholds, i.e. below the train rate).  A higher "robust" threshold now only cuts de
-recall — it is neither safer nor nested-higher:
+recall, it is neither safer nor nested-higher:
 
     SHIP-FIXED honest nested (de fixed a-priori, en nested, it fixed rescorer0.6+P2, vote)
       de_thr 0.15 -> 0.5789   0.19 -> 0.5803   0.25 -> 0.5781
       de_thr 0.29 -> 0.5777   0.31 -> 0.5777   0.35 -> 0.5756     (flat, all >> 0.56)
 
-**SHIPPED (submission_final.csv): de_thr = 0.31** — the MEDIAN of the per-fold nested
+**SHIPPED (submission_final.csv): de_thr = 0.31**: the MEDIAN of the per-fold nested
 picks [.19,.31,.29,.35,.31].  A blind, pre-committed rule (no peeking at the scan above)
 -> zero selection-optimism on the threshold; ship-fixed honest nested 0.5777; de edited-
 ratio 0.86, comfortably in band.  **submission_cvopt.csv: de_thr = 0.19** (the non-nested
@@ -62,7 +62,7 @@ all-OOF optimum; de edited-ratio 0.95) is provided as the CV-optimal alternate.
 
 All edited-row ratios in [0.45,1.80].  (differ in 28 rows = de threshold + vote propagation.)
 
-## solution.py — self-contained, deterministic, scorer-free
+## solution.py: self-contained, deterministic, scorer-free
 
 ONE file (~4030 lines).  The 8 base modules (pipeline, transducer[=P2], m2/m3/m4/n2_ext,
 run_m4, run_n1) are embedded VERBATIM as readable r'''...''' blocks and exec'd into
@@ -71,13 +71,13 @@ import from runs/.  elru is a scorer-free shim (validate_edits only).  P1 levers
 IT re-scorer) + the ship orchestration are hand-written runtime code.  Every model is fit
 on train.csv AT RUNTIME.
 
-* `python3 solution.py [public_dir] [submission_out]` — argv + autodetect (dataset/public,
+* `python3 solution.py [public_dir] [submission_out]`: argv + autodetect (dataset/public,
   dataset, ., /kaggle/input, walk); default out working/submission.csv; parent mkdir;
   keep_default_na=False; fixed threads + seeds (byte-deterministic); wall-clock guard 3000s;
   strict pre- AND post-write validation; loud all-empty fallback ONLY if the main path throws.
 * Runtime ~82s (Xeon, OMP 7).  BiGRU 5-seed full-train ~30s; well within the 60-min grader.
 
-### Isolated smoke test (only dataset csvs + solution.py in /tmp/ship_test) — BOTH pass
+### Isolated smoke test (only dataset csvs + solution.py in /tmp/ship_test): BOTH pass
     argv  : solution.py dataset/public out/submission.csv  -> EXACT match to submission_final.csv
     no-arg: solution.py (autodetect -> working/submission.csv) -> EXACT match to submission_final.csv
 Re-run determinism: two independent full runs are byte-identical.
@@ -86,7 +86,7 @@ Re-run determinism: two independent full runs are byte-identical.
 no tfidf (only negated in docstring); no network; sample_submission never read; no hardcoded
 answer arrays / encoded content strings; all models (LGBM detector, P2 transducer, BiGRU,
 IT re-scorer, NP gate) fit at runtime.  The embedded modules' reranker / load_train(folds.csv)
-/ main() are dead code (never on the ship path — proven: the isolated smoke test has no
+/ main() are dead code (never on the ship path, proven: the isolated smoke test has no
 solution/folds.csv and still matches exactly).
 
 ## artifacts (box: ~/insled/runs/P3/, mirror: G:/ml/cpu-challenges/ins/runs/P3/)

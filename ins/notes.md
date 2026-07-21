@@ -1,4 +1,4 @@
-# Institutional Edit Ledger Recovery — notes
+# Institutional Edit Ledger Recovery: notes
 
 ## Task facts
 - Recover ordered edit ledger [{start,end,replacement}] per encoded text window. ≤8 edits, sorted, non-overlapping, rep ≤160 chars.
@@ -9,27 +9,27 @@
 ## Decoded structure (EDA)
 - Task is inclusive-language rewriting on privacy-encoded text. Letter mapping consistent per language across train+test; punctuation/case/whitespace unchanged.
 - de: "X:in"→"X oder Xin" (':xà'→' pwéu '), "X*in" same, "X:innen"→"X und Xinnen", paired "Xinnen und Xen"→neutral ("Studierende"-type participles, "Professuren"), slash forms, des→des/der ('wév'→'wév/wéu').
-- it: article doubling del→del/della ('uyh'→'uyh/uyhhl' OR 'uyhhl/uyh' — per-document convention!), o→o/a suffix ('g'→'g/l'), full neutral rewrites.
+- it: article doubling del→del/della ('uyh'→'uyh/uyhhl' OR 'uyhhl/uyh', per-document convention!), o→o/a suffix ('g'→'g/l'), full neutral rewrites.
 - en: his/her→their ('fuy / flv'→'dfluv'), he→they, Chairman→Chair ('Pfouvqok'→'Pfouv').
 - ALL 1365 edits align exactly with whitespace-token boundaries. Tokens/span: 1:774, 2:317, 3:193, 4:42, ≥5:39.
-- Trigger tokens with punct (colon/star/slash) have edit-rate ≈1.0. Plain tokens are context-dependent (it articles rate 0.1-0.3 — edited only in gendered NPs).
+- Trigger tokens with punct (colon/star/slash) have edit-rate ≈1.0. Plain tokens are context-dependent (it articles rate 0.1-0.3, edited only in gendered NPs).
 - Windows overlap within groups (60-char tail shared: 690/1259). Deterministic per-token model gives automatic cross-window consistency.
-- Cross-group surface memorization transfers poorly (probe: CV 0.30-0.37; edited-mean de/it only 0.03-0.12) — stems differ per document. MUST generalize at pattern level (suffix/punct morphology + stem-abstracted templates).
+- Cross-group surface memorization transfers poorly (probe: CV 0.30-0.37; edited-mean de/it only 0.03-0.12), stems differ per document. MUST generalize at pattern level (suffix/punct morphology + stem-abstracted templates).
 
 ## Canonical foundation (all runs comparable)
-- solution/elru.py — exact scorer. solution/folds.csv — 5-fold grouped split (language-balanced). Both verified identical local & Box 2.
+- solution/elru.py, exact scorer. solution/folds.csv, 5-fold grouped split (language-balanced). Both verified identical local & Box 2.
 - Probes: noop 0.2500; memo(t0.5,s1) 0.3715 CV.
 
 ## Architecture plan (v1)
 1. Detection: token-level BIO tagger. LGBM on char/context/morph features vs char-BiGRU; per-language threshold tuned on CV for ELRU directly.
-2. Transduction: learned hierarchy — (a) exact (lang,src)→majority-rep memory fit from train; (b) char-alignment template induction (stem-abstracted, e.g. VAR+':xà' → VAR+' pwéu '+VAR+'xà') with language-level convention stats; (c) char seq2seq (small GRU) fallback + scorer. All fit in-script from train.csv only.
+2. Transduction: learned hierarchy, (a) exact (lang,src)→majority-rep memory fit from train; (b) char-alignment template induction (stem-abstracted, e.g. VAR+':xà' → VAR+' pwéu '+VAR+'xà') with language-level convention stats; (c) char seq2seq (small GRU) fallback + scorer. All fit in-script from train.csv only.
 3. Assembly: BIO spans, ≤8, ELRU-tuned confidence gates.
 
 ## Compliance
 - No tfidf/idf. No hardcoded replacement dictionary as a substitute for learning (memory/templates are FIT from train.csv at runtime). Real ML: trained tagger + trained transducer. No test-time adaptation. Runtime trivial vs 1.5h CPU budget.
 
 ## Box assignment
-Box 2 (Xeon SPR 61GB, ~/insled) — small data, fast iteration; grader-parity runtime checks.
+Box 2 (Xeon SPR 61GB, ~/insled), small data, fast iteration; grader-parity runtime checks.
 
 ## Log
 - [x] EDA, scorer, folds, probes (local + Box 2 parity)
@@ -38,11 +38,11 @@ Box 2 (Xeon SPR 61GB, ~/insled) — small data, fast iteration; grader-parity ru
   - Negative results: row-level prob gate hurts; bigger LGBM no help; GRU seq2seq generator 0.35 < templates 0.66; span-text deletion classifier precision ≤0.15 (disabled).
   - Defects noted: U+2217 mark charset, whitespace-preserving joins, nested thresholds.
 - [x] iter2 (wf_6967ecef): M1 merge non-nested 0.5102 / NESTED 0.4966 (defects fixed: U+2217, whitespace joins; plug-in points). M2 de paired-form connector-bridge generator: de multi_plain recall .142→.604, nested +0.007. M3 it article/ending/agreement features: nested +0.010; deletion forfeit measured (oracle +0.0123, precision 0 → forfeit). M4 integrated + group-vote(de,en; hi .6/lo .4): **NESTED 0.5423 / non-nested 0.5517** (de .409/en .807/it .411 nested). submission_v2 valid (292 edited rows). Span reranker measured NEGATIVE (not shipped).
-  - Open buckets: it single_plain .322 (biggest), it multi_plain .336 (REGRESSED from .508 — needs diagnosis), de multi_marked .138, de single_plain .047, deletions forfeited.
+  - Open buckets: it single_plain .322 (biggest), it multi_plain .336 (REGRESSED from .508, needs diagnosis), de multi_marked .138, de single_plain .047, deletions forfeited.
   - Risks: en test slash-shift materializing (test en edit-rate ratio 0.62 vs train); de overprediction (ratio 1.44 @ thr .07).
-- [x] iter3 (wf_c2ce44d2): N1 it NP-gate generator (+.0096 it nested; diagnosed multi_plain regression = detection collapse; doc-prior/ending-gate/reranker all measured negative — all it groups edit-active, TP/FP lexically identical). N2 de markrun generator (multi_marked .138→.394) + masc_only collapse fallback (chrF .699 vs identity .474) + de robustness curve (thr .10 ≈ free, ratio 1.29) + EN SHIFT PROVEN RESOLVED (zeroing all slash features changes 0/2208 en tokens — en is plain-lexicon driven). N3 integrated: **nested 0.5503 CV-opt / 0.5534 ROBUST (de@0.11)**; non-nested 0.5617; zero added FPs; robust variant BOTH safer and nested-higher → upload candidate. Honest nested still < 0.56.
+- [x] iter3 (wf_c2ce44d2): N1 it NP-gate generator (+.0096 it nested; diagnosed multi_plain regression = detection collapse; doc-prior/ending-gate/reranker all measured negative, all it groups edit-active, TP/FP lexically identical). N2 de markrun generator (multi_marked .138→.394) + masc_only collapse fallback (chrF .699 vs identity .474) + de robustness curve (thr .10 ≈ free, ratio 1.29) + EN SHIFT PROVEN RESOLVED (zeroing all slash features changes 0/2208 en tokens, en is plain-lexicon driven). N3 integrated: **nested 0.5503 CV-opt / 0.5534 ROBUST (de@0.11)**; non-nested 0.5617; zero added FPs; robust variant BOTH safer and nested-higher → upload candidate. Honest nested still < 0.56.
 - [ ] iter4 (wf_dbd3a965): P1 it-only re-scorer + BiGRU sequence-tagger ensemble ∥ P2 multi-token transform decomposition learning + it agreement composer + duplicate-adjacency deletion re-check → P3 final compose + self-contained solution.py + isolated smoke test
-- [x] final deliverables (approach.md, submission handoff) — PR #29 merged 2026-07-21
+- [x] final deliverables (approach.md, submission handoff), PR #29 merged 2026-07-21
 
 ## Compliance fix (2026-07-21, post-rejection)
 Platform rejected the shipped solution.py: "Prompt Compliance" and "Held-out Answer Ingestion" both
@@ -54,7 +54,7 @@ synthetic `sys.modules` entries at import time so their cross-imports resolved. 
 strings as inspectable, and the ~2700 lines of embedded dead research code (old argparse dispatchers,
 diagnostic mains, an unused folds.csv reader) looked evasive besides.
 
-Fix: rewrote solution.py as genuinely flat code — no exec/compile/eval/__import__/marshal/pickle/
+Fix: rewrote solution.py as genuinely flat code, no exec/compile/eval/__import__/marshal/pickle/
 ModuleType/sys.modules trick anywhere, only the ship-path-reachable functions kept (86 top-level
 defs, single `if __name__` guard), 4028 -> 2351 lines. Verified independently: isolated run on Box 2
 (clean dir, only train.csv+test.csv+solution.py, no runs/ or solution/ folder) produced output

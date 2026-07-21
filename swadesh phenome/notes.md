@@ -1,4 +1,4 @@
-# Swadesh Phoneme Cipher Decoding — notes
+# Swadesh Phoneme Cipher Decoding: notes
 
 ## Task
 Recover a global bijection `sigma: token -> IPA segment` for one held-out **Uralic** target

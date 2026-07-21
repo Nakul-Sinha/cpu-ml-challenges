@@ -1,4 +1,4 @@
-# LPBF Visual Alert Box Localization — notes
+# LPBF Visual Alert Box Localization: notes
 
 Challenge: localize rectangular "alert" regions in transformed LPBF inspection
 images. CPU-only, <=1.5 h, 10 cores / 62 GB. Goal: beat AI baseline 0.1775 and

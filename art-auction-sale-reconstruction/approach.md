@@ -1,4 +1,4 @@
-# Approach — Art-Auction Sale Reconstruction
+# Approach: Art-Auction Sale Reconstruction
 
 ## Summary
 Each pool mixes the lots of 6 sales and the task is to recover the grouping. I treat it as

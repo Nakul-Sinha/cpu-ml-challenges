@@ -1,4 +1,4 @@
-# Art-Auction Sale Reconstruction — notes
+# Art-Auction Sale Reconstruction: notes
 
 ## Task
 Each pool = lots of 6 sales shuffled; recover the 6-way grouping. Metric: mean ARI over pools.
@@ -26,7 +26,7 @@ AI baseline 0.55. Lot = `artist :: seller :: nationality :: object :: materials 
    whose artist co-occurs with exactly one consignor in the pool.
 3. Grouping: seed clusters by consignor (near-deterministic), then agglomeratively merge the two
    clusters with the highest average same-sale probability while it exceeds a threshold and >6
-   clusters remain. Conservative by design — ARI rewards not merging different sales.
+   clusters remain. Conservative by design, ARI rewards not merging different sales.
 
 ## Validation
 Group CV over pools (mean ARI). ORACLE-prob clustering ceiling = 0.988 (the clustering is not
